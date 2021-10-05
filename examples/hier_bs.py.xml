@@ -1,0 +1,112 @@
+<block>
+  <name>IoT BS Emulator</name>
+  <key>hier_bs</key>
+  <category>[ephyl]</category>
+  <import>from hier_bs import hier_bs  # grc-generated hier_block</import>
+  <make>hier_bs(
+    M=$M,
+    N=$N,
+    T_bch=$T_bch,
+    T_g=$T_g,
+    T_p=$T_p,
+    T_s=$T_s,
+    UHD=$UHD,
+    bs_slots=$bs_slots,
+    exit_frame=$exit_frame,
+    samp_rate=$samp_rate,
+)</make>
+  <callback>set_M($M)</callback>
+  <callback>set_N($N)</callback>
+  <callback>set_T_bch($T_bch)</callback>
+  <callback>set_T_g($T_g)</callback>
+  <callback>set_T_p($T_p)</callback>
+  <callback>set_T_s($T_s)</callback>
+  <callback>set_UHD($UHD)</callback>
+  <callback>set_bs_slots($bs_slots)</callback>
+  <callback>set_exit_frame($exit_frame)</callback>
+  <callback>set_samp_rate($samp_rate)</callback>
+  <param>
+    <name>M</name>
+    <key>M</key>
+    <value>64</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>N</name>
+    <key>N</key>
+    <value>1</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>BCH duration (ms)</name>
+    <key>T_bch</key>
+    <value>200</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>Guard time duration (ms)</name>
+    <key>T_g</key>
+    <value>20</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>Processing duration (ms)</name>
+    <key>T_p</key>
+    <value>200</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>Slot duration (ms)</name>
+    <key>T_s</key>
+    <value>150</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>Over the air</name>
+    <key>UHD</key>
+    <value>True</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>BS Slots</name>
+    <key>bs_slots</key>
+    <value>range(10)</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>Exit Frame</name>
+    <key>exit_frame</key>
+    <value>0</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>Sample rate</name>
+    <key>samp_rate</key>
+    <value>1e6</value>
+    <type>raw</type>
+  </param>
+  <sink>
+    <name>UL</name>
+    <type>complex</type>
+    <vlen>1</vlen>
+  </sink>
+  <source>
+    <name>DL</name>
+    <type>message</type>
+    <optional>1</optional>
+  </source>
+  <source>
+    <name>BCH</name>
+    <type>message</type>
+    <optional>1</optional>
+  </source>
+  <source>
+    <name>BS Frame</name>
+    <type>complex</type>
+    <vlen>1</vlen>
+    <optional>1</optional>
+  </source>
+  <doc>Othmane Oubejja
+/home/othmane/.grc_gnuradio/hier_bs.py</doc>
+  <grc_source>/home/othmane/comp_dir/gr-ephyl/examples/hier_bs.grc</grc_source>
+</block>

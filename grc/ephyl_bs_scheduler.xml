@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<block>
+  <name>Base Station Scheduler</name>
+  <key>ephyl_bs_scheduler</key>
+  <category>[ephyl]</category>
+  <import>import ephyl</import>
+  <make>ephyl.bs_scheduler($num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $samp_rate, $UHD, $exit_frame)</make>
+
+
+  <param>
+    <name>Number of Slots</name>
+    <key>num_slots</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+ 
+  <param>
+    <name>BCH duration</name>
+    <key>bch_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+  
+<!--   <param>
+    <name>Sync duration</name>
+    <key>Sync_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param> -->
+  
+  <param>
+    <name>Guard time duration</name>
+    <key>guard_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+  
+  <param>
+    <name>Slot duration</name>
+    <key>Slot_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+  
+  <param>
+    <name>Post Processing duration</name>
+    <key>Proc_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+
+   <param>
+    <name>Sample rate</name>
+    <key>samp_rate</key>
+    <value>1000000</value>
+    <type>int</type>
+  </param>
+
+   <param>
+    <name>Over the Air</name>
+    <key>UHD</key>
+    <value>False</value>
+    <type>bool</type>
+  </param>
+
+   <param>
+    <name>Exit Frame Nb</name>
+    <key>exit_frame</key>
+    <value>0</value>
+    <type>int</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+
+  <source>
+    <name>out0</name>
+    <type>complex</type>
+  </source>
+  <source>
+    <name>bcn</name>
+    <type>message</type>
+  </source>
+
+
+</block>

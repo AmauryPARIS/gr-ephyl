@@ -1,0 +1,68 @@
+cd ~/cxlb_toolchain_build
+
+==================================================================
+
+apt install unzip
+
+apt install wget
+
+apt install libncurses5
+
+apt install libxmu-dev
+
+==================================================================
+
+wget https://fr.mathworks.com/supportfiles/downloads/R2014a/deployment_files/R2014a/installers/glnxa64/MCR_R2014a_glnxa64_installer.zip
+
+unzip MCR_R2014a_glnxa64_installer.zip -d MCR_build
+
+rm MCR_R2014a_glnxa64_installer.zip
+
+cd MCR_build
+
+./install -mode silent -agreeToLicense yes  ## (add sudo for non docker users)
+
+mv /usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/bin/glnxa64/libcurl.so.4 /usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/bin/glnxa64/libcurl.so.4_mcr
+
+mv /usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/sys/os/glnxa64/libstdc++.so.6 /usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/sys/os/glnxa64/libstdc++.so.6_mcr
+
+==================================================================
+
+echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/bin/glnxa64:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/sys/os/glnxa64' >> ~/.bashrc 
+
+echo 'export XAPPLRESDIR=$XAPPLRESDIR:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/X11/app-defaults' >> ~/.bashrc 
+
+echo 'export INSTALL_PATH=/cortexlab/toolchains/current' >> ~/.bashrc
+
+echo 'export MCR_PATH=/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/extern/include' >> ~/.bashrc
+
+echo 'export CPATH=$CPATH:$MCR_PATH' >> ~/.bashrc
+
+
+==================================================================
+
+cd ..
+
+git clone git://github.com/CorteXlab/gr-ephyl.git
+
+cd gr-ephyl
+
+
+## THIS DOESNT WORK (??)
+cp include/libTurboFSK_v4.h /cortexlab/toolchains/current/include/
+cp lib/libTurboFSK_v4.so /cortexlab/toolchains/current/lib/
+
+## THIS WORKS (??)
+cp include/libTurboFSK_v4.h /usr/include/
+cp lib/libTurboFSK_v4.so /usr/lib/
+
+mkdir build
+cd build
+
+cmake -DCMAKE_INSTALL_PREFIX=${INSTALL_PATH} ..
+make
+make install
+
+cd ../apps
+
+

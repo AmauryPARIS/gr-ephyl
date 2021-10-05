@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<block>
+  <name>Concatenate
+Messages</name>
+  <key>ephyl_msg_mux</key>
+  <category>[ephyl]</category>
+  <import>import ephyl</import>
+  <make>ephyl.msg_mux()</make>
+
+  <sink>
+    <name>frame_n</name>
+    <type>message</type>
+  </sink>
+
+  <sink>
+    <name>slot_n</name>
+    <type>message</type>
+  </sink>
+
+  <sink>
+    <name>data</name>
+    <type>message</type>
+  </sink>
+
+  <source>
+    <name>final_msg</name>
+    <type>message</type>
+  </source>
+
+</block>
