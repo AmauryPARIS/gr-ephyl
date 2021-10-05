@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<block>
+  <name>Sensor Scheduler</name>
+  <key>ephyl_sn_scheduler</key>
+  <category>[ephyl]</category>
+  <import>import ephyl</import>
+  <make>ephyl.sn_scheduler($phy_option, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate)</make>
+ 
+  <param>
+    <name>PHY Option</name>
+    <key>phy_option</key>
+    <value>0</value>
+    <type>int</type>
+  </param>
+
+  <param>
+    <name>Number of Slots</name>
+    <key>num_slots</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+ 
+  <param>
+    <name>BCH duration</name>
+    <key>bch_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+  
+<!--   <param>
+    <name>Sync duration</name>
+    <key>Sync_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+   -->
+  <param>
+    <name>Guard time</name>
+    <key>guard_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+  
+  <param>
+    <name>Slot duration</name>
+    <key>Slot_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+  
+  <param>
+    <name>Processing duration</name>
+    <key>Proc_time</key>
+    <value>5</value>
+    <type>int</type>
+  </param>
+  
+  <param>
+    <name>Trigger tag</name>
+    <key>wanted_tag</key>
+    <value>"corr_est"</value>
+    <type>raw</type>
+  </param>
+  
+  <param>
+    <name>Length tag key</name>
+    <key>length_tag_key</key>
+    <value>"packet_len"</value>
+    <type>raw</type>
+  </param>
+  
+  <param>
+    <name>Sample rate</name>
+    <key>samp_rate</key>
+    <value>1000000</value>
+    <type>int</type>
+  </param>
+ 
+
+
+
+
+  <sink>
+    <name>in</name>
+    <type>message</type>
+  </sink>
+  <sink>
+    <name>slot</name>
+    <type>message</type>
+  </sink>
+  <sink>
+    <name>trig</name>
+    <type>message</type>
+  </sink>
+
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+  <source>
+    <name>busy</name>
+    <type>message</type>
+  </source>
+
+
+</block>

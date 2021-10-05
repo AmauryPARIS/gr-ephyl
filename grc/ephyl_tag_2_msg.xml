@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<block>
+  <name>Tag to Message</name>
+  <key>ephyl_tag_2_msg</key>
+  <category>[ephyl]</category>
+  <import>import ephyl</import>
+  <make>ephyl.tag_2_msg($wanted_tag)</make>
+
+  <param>
+    <name>Trigger Tag</name>
+    <key>wanted_tag</key>
+    <value>"corr_start"</value>
+    <type>raw</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>float</type>
+  </sink>
+
+  <source>
+    <name>tag_msg</name>
+    <type>message</type>
+  </source>
+
+</block>

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/runtime/glnxa64:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/bin/glnxa64:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/sys/os/glnxa64' >> ~/.bashrc 
+echo 'export XAPPLRESDIR=$XAPPLRESDIR:/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/X11/app-defaults' >> ~/.bashrc 
+echo 'export INSTALL_PATH=/cortexlab/toolchains/current' >> ~/.bashrc
+echo 'export MCR_PATH=/usr/local/MATLAB/MATLAB_Compiler_Runtime/v83/extern/include' >> ~/.bashrc
+echo 'export CPATH=$CPATH:$MCR_PATH' >> ~/.bashrc
+source ~/.bashrc
+# /usr/sbin/sshd -p 2222 -D
