@@ -59,6 +59,7 @@ class msg_mux(gr.sync_block):
         self.frame_n = 0
         self.slot_n = ''
         self.data = ''
+        self.filename = "PLD_COMPARE_BS_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
 
 
     # def decrypt(self,mystr) :
@@ -90,12 +91,15 @@ class msg_mux(gr.sync_block):
             l = '\t'.join(l)
             # print "HERE"
             # print l
+            with open(self.filename,"a+") as f_pld:
+                f_pld.write("BS RX : %s\n" % (l))  
 
-            if any(self.slot_n) and any(self.data) :
-                # res = [self.frame_n,self.slot_n,self.data]
-                res = l
-                # print "HEEEEEEEEEEEEEE"
-                # print res
-                res_pdu = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(res),[ord(c) for c in res]))
-                self.message_port_pub(pmt.to_pmt("final_msg"), res_pdu)
-                # self.slot_n = self.data = ''
+                if any(self.slot_n) and any(self.data) :
+                    # res = [self.frame_n,self.slot_n,self.data]
+                    res = l
+                    # print "HEEEEEEEEEEEEEE"
+                    # print res
+                    res_pdu = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(res),[ord(c) for c in res]))
+                    self.message_port_pub(pmt.to_pmt("final_msg"), res_pdu)
+                    f_pld.write("BS RX : SEND to feedback channel\n") 
+                    # self.slot_n = self.data = ''
