@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Ms Fixed Odd
-# Generated: Fri Feb  7 14:23:31 2020
+# GNU Radio version: 3.7.13.5
 ##################################################
 
 import os
@@ -61,7 +61,7 @@ class ms_fixed_odd(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.zeromq_sub_msg_source_0 = zeromq.sub_msg_source('tcp://mnode3:5556', 100)
+        self.zeromq_sub_msg_source_0 = zeromq.sub_msg_source('tcp://mnode33:5556', 100)
         self.uhd_usrp_sink_0_0 = uhd.usrp_sink(
         	",".join(('', "")),
         	uhd.stream_args(
@@ -133,6 +133,8 @@ class ms_fixed_odd(gr.top_block):
         self.blocks_null_sink_0_0 = blocks.null_sink(gr.sizeof_float*1)
         self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_float*1)
         self.blocks_add_xx_0 = blocks.add_vcc(1)
+
+
 
         ##################################################
         # Connections

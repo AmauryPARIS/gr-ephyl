@@ -767,7 +767,7 @@
     </param>
     <param>
       <key>type</key>
-      <value></value>
+      <value>intx</value>
     </param>
     <param>
       <key>value</key>
@@ -1500,7 +1500,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>0:1:2:3</value>
+      <value>1</value>
     </param>
   </block>
   <block>
@@ -1547,7 +1547,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>4:5:6</value>
+      <value>3</value>
     </param>
   </block>
   <block>
@@ -1594,7 +1594,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>7</value>
+      <value>5</value>
     </param>
   </block>
   <block>
@@ -1641,7 +1641,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>8</value>
+      <value>7</value>
     </param>
   </block>
   <block>
@@ -1857,7 +1857,7 @@
     <key>hier_sensor</key>
     <param>
       <key>activation_rate</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>T_bch</key>
@@ -1940,7 +1940,7 @@
     <key>hier_sensor</key>
     <param>
       <key>activation_rate</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>T_bch</key>

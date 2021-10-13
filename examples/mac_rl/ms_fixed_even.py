@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 ##################################################
 # GNU Radio Python Flow Graph
-# Title: Ms 1 Ucb08
+# Title: Ms Fixed Even
 # GNU Radio version: 3.7.13.5
 ##################################################
 
@@ -23,10 +23,10 @@ import math, sys, numpy as np, random,string
 import time
 
 
-class ms_1_ucb08(gr.top_block):
+class ms_fixed_even(gr.top_block):
 
-    def __init__(self, M=32, N=1, T_bch=200, T_g=50, T_p=1000, T_s=150, ar1=1, bs_slots=range(10), control0='ucb:0.8', cp_ratio=0.25):
-        gr.top_block.__init__(self, "Ms 1 Ucb08")
+    def __init__(self, M=32, N=1, T_bch=200, T_g=50, T_p=1000, T_s=150, ar=1, bs_slots=range(3), control='0', cp_ratio=0.25):
+        gr.top_block.__init__(self, "Ms Fixed Even")
 
         ##################################################
         # Parameters
@@ -37,9 +37,9 @@ class ms_1_ucb08(gr.top_block):
         self.T_g = T_g
         self.T_p = T_p
         self.T_s = T_s
-        self.ar1 = ar1
+        self.ar = ar
         self.bs_slots = bs_slots
-        self.control0 = control0
+        self.control = control
         self.cp_ratio = cp_ratio
 
         ##################################################
@@ -77,9 +77,9 @@ class ms_1_ucb08(gr.top_block):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
-            activation_rate=ar1,
+            activation_rate=ar,
             bs_slots=bs_slots,
-            control=control0,
+            control=control,
             log=log,
             samp_rate=samp_rate,
         )
@@ -139,12 +139,12 @@ class ms_1_ucb08(gr.top_block):
         self.hier_sensor_0.set_T_s(self.T_s)
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
-    def get_ar1(self):
-        return self.ar1
+    def get_ar(self):
+        return self.ar
 
-    def set_ar1(self, ar1):
-        self.ar1 = ar1
-        self.hier_sensor_0.set_activation_rate(self.ar1)
+    def set_ar(self, ar):
+        self.ar = ar
+        self.hier_sensor_0.set_activation_rate(self.ar)
 
     def get_bs_slots(self):
         return self.bs_slots
@@ -154,12 +154,12 @@ class ms_1_ucb08(gr.top_block):
         self.hier_sensor_0.set_bs_slots(self.bs_slots)
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
-    def get_control0(self):
-        return self.control0
+    def get_control(self):
+        return self.control
 
-    def set_control0(self, control0):
-        self.control0 = control0
-        self.hier_sensor_0.set_control(self.control0)
+    def set_control(self, control):
+        self.control = control
+        self.hier_sensor_0.set_control(self.control)
 
     def get_cp_ratio(self):
         return self.cp_ratio
@@ -213,19 +213,19 @@ class ms_1_ucb08(gr.top_block):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--ar1", dest="ar1", type="eng_float", default=eng_notation.num_to_str(1),
+        "", "--ar", dest="ar", type="eng_float", default=eng_notation.num_to_str(1),
         help="Set Activation rate [default=%default]")
     parser.add_option(
-        "", "--control0", dest="control0", type="string", default='ucb:0.8',
+        "", "--control", dest="control", type="string", default='0',
         help="Set Control [default=%default]")
     return parser
 
 
-def main(top_block_cls=ms_1_ucb08, options=None):
+def main(top_block_cls=ms_fixed_even, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls(ar1=options.ar1, control0=options.control0)
+    tb = top_block_cls(ar=options.ar, control=options.control)
     tb.start()
     tb.wait()
 

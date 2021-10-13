@@ -26,6 +26,8 @@ import random
 import threading
 import math
 from decimal import Decimal
+from datetime import datetime
+
 
 from gnuradio import gr, gr_unittest, blocks
 
@@ -59,8 +61,8 @@ class data_and_access_control(gr.sync_block):
         self.set_msg_handler(pmt.intern("DL"), self.handle_DL)        
 
         self.lock = threading.Lock()
-
         self.ID = random.choice(string.ascii_letters)
+        self.filename_pld = "PLD_COMPARE_SN-"+self.ID+"_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
 
         self.slot_n = -1
         self.data = []
@@ -111,10 +113,11 @@ class data_and_access_control(gr.sync_block):
         self.lines = self.gen_rand_pld(self.ID,1,result[1],self.tmp_data)
         self.error = 0
         self.detection = 0
-
+        
         self.save_log = save_log
         if self.save_log :
             self.filename = "SN-"+self.ID+"_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
+            
             with open(self.filename,"a+") as f:
                 template =                                          \
                 "SN-"+self.ID                                       \
@@ -169,6 +172,10 @@ class data_and_access_control(gr.sync_block):
             ## Small note here, the payload is adapted if the
             ## slot number contains more than two characters
             res += [[str(self.frame_cnt),slots[j], ID, data[:len(data)-len(slots[j])+1]]]
+
+        now = datetime.now().time()
+        with open(self.filename_pld,"a+") as f_pld:
+            f_pld.write("%s-%s-%s Generate new payload : %s\n" % (self.ID, self.frame_cnt, now, res))  
         return res 
 
     # Compare Tx & Rx PLD
@@ -199,33 +206,42 @@ class data_and_access_control(gr.sync_block):
             used_slots = np.append(used_slots,tx[j][1])  
 
         print("%s - F" % (self.ID))
-        for f in range(len(rx)) :
-            if len(rx[f])>3 :
-                active_slots = np.append(active_slots,rx[f][1])
-                print("%s - J" % (self.ID))
-                for j in xrange(len(tx)):
-                    print("%s - Compare PLD : %s | %s" % (self.ID,rx[f], tx[j]))
-                    # Check frame match
-                    if rx[f][0] == tx[j][0]:  
-                        v += 'f'
-                    ## Check for slot activity
-                    if rx[f][1] == tx[j][1]:     
-                        v += 's'
-                        ## Check for matching id
-                    if rx[f][2] == tx[j][2]:     
-                        v += 'i'
-                        ## Check for matching payload
-                        if rx[f][3][:-2] == tx[j][3][:-2]:    # Some sporadic bug causes the last sample to be (sometimes) corrupted,      
-                            v += 'p'                          # Probably a software bug. Unsolved yet
-                            print("%s - Considered OK" % (self.ID))
-                        
-                        ## Compute BER for detected packets
-                        rx_bits = ''.join(format(ord(x), 'b') for x in rx[f][3][:-2])
-                        tx_bits = ''.join(format(ord(x), 'b') for x in tx[j][3][:-2])
-                        y = int(rx_bits, 2)^int(tx_bits,2)
-                        self.error_bits = bin(y)[2:].zfill(len(tx_bits))
+        now = datetime.now().time()
+        with open(self.filename_pld, "a+") as f_pld:
+            f_pld.write("%s-%s-%s - F\n" % (self.ID, self.frame_cnt, now))
+            for f in range(len(rx)) :
+                if len(rx[f])>3 :
+                    active_slots = np.append(active_slots,rx[f][1])
+                    print("%s - J" % (self.ID))
+                    now = datetime.now().time()
+                    f_pld.write("%s-%s-%s - J\n" % (self.ID, self.frame_cnt, now))
+                    for j in xrange(len(tx)):
+                        now = datetime.now().time()
+                        print("%s - Compare PLD : %s | %s" % (self.ID,rx[f], tx[j]))
+                        f_pld.write("%s-%s-%s - Compare PLD : %s | %s\n" % (self.ID, self.frame_cnt, now,rx[f], tx[j]))
+                        # Check frame match
+                        if rx[f][0] == tx[j][0]:  
+                            v += 'f'
+                        ## Check for slot activity
+                        if rx[f][1] == tx[j][1]:     
+                            v += 's'
+                            ## Check for matching id
+                        if rx[f][2] == tx[j][2]:     
+                            v += 'i'
+                            ## Check for matching payload
+                            if rx[f][3][:-2] == tx[j][3][:-2]:    # Some sporadic bug causes the last sample to be (sometimes) corrupted,      
+                                v += 'p'
+                                now = datetime.now().time()                          # Probably a software bug. Unsolved yet
+                                print("%s - Considered OK" % (self.ID))
+                                f_pld.write("%s-%s-%s - Considered OK\n\n" % (self.ID, self.frame_cnt, now))
+                            
+                            ## Compute BER for detected packets
+                            rx_bits = ''.join(format(ord(x), 'b') for x in rx[f][3][:-2])
+                            tx_bits = ''.join(format(ord(x), 'b') for x in tx[j][3][:-2])
+                            y = int(rx_bits, 2)^int(tx_bits,2)
+                            self.error_bits = bin(y)[2:].zfill(len(tx_bits))
 
-                        h = f 
+                            h = f 
 
         if not any(active_slots)  :
             active_slots = ['0']            
@@ -390,6 +406,9 @@ class data_and_access_control(gr.sync_block):
                     ########################################################################################################
                     elif self.busy == 'ACTIVE?':
                         ## Generate an activation value following a Bernoulli distribution
+                        now = datetime.now().time()
+                        with open(self.filename_pld, "a+") as f_pld:
+                            f_pld.write("%s-%s-%s Active ?\n" % (self.ID, self.frame_cnt, now)) 
                         self.active = any(np.random.binomial(1,self.activation_rate,1))
                         
                         if self.active:
@@ -408,6 +427,9 @@ class data_and_access_control(gr.sync_block):
                     ########################################################################################################
                     ## Scheduler requests payload array to be sent in PHY chain
                         elif self.busy == 'DATA' :
+                            now = datetime.now().time()
+                            with open(self.filename_pld, "a+") as f_pld:
+                                f_pld.write("%s-%s-%s Data sent in PHYchanel\n" % (self.ID, self.frame_cnt, now))  
                             ## Data is (node_id + line_i)
                             data = self.lines[self.i][2:]     # Remove frame number and slot number
                             data = '\t'.join(data)
@@ -417,6 +439,9 @@ class data_and_access_control(gr.sync_block):
                     ########################################################################################################
                     ## Scheduler informs a frame reset (frame finished or new will start)
                     if self.busy == 'RESET_FRAME' :
+                        now = datetime.now().time()
+                        with open(self.filename_pld,"a+") as f_pld:
+                            f_pld.write("%s-%s-%s RESET\n" % (self.ID, self.frame_cnt, now)) 
                         self.i=0
                         if self.active == True :
                             print "[SN "+self.ID+"] ACCESS POLICY: " + self.control + "\n"
@@ -461,6 +486,9 @@ class data_and_access_control(gr.sync_block):
                             # print "BER"
                             # print self.BER
                             ###################### WRITE LOG FILE #########################
+                            now = datetime.now().time()
+                            with open(self.filename_pld,"a+") as f_pld:
+                                f_pld.write("%s-%s-%s RESET - feedback ready\n" % (self.ID, self.frame_cnt, now)) 
                             if self.save_log :    
                                 with open(self.filename,"r") as f:
                                     lines = f.readlines()

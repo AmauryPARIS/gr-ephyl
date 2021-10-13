@@ -40,7 +40,7 @@ from gnuradio import qtgui
 
 class demo_loop(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=50, T_g=20, T_p=100, T_s=50, bs_slots=range(10), control0='0:1:2:3', control1='4:5:6', control2='7', control3='8', cp_ratio=0.25):
+    def __init__(self, M=32, N=1, T_bch=50, T_g=20, T_p=100, T_s=50, bs_slots=range(10), control0='1', control1='3', control2='5', control3='7', cp_ratio=0.25):
         gr.top_block.__init__(self, "Demo Loop")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop")
@@ -224,7 +224,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
-            activation_rate=0,
+            activation_rate=1,
             bs_slots=bs_slots,
             control=control3,
             log=True,
@@ -237,7 +237,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
-            activation_rate=0,
+            activation_rate=1,
             bs_slots=bs_slots,
             control=control2,
             log=True,
@@ -494,16 +494,19 @@ class demo_loop(gr.top_block, Qt.QWidget):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--control0", dest="control0", type="string", default='0:1:2:3',
+        "", "--T-p", dest="T_p", type="intx", default=100,
+        help="Set Proc duration (ms) [default=%default]")
+    parser.add_option(
+        "", "--control0", dest="control0", type="string", default='1',
         help="Set Control [default=%default]")
     parser.add_option(
-        "", "--control1", dest="control1", type="string", default='4:5:6',
+        "", "--control1", dest="control1", type="string", default='3',
         help="Set Control [default=%default]")
     parser.add_option(
-        "", "--control2", dest="control2", type="string", default='7',
+        "", "--control2", dest="control2", type="string", default='5',
         help="Set Control [default=%default]")
     parser.add_option(
-        "", "--control3", dest="control3", type="string", default='8',
+        "", "--control3", dest="control3", type="string", default='7',
         help="Set Control [default=%default]")
     return parser
 
@@ -518,7 +521,7 @@ def main(top_block_cls=demo_loop, options=None):
         Qt.QApplication.setGraphicsSystem(style)
     qapp = Qt.QApplication(sys.argv)
 
-    tb = top_block_cls(control0=options.control0, control1=options.control1, control2=options.control2, control3=options.control3)
+    tb = top_block_cls(T_p=options.T_p, control0=options.control0, control1=options.control1, control2=options.control2, control3=options.control3)
     tb.start()
     tb.show()
 
