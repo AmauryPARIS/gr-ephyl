@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Sn 0 Macrl
-# GNU Radio version: 3.7.13.5
+# GNU Radio version: 3.7.14.0
 ##################################################
 
 import os
@@ -25,7 +25,7 @@ import time
 
 class sn_0_macrl(gr.top_block):
 
-    def __init__(self, M=32, N=1, T_bch=200, T_g=50, T_p=2000, T_s=150, ar=1, bs_slots=range(3), control='0', cp_ratio=0.25):
+    def __init__(self, M=32, N=1, T_bch=200, T_g=500, T_p=2000, T_s=150, ar=1, bs_slots=range(3), control='0', cp_ratio=0.25):
         gr.top_block.__init__(self, "Sn 0 Macrl")
 
         ##################################################

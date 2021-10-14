@@ -165,8 +165,8 @@ class data_and_access_control(gr.sync_block):
         res = []
         if not any(slots) :
             slots = [0]
-        if not data :
-            data = self.rand_data(14)
+        #if not data :
+        data = self.rand_data(14)
         slots = map(str, slots)
         for j in range(len(slots)):
             ## Small note here, the payload is adapted if the
@@ -233,7 +233,7 @@ class data_and_access_control(gr.sync_block):
                                 v += 'p'
                                 now = datetime.now().time()                          # Probably a software bug. Unsolved yet
                                 print("%s - Considered OK" % (self.ID))
-                                f_pld.write("%s-%s-%s - Considered OK\n\n" % (self.ID, self.frame_cnt, now))
+                                f_pld.write("%s-%s-%s - Considered OK\n" % (self.ID, self.frame_cnt, now))
                             
                             ## Compute BER for detected packets
                             rx_bits = ''.join(format(ord(x), 'b') for x in rx[f][3][:-2])
