@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Bs
-# GNU Radio version: 3.7.13.5
+# GNU Radio version: 3.7.14.0
 ##################################################
 
 import os
@@ -25,7 +25,7 @@ import time
 
 class bs(gr.top_block):
 
-    def __init__(self, M=32, N=1, T_bch=200, T_g=50, T_p=1000, T_s=150, bs_slots=range(10), cp_ratio=0.25):
+    def __init__(self, M=32, N=1, T_bch=200, T_g=500, T_p=2000, T_s=150, bs_slots=range(10), cp_ratio=0.25):
         gr.top_block.__init__(self, "Bs")
 
         ##################################################
