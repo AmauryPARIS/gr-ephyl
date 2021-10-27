@@ -32,6 +32,7 @@ from gnuradio.qtgui import Range, RangeWidget
 from hier_bs import hier_bs  # grc-generated hier_block
 from hier_sensor import hier_sensor  # grc-generated hier_block
 from optparse import OptionParser
+import ephyl
 import math, sys, numpy as np, random,string
 import pmt
 import sip
@@ -40,7 +41,7 @@ from gnuradio import qtgui
 
 class demo_loop(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=50, T_g=20, T_p=100, T_s=50, bs_slots=range(10), control0='1', control1='3', control2='5', control3='7', cp_ratio=0.25):
+    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=250, T_s=100, bs_slots=range(3), control0='1', control1='2', control2='5', control3='7', cp_ratio=0.25, list_sensor=["A","B"]):
         gr.top_block.__init__(self, "Demo Loop")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop")
@@ -80,6 +81,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.control2 = control2
         self.control3 = control3
         self.cp_ratio = cp_ratio
+        self.list_sensor = list_sensor
 
         ##################################################
         # Variables
@@ -156,54 +158,6 @@ class demo_loop(gr.top_block, Qt.QWidget):
 
         self._qtgui_time_sink_x_0_0_0_1_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_0_0_1_0_0.pyqwidget(), Qt.QWidget)
         self.top_grid_layout.addWidget(self._qtgui_time_sink_x_0_0_0_1_0_0_win)
-        self.qtgui_time_sink_x_0 = qtgui.time_sink_f(
-        	64, #size
-        	samp_rate, #samp_rate
-        	'Packet Error rate', #name
-        	4 #number of inputs
-        )
-        self.qtgui_time_sink_x_0.set_update_time(0.10)
-        self.qtgui_time_sink_x_0.set_y_axis(0, 1)
-
-        self.qtgui_time_sink_x_0.set_y_label('PER', "")
-
-        self.qtgui_time_sink_x_0.enable_tags(-1, False)
-        self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
-        self.qtgui_time_sink_x_0.enable_autoscale(False)
-        self.qtgui_time_sink_x_0.enable_grid(True)
-        self.qtgui_time_sink_x_0.enable_axis_labels(True)
-        self.qtgui_time_sink_x_0.enable_control_panel(False)
-        self.qtgui_time_sink_x_0.enable_stem_plot(False)
-
-        if not True:
-          self.qtgui_time_sink_x_0.disable_legend()
-
-        labels = [control0, control1, control2, control3, '',
-                  '', '', '', '', '']
-        widths = [1, 1, 1, 1, 1,
-                  1, 1, 1, 1, 1]
-        colors = ["blue", "red", "green", "black", "cyan",
-                  "magenta", "yellow", "dark red", "dark green", "blue"]
-        styles = [1, 2, 1, 1, 1,
-                  1, 1, 1, 1, 1]
-        markers = [0, 8, 3, 2, -1,
-                   -1, -1, -1, -1, -1]
-        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
-                  1.0, 1.0, 1.0, 1.0, 1.0]
-
-        for i in xrange(4):
-            if len(labels[i]) == 0:
-                self.qtgui_time_sink_x_0.set_line_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_time_sink_x_0.set_line_label(i, labels[i])
-            self.qtgui_time_sink_x_0.set_line_width(i, widths[i])
-            self.qtgui_time_sink_x_0.set_line_color(i, colors[i])
-            self.qtgui_time_sink_x_0.set_line_style(i, styles[i])
-            self.qtgui_time_sink_x_0.set_line_marker(i, markers[i])
-            self.qtgui_time_sink_x_0.set_line_alpha(i, alphas[i])
-
-        self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.pyqwidget(), Qt.QWidget)
-        self.top_grid_layout.addWidget(self._qtgui_time_sink_x_0_win)
         self.hier_sensor_0_2 = hier_sensor(
             M=M,
             N=1,
@@ -211,35 +165,9 @@ class demo_loop(gr.top_block, Qt.QWidget):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
-            activation_rate=1,
             bs_slots=bs_slots,
             control=control1,
-            log=True,
-            samp_rate=samp_rate,
-        )
-        self.hier_sensor_0_1 = hier_sensor(
-            M=M,
-            N=1,
-            T_bch=T_bch,
-            T_g=T_g,
-            T_p=T_p,
-            T_s=T_s,
-            activation_rate=1,
-            bs_slots=bs_slots,
-            control=control3,
-            log=True,
-            samp_rate=samp_rate,
-        )
-        self.hier_sensor_0_0 = hier_sensor(
-            M=M,
-            N=1,
-            T_bch=T_bch,
-            T_g=T_g,
-            T_p=T_p,
-            T_s=T_s,
-            activation_rate=1,
-            bs_slots=bs_slots,
-            control=control2,
+            id_0=list_sensor[1],
             log=True,
             samp_rate=samp_rate,
         )
@@ -250,9 +178,9 @@ class demo_loop(gr.top_block, Qt.QWidget):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
-            activation_rate=1,
             bs_slots=bs_slots,
             control=control0,
+            id_0=list_sensor[0],
             log=True,
             samp_rate=samp_rate,
         )
@@ -266,8 +194,11 @@ class demo_loop(gr.top_block, Qt.QWidget):
             UHD=False,
             bs_slots=bs_slots,
             exit_frame=600,
+            list_sensor=list_sensor,
             samp_rate=samp_rate,
         )
+        self.ephyl_easy_upper_0_0 = ephyl.easy_upper(True, list_sensor)
+        self.ephyl_easy_upper_0 = ephyl.easy_upper(False, list_sensor)
         self.channels_channel_model_0 = channels.channel_model(
         	noise_voltage=noise_voltage,
         	frequency_offset=freq_offset,
@@ -279,10 +210,11 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.blocks_socket_pdu_0_0 = blocks.socket_pdu("UDP_CLIENT", '127.0.0.1', '52002', MTU, True)
         self.blocks_socket_pdu_0 = blocks.socket_pdu("UDP_SERVER", '', '52002', MTU, True)
+        self.blocks_null_sink_1_0 = blocks.null_sink(gr.sizeof_float*1)
         self.blocks_null_sink_1 = blocks.null_sink(gr.sizeof_float*1)
         self.blocks_message_strobe_0 = blocks.message_strobe(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1,[1])), .01)
         self.blocks_complex_to_real_0 = blocks.complex_to_real(1)
-        self.blocks_add_xx_0 = blocks.add_vcc(1)
+        self.blocks_add_xx_0_0 = blocks.add_vcc(1)
 
 
 
@@ -291,25 +223,28 @@ class demo_loop(gr.top_block, Qt.QWidget):
         ##################################################
         self.msg_connect((self.blocks_message_strobe_0, 'strobe'), (self.blocks_socket_pdu_0_0, 'pdus'))
         self.msg_connect((self.blocks_socket_pdu_0_0, 'pdus'), (self.hier_sensor_0, 'DL'))
-        self.msg_connect((self.blocks_socket_pdu_0_0, 'pdus'), (self.hier_sensor_0_0, 'DL'))
-        self.msg_connect((self.blocks_socket_pdu_0_0, 'pdus'), (self.hier_sensor_0_1, 'DL'))
         self.msg_connect((self.blocks_socket_pdu_0_0, 'pdus'), (self.hier_sensor_0_2, 'DL'))
+        self.msg_connect((self.ephyl_easy_upper_0, 'inst'), (self.hier_sensor_0, 'Inst'))
+        self.msg_connect((self.ephyl_easy_upper_0, 'inst'), (self.hier_sensor_0_2, 'Inst'))
+        self.msg_connect((self.ephyl_easy_upper_0_0, 'inst'), (self.hier_bs_0, 'inst'))
         self.msg_connect((self.hier_bs_0, 'BCH'), (self.blocks_socket_pdu_0, 'pdus'))
         self.msg_connect((self.hier_bs_0, 'DL'), (self.blocks_socket_pdu_0, 'pdus'))
-        self.connect((self.blocks_add_xx_0, 0), (self.channels_channel_model_0, 0))
+        self.msg_connect((self.hier_bs_0, 'feedback'), (self.ephyl_easy_upper_0_0, 'feedback'))
+        self.msg_connect((self.hier_bs_0, 'DLCCH'), (self.hier_sensor_0, 'DLCCH'))
+        self.msg_connect((self.hier_bs_0, 'DLCCH'), (self.hier_sensor_0_2, 'DLCCH'))
+        self.msg_connect((self.hier_sensor_0, 'feedback'), (self.ephyl_easy_upper_0, 'feedback'))
+        self.msg_connect((self.hier_sensor_0, 'ULCCH'), (self.hier_bs_0, 'ULCCH'))
+        self.msg_connect((self.hier_sensor_0_2, 'feedback'), (self.ephyl_easy_upper_0, 'feedback'))
+        self.msg_connect((self.hier_sensor_0_2, 'ULCCH'), (self.hier_bs_0, 'ULCCH'))
+        self.connect((self.blocks_add_xx_0_0, 0), (self.channels_channel_model_0, 0))
         self.connect((self.blocks_complex_to_real_0, 0), (self.qtgui_time_sink_x_0_0_0_1_0_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.hier_bs_0, 0))
         self.connect((self.channels_channel_model_0, 0), (self.blocks_throttle_0, 0))
         self.connect((self.hier_bs_0, 0), (self.blocks_complex_to_real_0, 0))
-        self.connect((self.hier_sensor_0, 1), (self.blocks_add_xx_0, 0))
+        self.connect((self.hier_sensor_0, 1), (self.blocks_add_xx_0_0, 0))
         self.connect((self.hier_sensor_0, 0), (self.blocks_null_sink_1, 0))
-        self.connect((self.hier_sensor_0, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.hier_sensor_0_0, 1), (self.blocks_add_xx_0, 2))
-        self.connect((self.hier_sensor_0_0, 0), (self.qtgui_time_sink_x_0, 2))
-        self.connect((self.hier_sensor_0_1, 1), (self.blocks_add_xx_0, 3))
-        self.connect((self.hier_sensor_0_1, 0), (self.qtgui_time_sink_x_0, 3))
-        self.connect((self.hier_sensor_0_2, 1), (self.blocks_add_xx_0, 1))
-        self.connect((self.hier_sensor_0_2, 0), (self.qtgui_time_sink_x_0, 1))
+        self.connect((self.hier_sensor_0_2, 1), (self.blocks_add_xx_0_0, 1))
+        self.connect((self.hier_sensor_0_2, 0), (self.blocks_null_sink_1_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "demo_loop")
@@ -323,8 +258,6 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.M = M
         self.qtgui_time_sink_x_0_0_0_1_0_0.set_samp_rate(self.samp_rate/int(2*self.M*(1+self.cp_ratio)))
         self.hier_sensor_0_2.set_M(self.M)
-        self.hier_sensor_0_1.set_M(self.M)
-        self.hier_sensor_0_0.set_M(self.M)
         self.hier_sensor_0.set_M(self.M)
         self.hier_bs_0.set_M(self.M)
 
@@ -342,8 +275,6 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.T_bch = T_bch
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
         self.hier_sensor_0_2.set_T_bch(self.T_bch)
-        self.hier_sensor_0_1.set_T_bch(self.T_bch)
-        self.hier_sensor_0_0.set_T_bch(self.T_bch)
         self.hier_sensor_0.set_T_bch(self.T_bch)
         self.hier_bs_0.set_T_bch(self.T_bch)
 
@@ -354,8 +285,6 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.T_g = T_g
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
         self.hier_sensor_0_2.set_T_g(self.T_g)
-        self.hier_sensor_0_1.set_T_g(self.T_g)
-        self.hier_sensor_0_0.set_T_g(self.T_g)
         self.hier_sensor_0.set_T_g(self.T_g)
         self.hier_bs_0.set_T_g(self.T_g)
 
@@ -366,8 +295,6 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.T_p = T_p
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
         self.hier_sensor_0_2.set_T_p(self.T_p)
-        self.hier_sensor_0_1.set_T_p(self.T_p)
-        self.hier_sensor_0_0.set_T_p(self.T_p)
         self.hier_sensor_0.set_T_p(self.T_p)
         self.hier_bs_0.set_T_p(self.T_p)
 
@@ -378,8 +305,6 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.T_s = T_s
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
         self.hier_sensor_0_2.set_T_s(self.T_s)
-        self.hier_sensor_0_1.set_T_s(self.T_s)
-        self.hier_sensor_0_0.set_T_s(self.T_s)
         self.hier_sensor_0.set_T_s(self.T_s)
         self.hier_bs_0.set_T_s(self.T_s)
 
@@ -390,8 +315,6 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.bs_slots = bs_slots
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
         self.hier_sensor_0_2.set_bs_slots(self.bs_slots)
-        self.hier_sensor_0_1.set_bs_slots(self.bs_slots)
-        self.hier_sensor_0_0.set_bs_slots(self.bs_slots)
         self.hier_sensor_0.set_bs_slots(self.bs_slots)
         self.hier_bs_0.set_bs_slots(self.bs_slots)
 
@@ -414,14 +337,12 @@ class demo_loop(gr.top_block, Qt.QWidget):
 
     def set_control2(self, control2):
         self.control2 = control2
-        self.hier_sensor_0_0.set_control(self.control2)
 
     def get_control3(self):
         return self.control3
 
     def set_control3(self, control3):
         self.control3 = control3
-        self.hier_sensor_0_1.set_control(self.control3)
 
     def get_cp_ratio(self):
         return self.cp_ratio
@@ -429,6 +350,15 @@ class demo_loop(gr.top_block, Qt.QWidget):
     def set_cp_ratio(self, cp_ratio):
         self.cp_ratio = cp_ratio
         self.qtgui_time_sink_x_0_0_0_1_0_0.set_samp_rate(self.samp_rate/int(2*self.M*(1+self.cp_ratio)))
+
+    def get_list_sensor(self):
+        return self.list_sensor
+
+    def set_list_sensor(self, list_sensor):
+        self.list_sensor = list_sensor
+        self.hier_sensor_0_2.set_id_0(self.list_sensor[1])
+        self.hier_sensor_0.set_id_0(self.list_sensor[0])
+        self.hier_bs_0.set_list_sensor(self.list_sensor)
 
     def get_time_offset(self):
         return self.time_offset
@@ -443,10 +373,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.qtgui_time_sink_x_0_0_0_1_0_0.set_samp_rate(self.samp_rate/int(2*self.M*(1+self.cp_ratio)))
-        self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
         self.hier_sensor_0_2.set_samp_rate(self.samp_rate)
-        self.hier_sensor_0_1.set_samp_rate(self.samp_rate)
-        self.hier_sensor_0_0.set_samp_rate(self.samp_rate)
         self.hier_sensor_0.set_samp_rate(self.samp_rate)
         self.hier_bs_0.set_samp_rate(self.samp_rate)
         self.blocks_throttle_0.set_sample_rate(self.samp_rate)
@@ -494,13 +421,13 @@ class demo_loop(gr.top_block, Qt.QWidget):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--T-p", dest="T_p", type="intx", default=100,
+        "", "--T-p", dest="T_p", type="intx", default=250,
         help="Set Proc duration (ms) [default=%default]")
     parser.add_option(
         "", "--control0", dest="control0", type="string", default='1',
         help="Set Control [default=%default]")
     parser.add_option(
-        "", "--control1", dest="control1", type="string", default='3',
+        "", "--control1", dest="control1", type="string", default='2',
         help="Set Control [default=%default]")
     parser.add_option(
         "", "--control2", dest="control2", type="string", default='5',

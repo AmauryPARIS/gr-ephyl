@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.13'?>
+<?grc format='1' created='3.7.14'?>
 <flow_graph>
   <timestamp>Mon Nov  5 15:30:13 2018</timestamp>
   <block>
@@ -677,7 +677,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>50</value>
+      <value>100</value>
     </param>
   </block>
   <block>
@@ -724,7 +724,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>20</value>
+      <value>100</value>
     </param>
   </block>
   <block>
@@ -771,7 +771,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>100</value>
+      <value>250</value>
     </param>
   </block>
   <block>
@@ -818,7 +818,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>50</value>
+      <value>100</value>
     </param>
   </block>
   <block>
@@ -888,7 +888,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1168, 696)</value>
+      <value>(1064, 664)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -896,7 +896,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>blocks_add_xx_0</value>
+      <value>blocks_add_xx_0_0</value>
     </param>
     <param>
       <key>type</key>
@@ -912,7 +912,7 @@
     </param>
     <param>
       <key>num_inputs</key>
-      <value>4</value>
+      <value>2</value>
     </param>
     <param>
       <key>vlen</key>
@@ -1068,7 +1068,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(304, 888)</value>
+      <value>(312, 1136)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1099,7 +1099,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(32, 756)</value>
+      <value>(32, 636)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1150,7 +1150,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1024, 416)</value>
+      <value>(888, 528)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1159,6 +1159,53 @@
     <param>
       <key>id</key>
       <value>blocks_null_sink_1</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>float</value>
+    </param>
+    <param>
+      <key>num_inputs</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_null_sink</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>bus_conns</key>
+      <value>[[0,],]</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(888, 792)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>blocks_null_sink_1_0</value>
     </param>
     <param>
       <key>type</key>
@@ -1193,7 +1240,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(880, 1456)</value>
+      <value>(896, 1428)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1252,7 +1299,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(280, 744)</value>
+      <value>(280, 620)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1390,7 +1437,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>range(10)</value>
+      <value>range(3)</value>
     </param>
   </block>
   <block>
@@ -1425,7 +1472,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1288, 704)</value>
+      <value>(1208, 636)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1547,7 +1594,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>3</value>
+      <value>2</value>
     </param>
   </block>
   <block>
@@ -1692,6 +1739,100 @@
     </param>
   </block>
   <block>
+    <key>ephyl_easy_upper</key>
+    <param>
+      <key>BS</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(600, 1040)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>180</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ephyl_easy_upper_0</value>
+    </param>
+    <param>
+      <key>list_sensor</key>
+      <value>list_sensor</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>ephyl_easy_upper</key>
+    <param>
+      <key>BS</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(568, 1740)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>180</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ephyl_easy_upper_0_0</value>
+    </param>
+    <param>
+      <key>list_sensor</key>
+      <value>list_sensor</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>hier_bs</key>
     <param>
       <key>T_bch</key>
@@ -1738,6 +1879,10 @@
       <value>hier_bs_0</value>
     </param>
     <param>
+      <key>list_sensor</key>
+      <value>list_sensor</value>
+    </param>
+    <param>
       <key>M</key>
       <value>M</value>
     </param>
@@ -1773,10 +1918,6 @@
   <block>
     <key>hier_sensor</key>
     <param>
-      <key>activation_rate</key>
-      <value>1</value>
-    </param>
-    <param>
       <key>T_bch</key>
       <value>T_bch</value>
     </param>
@@ -1802,7 +1943,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(656, 400)</value>
+      <value>(544, 452)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1845,6 +1986,10 @@
       <value>samp_rate</value>
     </param>
     <param>
+      <key>id_0</key>
+      <value>list_sensor[0]</value>
+    </param>
+    <param>
       <key>control</key>
       <value>control0</value>
     </param>
@@ -1856,10 +2001,6 @@
   <block>
     <key>hier_sensor</key>
     <param>
-      <key>activation_rate</key>
-      <value>1</value>
-    </param>
-    <param>
       <key>T_bch</key>
       <value>T_bch</value>
     </param>
@@ -1885,173 +2026,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(656, 792)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>log</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>T_g</key>
-      <value>T_g</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>hier_sensor_0_0</value>
-    </param>
-    <param>
-      <key>M</key>
-      <value>M</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>N</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>T_p</key>
-      <value>T_p</value>
-    </param>
-    <param>
-      <key>samp_rate</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>control</key>
-      <value>control2</value>
-    </param>
-    <param>
-      <key>T_s</key>
-      <value>T_s</value>
-    </param>
-  </block>
-  <block>
-    <key>hier_sensor</key>
-    <param>
-      <key>activation_rate</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>T_bch</key>
-      <value>T_bch</value>
-    </param>
-    <param>
-      <key>bs_slots</key>
-      <value>bs_slots</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(656, 992)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>log</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>T_g</key>
-      <value>T_g</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>hier_sensor_0_1</value>
-    </param>
-    <param>
-      <key>M</key>
-      <value>M</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>N</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>T_p</key>
-      <value>T_p</value>
-    </param>
-    <param>
-      <key>samp_rate</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>control</key>
-      <value>control3</value>
-    </param>
-    <param>
-      <key>T_s</key>
-      <value>T_s</value>
-    </param>
-  </block>
-  <block>
-    <key>hier_sensor</key>
-    <param>
-      <key>activation_rate</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>T_bch</key>
-      <value>T_bch</value>
-    </param>
-    <param>
-      <key>bs_slots</key>
-      <value>bs_slots</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(656, 592)</value>
+      <value>(544, 716)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2094,6 +2069,10 @@
       <value>samp_rate</value>
     </param>
     <param>
+      <key>id_0</key>
+      <value>list_sensor[1]</value>
+    </param>
+    <param>
       <key>control</key>
       <value>control1</value>
     </param>
@@ -2134,6 +2113,53 @@
     </param>
   </block>
   <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(560, 12)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>list_sensor</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>List of sensors</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>["A","B"]</value>
+    </param>
+  </block>
+  <block>
     <key>qtgui_time_sink_x</key>
     <param>
       <key>autoscale</key>
@@ -2165,7 +2191,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -3300,7 +3326,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(888, 452)</value>
+      <value>(888, 580)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3327,61 +3353,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(896, 1012)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>virtual_sink_0_1_0_0_0</value>
-    </param>
-    <param>
-      <key>stream_id</key>
-      <value>PER 4</value>
-    </param>
-  </block>
-  <block>
-    <key>virtual_sink</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(896, 820)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>virtual_sink_0_1_0_0_1</value>
-    </param>
-    <param>
-      <key>stream_id</key>
-      <value>PER 3</value>
-    </param>
-  </block>
-  <block>
-    <key>virtual_sink</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(888, 628)</value>
+      <value>(888, 860)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3394,6 +3366,60 @@
     <param>
       <key>stream_id</key>
       <value>PER 2</value>
+    </param>
+  </block>
+  <block>
+    <key>virtual_sink</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1040, 788)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>virtual_sink_1</value>
+    </param>
+    <param>
+      <key>stream_id</key>
+      <value>channel_ulcch</value>
+    </param>
+  </block>
+  <block>
+    <key>virtual_sink</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(896, 1532)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>virtual_sink_2</value>
+    </param>
+    <param>
+      <key>stream_id</key>
+      <value>channel_dlcch</value>
     </param>
   </block>
   <block>
@@ -3458,7 +3484,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -3485,7 +3511,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -3512,7 +3538,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -3539,7 +3565,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -3570,7 +3596,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(248, 1516)</value>
+      <value>(296, 1492)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3585,8 +3611,148 @@
       <value>UL SN</value>
     </param>
   </block>
+  <block>
+    <key>virtual_source</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(216, 716)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>virtual_source_1</value>
+    </param>
+    <param>
+      <key>stream_id</key>
+      <value>channel_dlcch</value>
+    </param>
+  </block>
+  <block>
+    <key>virtual_source</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(296, 1556)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>virtual_source_2</value>
+    </param>
+    <param>
+      <key>stream_id</key>
+      <value>channel_ulcch</value>
+    </param>
+  </block>
+  <block>
+    <key>zeromq_pub_msg_sink</key>
+    <param>
+      <key>address</key>
+      <value>tcp://*:5557</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(824, 444)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>zeromq_pub_msg_sink_0</value>
+    </param>
+    <param>
+      <key>timeout</key>
+      <value>100</value>
+    </param>
+  </block>
+  <block>
+    <key>zeromq_sub_msg_source</key>
+    <param>
+      <key>address</key>
+      <value>tcp://localhost:5558</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(200, 452)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>zeromq_sub_msg_source_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>timeout</key>
+      <value>100</value>
+    </param>
+  </block>
   <connection>
-    <source_block_id>blocks_add_xx_0</source_block_id>
+    <source_block_id>blocks_add_xx_0_0</source_block_id>
     <sink_block_id>channels_channel_model_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -3617,25 +3783,7 @@
   </connection>
   <connection>
     <source_block_id>blocks_socket_pdu_0_0</source_block_id>
-    <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>pdus</source_key>
-    <sink_key>print</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_socket_pdu_0_0</source_block_id>
     <sink_block_id>hier_sensor_0</sink_block_id>
-    <source_key>pdus</source_key>
-    <sink_key>DL</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_socket_pdu_0_0</source_block_id>
-    <sink_block_id>hier_sensor_0_0</sink_block_id>
-    <source_key>pdus</source_key>
-    <sink_key>DL</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_socket_pdu_0_0</source_block_id>
-    <sink_block_id>hier_sensor_0_1</sink_block_id>
     <source_key>pdus</source_key>
     <sink_key>DL</sink_key>
   </connection>
@@ -3658,6 +3806,36 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
+    <source_block_id>ephyl_easy_upper_0</source_block_id>
+    <sink_block_id>blocks_message_debug_0</sink_block_id>
+    <source_key>inst</source_key>
+    <sink_key>print</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_easy_upper_0</source_block_id>
+    <sink_block_id>hier_sensor_0</sink_block_id>
+    <source_key>inst</source_key>
+    <sink_key>Inst</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_easy_upper_0</source_block_id>
+    <sink_block_id>hier_sensor_0_2</sink_block_id>
+    <source_key>inst</source_key>
+    <sink_key>Inst</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_easy_upper_0_0</source_block_id>
+    <sink_block_id>blocks_message_debug_0</sink_block_id>
+    <source_key>inst</source_key>
+    <sink_key>print</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_easy_upper_0_0</source_block_id>
+    <sink_block_id>hier_bs_0</sink_block_id>
+    <source_key>inst</source_key>
+    <sink_key>inst</sink_key>
+  </connection>
+  <connection>
     <source_block_id>hier_bs_0</source_block_id>
     <sink_block_id>blocks_socket_pdu_0</sink_block_id>
     <source_key>BCH</source_key>
@@ -3676,6 +3854,18 @@
     <sink_key>pdus</sink_key>
   </connection>
   <connection>
+    <source_block_id>hier_bs_0</source_block_id>
+    <sink_block_id>virtual_sink_2</sink_block_id>
+    <source_key>DLCCH</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>hier_bs_0</source_block_id>
+    <sink_block_id>ephyl_easy_upper_0_0</sink_block_id>
+    <source_key>feedback</source_key>
+    <sink_key>feedback</sink_key>
+  </connection>
+  <connection>
     <source_block_id>hier_sensor_0</source_block_id>
     <sink_block_id>blocks_null_sink_1</sink_block_id>
     <source_key>0</source_key>
@@ -3689,33 +3879,33 @@
   </connection>
   <connection>
     <source_block_id>hier_sensor_0</source_block_id>
-    <sink_block_id>blocks_add_xx_0</sink_block_id>
+    <sink_block_id>blocks_add_xx_0_0</sink_block_id>
     <source_key>1</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>hier_sensor_0_0</source_block_id>
-    <sink_block_id>virtual_sink_0_1_0_0_1</sink_block_id>
+    <source_block_id>hier_sensor_0</source_block_id>
+    <sink_block_id>virtual_sink_1</sink_block_id>
+    <source_key>ULCCH</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>hier_sensor_0</source_block_id>
+    <sink_block_id>ephyl_easy_upper_0</sink_block_id>
+    <source_key>feedback</source_key>
+    <sink_key>feedback</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>hier_sensor_0</source_block_id>
+    <sink_block_id>zeromq_pub_msg_sink_0</sink_block_id>
+    <source_key>feedback</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>hier_sensor_0_2</source_block_id>
+    <sink_block_id>blocks_null_sink_1_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>hier_sensor_0_0</source_block_id>
-    <sink_block_id>blocks_add_xx_0</sink_block_id>
-    <source_key>1</source_key>
-    <sink_key>2</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>hier_sensor_0_1</source_block_id>
-    <sink_block_id>virtual_sink_0_1_0_0_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>hier_sensor_0_1</source_block_id>
-    <sink_block_id>blocks_add_xx_0</sink_block_id>
-    <source_key>1</source_key>
-    <sink_key>3</sink_key>
   </connection>
   <connection>
     <source_block_id>hier_sensor_0_2</source_block_id>
@@ -3725,9 +3915,21 @@
   </connection>
   <connection>
     <source_block_id>hier_sensor_0_2</source_block_id>
-    <sink_block_id>blocks_add_xx_0</sink_block_id>
+    <sink_block_id>blocks_add_xx_0_0</sink_block_id>
     <source_key>1</source_key>
     <sink_key>1</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>hier_sensor_0_2</source_block_id>
+    <sink_block_id>virtual_sink_1</sink_block_id>
+    <source_key>ULCCH</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>hier_sensor_0_2</source_block_id>
+    <sink_block_id>ephyl_easy_upper_0</sink_block_id>
+    <source_key>feedback</source_key>
+    <sink_key>feedback</sink_key>
   </connection>
   <connection>
     <source_block_id>virtual_source_0</source_block_id>
@@ -3776,5 +3978,41 @@
     <sink_block_id>hier_bs_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>virtual_source_1</source_block_id>
+    <sink_block_id>blocks_message_debug_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>print</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>virtual_source_1</source_block_id>
+    <sink_block_id>hier_sensor_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>DLCCH</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>virtual_source_1</source_block_id>
+    <sink_block_id>hier_sensor_0_2</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>DLCCH</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>virtual_source_2</source_block_id>
+    <sink_block_id>blocks_message_debug_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>print</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>virtual_source_2</source_block_id>
+    <sink_block_id>hier_bs_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>ULCCH</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>zeromq_sub_msg_source_0</source_block_id>
+    <sink_block_id>hier_sensor_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>Inst</sink_key>
   </connection>
 </flow_graph>

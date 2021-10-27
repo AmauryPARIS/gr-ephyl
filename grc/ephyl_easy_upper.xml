@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<block>
+  <name>easy_upper</name>
+  <key>ephyl_easy_upper</key>
+  <category>[ephyl]</category>
+  <import>import ephyl</import>
+  <make>ephyl.easy_upper($BS, $list_sensor)</make>
+
+  <param>
+    <name>Base station</name>
+    <key>BS</key>
+    <value>True</value>
+    <type>bool</type>
+  </param>
+  <param>
+    <name>List of sensor ID</name>
+    <key>list_sensor</key>
+    <value>[0]</value>
+    <type>raw</type>
+  </param>
+
+  <sink>
+    <name>feedback</name>
+    <type>message</type>
+  </sink>
+
+  <source>
+    <name>inst</name>
+    <type>message</type>
+  </source>
+</block>

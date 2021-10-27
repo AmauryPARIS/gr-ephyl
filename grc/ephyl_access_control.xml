@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <block>
-  <name>Data and Access Control</name>
-  <key>ephyl_data_and_access_control</key>
+  <name>access_control</name>
+  <key>ephyl_access_control</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.data_and_access_control($bs_slots,$Control,$activation_rate,$save_log)</make>
+  <make>ephyl.access_control($bs_slots,$Control,$save_log,$ID)</make>
 
-  <param>
+<param>
     <name>BS Slots</name>
     <key>bs_slots</key>
     <value>[0]</value>
@@ -19,16 +19,17 @@
     <type>raw</type>
   </param>
   <param>
-    <name>Activation rate</name>
-    <key>activation_rate</key>
-    <value>1</value>
-    <type>float</type>
-  </param>
-  <param>
     <name>Save Log</name>
     <key>save_log</key>
     <value>False</value>
     <type>bool</type>
+  </param>
+
+  <param>
+    <name>Sensor ID</name>
+    <key>ID</key>
+    <value>"Z"</value>
+    <type>raw</type>
   </param>
 
   <sink>
@@ -37,6 +38,10 @@
   </sink>
   <sink>
     <name>busy</name>
+    <type>message</type>
+  </sink>
+  <sink>
+    <name>inst</name>
     <type>message</type>
   </sink>
 

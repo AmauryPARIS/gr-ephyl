@@ -25,7 +25,7 @@ import time
 
 class bs(gr.top_block):
 
-    def __init__(self, M=32, N=1, T_bch=200, T_g=500, T_p=2000, T_s=150, bs_slots=range(10), cp_ratio=0.25):
+    def __init__(self, M=32, N=1, cp_ratio=0.25, T_g=50, T_s=150, T_p=1000, T_bch=200, bs_slots=range(10)):
         gr.top_block.__init__(self, "Bs")
 
         ##################################################
@@ -33,17 +33,17 @@ class bs(gr.top_block):
         ##################################################
         self.M = M
         self.N = N
-        self.T_bch = T_bch
-        self.T_g = T_g
-        self.T_p = T_p
-        self.T_s = T_s
-        self.bs_slots = bs_slots
         self.cp_ratio = cp_ratio
+        self.T_g = T_g
+        self.T_s = T_s
+        self.T_p = T_p
+        self.T_bch = T_bch
+        self.bs_slots = bs_slots
 
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 1000000
+        self.samp_rate = samp_rate = 1e6
         self.gain = gain = 25
         self.freq = freq = 2450e6
         self.frame_len = frame_len = (T_bch+len(bs_slots)*(T_s+T_g)+T_p)/float(1000)
@@ -76,20 +76,18 @@ class bs(gr.top_block):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
-            UHD=True,
+            UHD=False,
             bs_slots=bs_slots,
-            exit_frame=1000,
+            exit_frame=600,
             samp_rate=samp_rate,
         )
         self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_gr_complex*1)
-        self.blocks_message_debug_0 = blocks.message_debug()
 
 
 
         ##################################################
         # Connections
         ##################################################
-        self.msg_connect((self.hier_bs_0, 'DL'), (self.blocks_message_debug_0, 'print'))
         self.msg_connect((self.hier_bs_0, 'BCH'), (self.zeromq_pub_msg_sink_0, 'in'))
         self.msg_connect((self.hier_bs_0, 'DL'), (self.zeromq_pub_msg_sink_0, 'in'))
         self.connect((self.hier_bs_0, 0), (self.blocks_null_sink_0, 0))
@@ -109,13 +107,11 @@ class bs(gr.top_block):
         self.N = N
         self.hier_bs_0.set_N(self.N)
 
-    def get_T_bch(self):
-        return self.T_bch
+    def get_cp_ratio(self):
+        return self.cp_ratio
 
-    def set_T_bch(self, T_bch):
-        self.T_bch = T_bch
-        self.hier_bs_0.set_T_bch(self.T_bch)
-        self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
+    def set_cp_ratio(self, cp_ratio):
+        self.cp_ratio = cp_ratio
 
     def get_T_g(self):
         return self.T_g
@@ -123,14 +119,6 @@ class bs(gr.top_block):
     def set_T_g(self, T_g):
         self.T_g = T_g
         self.hier_bs_0.set_T_g(self.T_g)
-        self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
-
-    def get_T_p(self):
-        return self.T_p
-
-    def set_T_p(self, T_p):
-        self.T_p = T_p
-        self.hier_bs_0.set_T_p(self.T_p)
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_T_s(self):
@@ -141,6 +129,22 @@ class bs(gr.top_block):
         self.hier_bs_0.set_T_s(self.T_s)
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
+    def get_T_p(self):
+        return self.T_p
+
+    def set_T_p(self, T_p):
+        self.T_p = T_p
+        self.hier_bs_0.set_T_p(self.T_p)
+        self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
+
+    def get_T_bch(self):
+        return self.T_bch
+
+    def set_T_bch(self, T_bch):
+        self.T_bch = T_bch
+        self.hier_bs_0.set_T_bch(self.T_bch)
+        self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
+
     def get_bs_slots(self):
         return self.bs_slots
 
@@ -148,12 +152,6 @@ class bs(gr.top_block):
         self.bs_slots = bs_slots
         self.hier_bs_0.set_bs_slots(self.bs_slots)
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
-
-    def get_cp_ratio(self):
-        return self.cp_ratio
-
-    def set_cp_ratio(self, cp_ratio):
-        self.cp_ratio = cp_ratio
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -193,6 +191,9 @@ class bs(gr.top_block):
 
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
+    parser.add_option(
+        "", "--T-p", dest="T_p", type="intx", default=1000,
+        help="Set Proc duration (ms) [default=%default]")
     return parser
 
 
@@ -200,7 +201,7 @@ def main(top_block_cls=bs, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls()
+    tb = top_block_cls(T_p=options.T_p)
     tb.start()
     tb.wait()
 

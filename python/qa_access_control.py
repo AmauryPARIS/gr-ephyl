@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# Copyright 2019 <+YOU OR YOUR COMPANY+>.
+# Copyright 2021 gr-ephyl author.
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-from data_and_access_control import data_and_access_control
+from access_control import access_control
 
-class qa_data_and_access_control (gr_unittest.TestCase):
+class qa_access_control (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -38,4 +38,4 @@ class qa_data_and_access_control (gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_data_and_access_control, "qa_data_and_access_control.xml")
+    gr_unittest.run(qa_access_control, "qa_access_control.xml")
