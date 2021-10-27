@@ -19,13 +19,14 @@ from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from hier_sensor import hier_sensor  # grc-generated hier_block
 from optparse import OptionParser
+import ephyl
 import math, sys, numpy as np, random,string
 import time
 
 
 class sn_0_macrl(gr.top_block):
 
-    def __init__(self, M=32, N=1, T_bch=200, T_g=500, T_p=2000, T_s=150, ar=1, bs_slots=range(3), control='0', cp_ratio=0.25):
+    def __init__(self, M=32, N=1, T_bch=200, T_g=50, T_p=1000, T_s=150, bs_slots=range(10), control='1', cp_ratio=0.25):
         gr.top_block.__init__(self, "Sn 0 Macrl")
 
         ##################################################
@@ -37,7 +38,6 @@ class sn_0_macrl(gr.top_block):
         self.T_g = T_g
         self.T_p = T_p
         self.T_s = T_s
-        self.ar = ar
         self.bs_slots = bs_slots
         self.control = control
         self.cp_ratio = cp_ratio
@@ -45,8 +45,7 @@ class sn_0_macrl(gr.top_block):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 1000000
-        self.log = log = True
+        self.samp_rate = samp_rate = 1e6
         self.gain = gain = 25
         self.freq = freq = 2450e6
         self.frame_len = frame_len = (T_bch+len(bs_slots)*(T_s+T_g)+T_p)/float(1000)
@@ -55,7 +54,7 @@ class sn_0_macrl(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.zeromq_sub_msg_source_0 = zeromq.sub_msg_source('tcp://mnode33:5556', 100)
+        self.zeromq_sub_msg_source_0 = zeromq.sub_msg_source('tcp://mnode18:5556', 100)
         self.uhd_usrp_sink_0_0 = uhd.usrp_sink(
         	",".join(('', "")),
         	uhd.stream_args(
@@ -77,21 +76,23 @@ class sn_0_macrl(gr.top_block):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
-            activation_rate=ar,
             bs_slots=bs_slots,
             control=control,
-            log=log,
+            log=True,
             samp_rate=samp_rate,
         )
-        self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_float*1)
+        self.ephyl_easy_upper_0 = ephyl.easy_upper()
+        self.blocks_null_sink_1 = blocks.null_sink(gr.sizeof_float*1)
 
 
 
         ##################################################
         # Connections
         ##################################################
+        self.msg_connect((self.ephyl_easy_upper_0, 'inst'), (self.hier_sensor_0, 'Inst'))
+        self.msg_connect((self.hier_sensor_0, 'feedback'), (self.ephyl_easy_upper_0, 'feedback'))
         self.msg_connect((self.zeromq_sub_msg_source_0, 'out'), (self.hier_sensor_0, 'DL'))
-        self.connect((self.hier_sensor_0, 0), (self.blocks_null_sink_0, 0))
+        self.connect((self.hier_sensor_0, 0), (self.blocks_null_sink_1, 0))
         self.connect((self.hier_sensor_0, 1), (self.uhd_usrp_sink_0_0, 0))
 
     def get_M(self):
@@ -139,13 +140,6 @@ class sn_0_macrl(gr.top_block):
         self.hier_sensor_0.set_T_s(self.T_s)
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
-    def get_ar(self):
-        return self.ar
-
-    def set_ar(self, ar):
-        self.ar = ar
-        self.hier_sensor_0.set_activation_rate(self.ar)
-
     def get_bs_slots(self):
         return self.bs_slots
 
@@ -174,13 +168,6 @@ class sn_0_macrl(gr.top_block):
         self.samp_rate = samp_rate
         self.uhd_usrp_sink_0_0.set_samp_rate(self.samp_rate)
         self.hier_sensor_0.set_samp_rate(self.samp_rate)
-
-    def get_log(self):
-        return self.log
-
-    def set_log(self, log):
-        self.log = log
-        self.hier_sensor_0.set_log(self.log)
 
     def get_gain(self):
         return self.gain
@@ -213,10 +200,10 @@ class sn_0_macrl(gr.top_block):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--ar", dest="ar", type="eng_float", default=eng_notation.num_to_str(1),
-        help="Set Activation rate [default=%default]")
+        "", "--T-p", dest="T_p", type="intx", default=1000,
+        help="Set Proc duration (ms) [default=%default]")
     parser.add_option(
-        "", "--control", dest="control", type="string", default='0',
+        "", "--control", dest="control", type="string", default='1',
         help="Set Control [default=%default]")
     return parser
 
@@ -225,7 +212,7 @@ def main(top_block_cls=sn_0_macrl, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls(ar=options.ar, control=options.control)
+    tb = top_block_cls(T_p=options.T_p, control=options.control)
     tb.start()
     tb.wait()
 

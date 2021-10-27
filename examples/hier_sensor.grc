@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.11'?>
+<?grc format='1' created='3.7.14'?>
 <flow_graph>
   <timestamp>Mon Apr  8 16:38:06 2019</timestamp>
   <block>
@@ -73,12 +73,20 @@
       <value>True</value>
     </param>
     <param>
+      <key>sizing_mode</key>
+      <value>fixed</value>
+    </param>
+    <param>
       <key>thread_safe_setters</key>
       <value></value>
     </param>
     <param>
       <key>title</key>
       <value>IoT Sensor emulator</value>
+    </param>
+    <param>
+      <key>placement</key>
+      <value>(0,0)</value>
     </param>
   </block>
   <block>
@@ -446,6 +454,10 @@
       <value></value>
     </param>
     <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
       <key>type</key>
       <value></value>
     </param>
@@ -487,6 +499,10 @@
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
@@ -532,6 +548,10 @@
       <value></value>
     </param>
     <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
       <key>type</key>
       <value></value>
     </param>
@@ -573,6 +593,10 @@
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
@@ -618,6 +642,10 @@
       <value></value>
     </param>
     <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
       <key>type</key>
       <value></value>
     </param>
@@ -661,55 +689,16 @@
       <value></value>
     </param>
     <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
       <key>type</key>
       <value></value>
     </param>
     <param>
       <key>value</key>
       <value>50</value>
-    </param>
-  </block>
-  <block>
-    <key>parameter</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(416, 68)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>activation_rate</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Activation Rate</value>
-    </param>
-    <param>
-      <key>short_id</key>
-      <value></value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>eng_float</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>1</value>
     </param>
   </block>
   <block>
@@ -873,7 +862,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(496, 444)</value>
+      <value>(496, 404)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -920,7 +909,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(496, 364)</value>
+      <value>(488, 340)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -979,7 +968,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(728, 436)</value>
+      <value>(728, 396)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1383,6 +1372,10 @@
       <value>False</value>
     </param>
     <param>
+      <key>single_key</key>
+      <value>""</value>
+    </param>
+    <param>
       <key>vlen</key>
       <value>1</value>
     </param>
@@ -1587,6 +1580,10 @@
       <value></value>
     </param>
     <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
       <key>type</key>
       <value></value>
     </param>
@@ -1611,7 +1608,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(280, 516)</value>
+      <value>(216, 564)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1628,6 +1625,10 @@
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
@@ -1671,6 +1672,10 @@
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
@@ -1886,14 +1891,10 @@
     </param>
   </block>
   <block>
-    <key>ephyl_data_and_access_control</key>
+    <key>ephyl_access_control</key>
     <param>
       <key>Control</key>
       <value>control</value>
-    </param>
-    <param>
-      <key>activation_rate</key>
-      <value>activation_rate</value>
     </param>
     <param>
       <key>bs_slots</key>
@@ -1917,7 +1918,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(264, 416)</value>
+      <value>(256, 336)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1925,7 +1926,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ephyl_data_and_access_control_0</value>
+      <value>ephyl_access_control_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1938,6 +1939,10 @@
     <param>
       <key>save_log</key>
       <value>log</value>
+    </param>
+    <param>
+      <key>ID</key>
+      <value>id_0</value>
     </param>
   </block>
   <block>
@@ -2005,6 +2010,10 @@
     <param>
       <key>samp_rate</key>
       <value>int(samp_rate)</value>
+    </param>
+    <param>
+      <key>ID</key>
+      <value>id_0</value>
     </param>
     <param>
       <key>Slot_time</key>
@@ -2134,6 +2143,53 @@
     </param>
   </block>
   <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(440, 84)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>id_0</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Sensor ID</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>"A"</value>
+    </param>
+  </block>
+  <block>
     <key>import</key>
     <param>
       <key>alias</key>
@@ -2180,7 +2236,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(280, 600)</value>
+      <value>(368, 564)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2197,6 +2253,10 @@
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
@@ -2219,7 +2279,93 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(728, 364)</value>
+      <value>(1024, 980)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pad_sink_0</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>message</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>feedback</value>
+    </param>
+    <param>
+      <key>num_streams</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>optional</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>pad_sink</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(976, 1156)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pad_sink_0_0</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>message</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>ULCCH</value>
+    </param>
+    <param>
+      <key>num_streams</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>optional</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>pad_sink</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(728, 340)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2380,6 +2526,92 @@
     </param>
   </block>
   <block>
+    <key>pad_source</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(40, 484)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pad_source_0_1</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Inst</value>
+    </param>
+    <param>
+      <key>num_streams</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>optional</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>message</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>pad_source</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(432, 1228)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pad_source_0_1_0_0</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>DLCCH</value>
+    </param>
+    <param>
+      <key>num_streams</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>optional</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>message</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
     <key>parameter</key>
     <param>
       <key>alias</key>
@@ -2412,6 +2644,10 @@
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
@@ -2515,7 +2751,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(528, 500)</value>
+      <value>(728, 468)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2585,6 +2821,33 @@
     </param>
   </block>
   <block>
+    <key>virtual_sink</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(376, 456)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>virtual_sink_0_1_0_0_0_1</value>
+    </param>
+    <param>
+      <key>stream_id</key>
+      <value>inst_hier_sn</value>
+    </param>
+  </block>
+  <block>
     <key>virtual_source</key>
     <param>
       <key>comment</key>
@@ -2596,7 +2859,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(40, 460)</value>
+      <value>(24, 420)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2704,7 +2967,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(40, 412)</value>
+      <value>(24, 356)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2731,7 +2994,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(456, 1124)</value>
+      <value>(352, 1116)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2744,6 +3007,33 @@
     <param>
       <key>stream_id</key>
       <value>BCN</value>
+    </param>
+  </block>
+  <block>
+    <key>virtual_source</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(272, 1164)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>virtual_source_1_2_0_4_0_0</value>
+    </param>
+    <param>
+      <key>stream_id</key>
+      <value>inst_hier_sn</value>
     </param>
   </block>
   <connection>
@@ -2885,27 +3175,39 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>ephyl_data_and_access_control_0</source_block_id>
+    <source_block_id>ephyl_access_control_0</source_block_id>
     <sink_block_id>virtual_sink_0_1_0_0_0</sink_block_id>
     <source_key>Array</source_key>
     <sink_key>in</sink_key>
   </connection>
   <connection>
-    <source_block_id>ephyl_data_and_access_control_0</source_block_id>
+    <source_block_id>ephyl_access_control_0</source_block_id>
     <sink_block_id>blocks_pdu_to_tagged_stream_0</sink_block_id>
     <source_key>Data</source_key>
     <sink_key>pdus</sink_key>
   </connection>
   <connection>
-    <source_block_id>ephyl_data_and_access_control_0</source_block_id>
+    <source_block_id>ephyl_access_control_0</source_block_id>
     <sink_block_id>blocks_pdu_to_tagged_stream_0_0</sink_block_id>
     <source_key>PER</source_key>
     <sink_key>pdus</sink_key>
   </connection>
   <connection>
     <source_block_id>ephyl_sn_scheduler_0_0</source_block_id>
+    <sink_block_id>pad_sink_0_0</sink_block_id>
+    <source_key>ULCCH</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_sn_scheduler_0_0</source_block_id>
     <sink_block_id>virtual_sink_0_1_0_0</sink_block_id>
     <source_key>busy</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_sn_scheduler_0_0</source_block_id>
+    <sink_block_id>pad_sink_0</sink_block_id>
+    <source_key>feedback</source_key>
     <sink_key>in</sink_key>
   </connection>
   <connection>
@@ -2945,8 +3247,26 @@
     <sink_key>in</sink_key>
   </connection>
   <connection>
+    <source_block_id>pad_source_0_1</source_block_id>
+    <sink_block_id>ephyl_access_control_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>inst</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>pad_source_0_1</source_block_id>
+    <sink_block_id>virtual_sink_0_1_0_0_0_1</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>pad_source_0_1_0_0</source_block_id>
+    <sink_block_id>ephyl_sn_scheduler_0_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>DLCCH</sink_key>
+  </connection>
+  <connection>
     <source_block_id>virtual_source_1_2_0</source_block_id>
-    <sink_block_id>ephyl_data_and_access_control_0</sink_block_id>
+    <sink_block_id>ephyl_access_control_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>busy</sink_key>
   </connection>
@@ -2970,7 +3290,7 @@
   </connection>
   <connection>
     <source_block_id>virtual_source_1_2_0_4</source_block_id>
-    <sink_block_id>ephyl_data_and_access_control_0</sink_block_id>
+    <sink_block_id>ephyl_access_control_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>DL</sink_key>
   </connection>
@@ -2979,5 +3299,11 @@
     <sink_block_id>ephyl_sn_scheduler_0_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>trig</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>virtual_source_1_2_0_4_0_0</source_block_id>
+    <sink_block_id>ephyl_sn_scheduler_0_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>inst</sink_key>
   </connection>
 </flow_graph>

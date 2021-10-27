@@ -25,6 +25,7 @@ import time
 import datetime
 import threading
 import pmt
+from datetime import datetime
 
 IDLE = 0
 BCH = 1
@@ -40,7 +41,7 @@ class bs_scheduler(gr.sync_block):
     """
     def __init__(self, num_slots=5,bch_time=20,
         guard_time=100, Slot_time=50, Proc_time = 50,
-        sample_rate=200000, UHD = True,exit_frame=0):
+        sample_rate=200000, UHD = True,exit_frame=0, list_sensor = ["a", "b"]):
         gr.sync_block.__init__(self,
             name="BS Scheduler",
             in_sig=[np.complex64],
@@ -48,6 +49,11 @@ class bs_scheduler(gr.sync_block):
 
 
         self.message_port_register_out(pmt.intern("bcn"))
+        self.message_port_register_out(pmt.intern("DLCCH"))
+
+        self.message_port_register_in(pmt.intern("inst"))
+        self.set_msg_handler(pmt.intern("inst"), self.handle_inst) 
+
         ##################################################
         # Parameters
         ##################################################
@@ -60,6 +66,8 @@ class bs_scheduler(gr.sync_block):
         # Variables
         ##################################################
         self.state = BCH
+        self.list_sensor = list_sensor
+        self.filename_log = "LOG_BS_sched_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
         # self.state = IDLE  # DEBUG (no uhd)
         # self.state = -1
         self.state_dbg = -1
@@ -72,8 +80,11 @@ class bs_scheduler(gr.sync_block):
         self.bcn_sent = False
         self.frame_cnt = 0
         self.bch_time = bch_time
+        self.list_dlcch = []
 
         self.diff = self.left = 0
+        self.inst_request_send = False
+        self.dlcch_send = False
 
         ## Here we set states data, 
         ## PS : SYNC has a constant offset of +guard_time to compensate the LISTEN state of the sensor nodes
@@ -87,6 +98,12 @@ class bs_scheduler(gr.sync_block):
     def to_time(self,n_samp) :
         return n_samp/float(self.samp_rate)
 
+    def log(self, log):
+        if True:
+            now = datetime.now().time()
+            with open(self.filename_log,"a+") as f_log:
+                f_log.write("%s-%s-%s-%s\n" % ("BS", self.frame_cnt, now, log)) 
+
     def to_samples(self,duration) :
         return int(duration*self.samp_rate)
 
@@ -97,7 +114,39 @@ class bs_scheduler(gr.sync_block):
         else :
             self.state = 0
 
+    def handle_inst(self, msg_pmt):
+        with self.lock :
+            frame = int(pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("FRAME"), pmt.PMT_NIL)))
+            for dlcch_inst in pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("DLCCH"), pmt.PMT_NIL)) :
+                
+                dlcch_inst_norm = {"sensor" : dlcch_inst[0], "frame" : frame, "content" : dlcch_inst[1], "send" : False}
+                if frame == self.frame_cnt:
+                    self.message_port_pub(pmt.to_pmt("DLCCH"), self.create_cch_msg(dlcch_inst_norm["sensor"], dlcch_inst_norm["content"]))
+                    dlcch_inst_norm["send"] = True
+                self.list_dlcch.append(dlcch_inst_norm)
+                self.log("Received new DLCCH instruction : %s" % (self.list_dlcch))
+
+
+    def create_cch_msg(self, sn_id, payload):
+        self.log("Send DLCCH on error free channel : %s | %s | %s | %s" % ("BS", sn_id, self.frame_cnt, payload))
+        msg = pmt.make_dict()
+        msg = pmt.dict_add(msg, pmt.to_pmt("SRC"), pmt.to_pmt("BS"))
+        msg = pmt.dict_add(msg, pmt.to_pmt("DST"), pmt.to_pmt(sn_id))
+        msg = pmt.dict_add(msg, pmt.to_pmt("FRM"), pmt.to_pmt(self.frame_cnt))
+        msg = pmt.dict_add(msg, pmt.to_pmt("CCH"), pmt.to_pmt(payload))
+        return msg
+
+            
+
     def run_state(self,Input,output1) :
+        self.log("State %s" % (self.state))
+        if self.frame_cnt == 0 and not self.inst_request_send:
+            for sensor in self.list_sensor:
+                self.log("Send START DLCCH to %s" % (sensor))
+                self.message_port_pub(pmt.to_pmt("DLCCH"), self.create_cch_msg(sensor, "START"))
+                self.inst_request_send = True
+
+        
 
         state_samp = self.to_samples(self.STATES[2][self.state])
         self.diff = state_samp-self.samp_cnt
@@ -114,7 +163,11 @@ class bs_scheduler(gr.sync_block):
 
             elif self.state == PUSCH : 
                 output1[:] = Input[:len(output1)]
-            
+                for elem in range(0,len(self.list_dlcch)):
+                    if self.list_dlcch[elem]["send"] == False and self.list_dlcch[elem]["frame"] == self.frame_cnt:
+                        self.message_port_pub(pmt.to_pmt("DLCCH"), self.create_cch_msg(self.list_dlcch[elem]["sensor"], self.list_dlcch[elem]["content"]))
+                        self.list_dlcch[elem]["send"] = True
+
             elif self.state == GUARD :
                 self.slot_cnt += 1
                 if self.slot_cnt < self.num_slots :
@@ -132,7 +185,7 @@ class bs_scheduler(gr.sync_block):
             elif self.state not in self.STATES[0] :
                 print("STATE ERROR")
                 exit(1)
-            
+
             else :
                 output1[:] = [0]*len(output1)
 
@@ -151,6 +204,7 @@ class bs_scheduler(gr.sync_block):
             self.add_item_tag(0,offset, key, value)
             if self.state == PROC :
                 print "[BS] ================= FRAME " + str(self.frame_cnt-1) + " FINISH ================="
+                self.dlcch_send = False
 
         ###############################################################################
         ## If the cuurent state can still run completely one more time
@@ -159,6 +213,10 @@ class bs_scheduler(gr.sync_block):
 
             if self.state == PUSCH :
                 output1[:] = Input[:]
+                for elem in range(0,len(self.list_dlcch)):
+                    if self.list_dlcch[elem]["send"] == False and self.list_dlcch[elem]["frame"] == self.frame_cnt:
+                        self.message_port_pub(pmt.to_pmt("DLCCH"), self.create_cch_msg(self.list_dlcch[elem]["sensor"], self.list_dlcch[elem]["content"]))
+                        self.list_dlcch[elem]["send"] = True
 
             elif self.state == BCH :
                 if not(self.bcn_sent) :

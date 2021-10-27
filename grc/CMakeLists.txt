@@ -18,15 +18,15 @@
 # Boston, MA 02110-1301, USA.
 
 ########################################################################
-
 install(FILES
     ephyl_turbofsk_tx.xml
     ephyl_turbofsk_tx.xml
     ephyl_turbofsk_rx.xml
-    ephyl_data_and_access_control.xml
     ephyl_sn_scheduler.xml
     ephyl_tag_2_msg.xml
     ephyl_bs_scheduler.xml
     ephyl_tag_2_msg_char.xml
-    ephyl_msg_mux.xml DESTINATION share/gnuradio/grc/blocks
+    ephyl_msg_mux.xml
+    ephyl_access_control.xml
+    ephyl_easy_upper.xml DESTINATION share/gnuradio/grc/blocks
 )

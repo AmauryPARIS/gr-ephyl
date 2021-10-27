@@ -3,7 +3,7 @@
 # GNU Radio Python Flow Graph
 # Title: IoT Sensor emulator
 # Author: Othmane Oubejja
-# Generated: Thu Feb  6 12:08:20 2020
+# GNU Radio version: 3.7.14.0
 ##################################################
 
 from gnuradio import blocks
@@ -19,13 +19,18 @@ import math, sys, numpy as np, random,string
 
 class hier_sensor(gr.hier_block2):
 
-    def __init__(self, M=64, N=1, T_bch=10, T_g=20, T_p=50, T_s=50, activation_rate=1, bs_slots=range(5), control='all', log=True, samp_rate=1e6):
+    def __init__(self, M=64, N=1, T_bch=10, T_g=20, T_p=50, T_s=50, bs_slots=range(5), control='all', log=True, samp_rate=1e6):
         gr.hier_block2.__init__(
             self, "IoT Sensor emulator",
             gr.io_signature(0, 0, 0),
             gr.io_signaturev(2, 2, [gr.sizeof_float*1, gr.sizeof_gr_complex*1]),
         )
         self.message_port_register_hier_in("DL")
+        self.message_port_register_hier_in("Inst")
+        self.message_port_register_hier_in("Inst")
+        self.message_port_register_hier_in("DLCCH")
+        self.message_port_register_hier_out("feedback")
+        self.message_port_register_hier_out("ULCCH")
 
         ##################################################
         # Parameters
@@ -36,7 +41,6 @@ class hier_sensor(gr.hier_block2):
         self.T_g = T_g
         self.T_p = T_p
         self.T_s = T_s
-        self.activation_rate = activation_rate
         self.bs_slots = bs_slots
         self.control = control
         self.log = log
@@ -67,7 +71,7 @@ class hier_sensor(gr.hier_block2):
         self.fft_vxx_0_0_0 = fft.fft_vcc(M, False, (), True, 1)
         self.fec_extended_tagged_encoder_0 = fec.extended_tagged_encoder(encoder_obj_list=enc_cc, puncpat='11', lentagname='packet_len', mtu=MTU)
         self.ephyl_sn_scheduler_0_0 = ephyl.sn_scheduler(0, len(bs_slots), T_bch, T_g, T_s, T_p, 'corr_est',"packet_len2", int(samp_rate))
-        self.ephyl_data_and_access_control_0 = ephyl.data_and_access_control(bs_slots,control,activation_rate,log)
+        self.ephyl_access_control_0 = ephyl.access_control(bs_slots,control,log)
         self.digital_protocol_formatter_bb_0 = digital.protocol_formatter_bb(hdr_format, 'packet_len')
         self.digital_ofdm_cyclic_prefixer_0 = digital.ofdm_cyclic_prefixer(M, M+M/4, 0, '')
         self.digital_diff_encoder_bb_0 = digital.diff_encoder_bb(2)
@@ -76,6 +80,7 @@ class hier_sensor(gr.hier_block2):
         self.blocks_tagged_stream_to_pdu_0_0_0 = blocks.tagged_stream_to_pdu(blocks.complex_t, 'packet_len2')
         self.blocks_tagged_stream_mux_0 = blocks.tagged_stream_mux(gr.sizeof_char*1, 'packet_len', 0)
         self.blocks_tag_gate_0 = blocks.tag_gate(gr.sizeof_float * 1, False)
+        self.blocks_tag_gate_0.set_single_key("")
         self.blocks_sub_xx_0_0 = blocks.sub_ff(1)
         self.blocks_stream_to_vector_1 = blocks.stream_to_vector(gr.sizeof_gr_complex*1, M)
         self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_gr_complex, 1, int(M*(1+cp_ratio))*2*8, "packet_len2")
@@ -89,16 +94,23 @@ class hier_sensor(gr.hier_block2):
         self.blocks_delay_0 = blocks.delay(gr.sizeof_float*1, 1)
         self.blocks_complex_to_arg_0 = blocks.complex_to_arg(1)
 
+
+
         ##################################################
         # Connections
         ##################################################
         self.msg_connect((self.blocks_tagged_stream_to_pdu_0_0_0, 'pdus'), (self.ephyl_sn_scheduler_0_0, 'in'))
-        self.msg_connect((self.ephyl_data_and_access_control_0, 'Data'), (self.blocks_pdu_to_tagged_stream_0, 'pdus'))
-        self.msg_connect((self.ephyl_data_and_access_control_0, 'PER'), (self.blocks_pdu_to_tagged_stream_0_0, 'pdus'))
-        self.msg_connect((self.ephyl_data_and_access_control_0, 'Array'), (self.ephyl_sn_scheduler_0_0, 'slot'))
-        self.msg_connect((self.ephyl_sn_scheduler_0_0, 'busy'), (self.ephyl_data_and_access_control_0, 'busy'))
-        self.msg_connect((self, 'DL'), (self.ephyl_data_and_access_control_0, 'DL'))
+        self.msg_connect((self.ephyl_access_control_0, 'Data'), (self.blocks_pdu_to_tagged_stream_0, 'pdus'))
+        self.msg_connect((self.ephyl_access_control_0, 'PER'), (self.blocks_pdu_to_tagged_stream_0_0, 'pdus'))
+        self.msg_connect((self.ephyl_access_control_0, 'Array'), (self.ephyl_sn_scheduler_0_0, 'slot'))
+        self.msg_connect((self.ephyl_sn_scheduler_0_0, 'busy'), (self.ephyl_access_control_0, 'busy'))
+        self.msg_connect((self.ephyl_sn_scheduler_0_0, 'feedback'), (self, 'feedback'))
+        self.msg_connect((self.ephyl_sn_scheduler_0_0, 'ULCCH'), (self, 'ULCCH'))
+        self.msg_connect((self, 'DL'), (self.ephyl_access_control_0, 'DL'))
         self.msg_connect((self, 'DL'), (self.ephyl_sn_scheduler_0_0, 'trig'))
+        self.msg_connect((self, 'Inst'), (self.ephyl_access_control_0, 'inst'))
+        self.msg_connect((self, 'Inst'), (self.ephyl_sn_scheduler_0_0, 'inst'))
+        self.msg_connect((self, 'DLCCH'), (self.ephyl_sn_scheduler_0_0, 'DLCCH'))
         self.connect((self.blocks_complex_to_arg_0, 0), (self.blocks_delay_0, 0))
         self.connect((self.blocks_complex_to_arg_0, 0), (self.blocks_tag_gate_0, 0))
         self.connect((self.blocks_delay_0, 0), (self.blocks_sub_xx_0_0, 0))
@@ -163,12 +175,6 @@ class hier_sensor(gr.hier_block2):
 
     def set_T_s(self, T_s):
         self.T_s = T_s
-
-    def get_activation_rate(self):
-        return self.activation_rate
-
-    def set_activation_rate(self, activation_rate):
-        self.activation_rate = activation_rate
 
     def get_bs_slots(self):
         return self.bs_slots

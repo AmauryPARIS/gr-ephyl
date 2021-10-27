@@ -31,12 +31,13 @@ endif()
 GR_PYTHON_INSTALL(
     FILES
     __init__.py
-    data_and_access_control.py
     sn_scheduler.py
     tag_2_msg.py
     bs_scheduler.py
     tag_2_msg_char.py
-    msg_mux.py DESTINATION ${GR_PYTHON_DIR}/ephyl
+    msg_mux.py
+    access_control.py
+    easy_upper.py DESTINATION ${GR_PYTHON_DIR}/ephyl
 )
 
 ########################################################################
@@ -49,9 +50,10 @@ set(GR_TEST_PYTHON_DIRS ${CMAKE_BINARY_DIR}/swig)
 GR_ADD_TEST(qa_turbofsk_tx ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_turbofsk_tx.py)
 GR_ADD_TEST(qa_turbofsk_tx ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_turbofsk_tx.py)
 GR_ADD_TEST(qa_turbofsk_rx ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_turbofsk_rx.py)
-GR_ADD_TEST(qa_data_and_access_control ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_data_and_access_control.py)
 GR_ADD_TEST(qa_sn_scheduler ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_sn_scheduler.py)
 GR_ADD_TEST(qa_tag_2_msg ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_tag_2_msg.py)
 GR_ADD_TEST(qa_bs_scheduler ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_bs_scheduler.py)
 GR_ADD_TEST(qa_tag_2_msg_char ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_tag_2_msg_char.py)
 GR_ADD_TEST(qa_msg_mux ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_msg_mux.py)
+GR_ADD_TEST(qa_access_control ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_access_control.py)
+GR_ADD_TEST(qa_easy_upper ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_easy_upper.py)

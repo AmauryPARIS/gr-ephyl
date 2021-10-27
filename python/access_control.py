@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# Copyright 2019 <+YOU OR YOUR COMPANY+>.
+# Copyright 2021 gr-ephyl author.
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,31 +38,37 @@ import base64
 import string
 import re
 
-class data_and_access_control(gr.sync_block):
+SEND, IDLE, NOK = 0,1,2
+
+
+class access_control(gr.sync_block):
     """
-    docstring for block data_and_access_control
+    docstring for block access_control
     """
-    def __init__(self, bs_slots,Control = "random", activation_rate = 1.0, save_log = False):  # only default arguments here
-        """arguments to this function show up as parameters in GRC"""
-        gr.sync_block.__init__(
-            self,
-            name='Data & Slot Control',   # will show up in GRC
+    def __init__(self, bs_slots, Control = "random", save_log = False, ID = "Z"):
+        gr.sync_block.__init__(self,
+            name="access_control",
             in_sig=[],
-            out_sig=[]
-        )
-        
+            out_sig=[])
+
         self.message_port_register_out(pmt.to_pmt("Array"))
         self.message_port_register_out(pmt.to_pmt("Data"))
         self.message_port_register_out(pmt.to_pmt("PER"))
+        self.message_port_register_out(pmt.to_pmt("DLCCH"))
 
         self.message_port_register_in(pmt.intern("busy"))
         self.set_msg_handler(pmt.intern("busy"), self.handle_busy)
         self.message_port_register_in(pmt.intern("DL"))
-        self.set_msg_handler(pmt.intern("DL"), self.handle_DL)        
+        self.set_msg_handler(pmt.intern("DL"), self.handle_DL)    
+
+        self.message_port_register_in(pmt.intern("inst"))
+        self.set_msg_handler(pmt.intern("inst"), self.handle_inst)      
 
         self.lock = threading.Lock()
-        self.ID = random.choice(string.ascii_letters)
-        self.filename_pld = "PLD_COMPARE_SN-"+self.ID+"_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
+        self.ID = ID
+
+        self.filename_log = "LOG_SN_"+self.ID+"_access_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
+        self.save_detail_log = True
 
         self.slot_n = -1
         self.data = []
@@ -76,7 +82,9 @@ class data_and_access_control(gr.sync_block):
         self.control = Control
 
         self.bs_slots = bs_slots
-        self.activation_rate = activation_rate
+        self.send = []
+        self.send_inst = NOK
+        self.sequence = None
         self.active = -1
 
         self.detection = 0
@@ -128,9 +136,6 @@ class data_and_access_control(gr.sync_block):
                 +"\n"+"Total frames: "                              \
                 +"\n"                                               \
                 +"\n"+"======================"                      \
-                +"\n"+"Activation Rate: "                           \
-                +"\n"+str(self.activation_rate)                     \
-                +"\n"+"======================"                      \
                 +"\n"+"Observed activation rate: "                  \
                 +"\n"                                               \
                 +"\n"+"======================"                      \
@@ -149,6 +154,11 @@ class data_and_access_control(gr.sync_block):
                 +"\n"
                 f.write(template)
 
+    def log(self, log):
+        if True:
+            now = datetime.now().time()
+            with open(self.filename_log,"a+") as f_log:
+                f_log.write("%s-%s-%s-%s\n" % (self.ID, self.frame_cnt, now, log)) 
 
     def rand_slots(self,len) :
         res = [random.choice(self.bs_slots) for _ in xrange(len)]
@@ -172,10 +182,8 @@ class data_and_access_control(gr.sync_block):
             ## Small note here, the payload is adapted if the
             ## slot number contains more than two characters
             res += [[str(self.frame_cnt),slots[j], ID, data[:len(data)-len(slots[j])+1]]]
-
-        now = datetime.now().time()
-        with open(self.filename_pld,"a+") as f_pld:
-            f_pld.write("%s-%s-%s Generate new payload : %s\n" % (self.ID, self.frame_cnt, now, res))  
+        
+        self.log("Generate new payload : %s" % (res))
         return res 
 
     # Compare Tx & Rx PLD
@@ -186,6 +194,7 @@ class data_and_access_control(gr.sync_block):
         used_slots = []
         new_slots = []
         remaining = []
+        ERROR_FREE_BIT = 4
         self.error = 0
         self.detection = 0
         tx = TX
@@ -205,43 +214,32 @@ class data_and_access_control(gr.sync_block):
         for j in xrange(len(tx)):    
             used_slots = np.append(used_slots,tx[j][1])  
 
-        print("%s - F" % (self.ID))
-        now = datetime.now().time()
-        with open(self.filename_pld, "a+") as f_pld:
-            f_pld.write("%s-%s-%s - F\n" % (self.ID, self.frame_cnt, now))
-            for f in range(len(rx)) :
-                if len(rx[f])>3 :
-                    active_slots = np.append(active_slots,rx[f][1])
-                    print("%s - J" % (self.ID))
-                    now = datetime.now().time()
-                    f_pld.write("%s-%s-%s - J\n" % (self.ID, self.frame_cnt, now))
-                    for j in xrange(len(tx)):
-                        now = datetime.now().time()
-                        print("%s - Compare PLD : %s | %s" % (self.ID,rx[f], tx[j]))
-                        f_pld.write("%s-%s-%s - Compare PLD : %s | %s\n" % (self.ID, self.frame_cnt, now,rx[f], tx[j]))
-                        # Check frame match
-                        if rx[f][0] == tx[j][0]:  
-                            v += 'f'
-                        ## Check for slot activity
-                        if rx[f][1] == tx[j][1]:     
-                            v += 's'
-                            ## Check for matching id
-                        if rx[f][2] == tx[j][2]:     
-                            v += 'i'
-                            ## Check for matching payload
-                            if rx[f][3][:-2] == tx[j][3][:-2]:    # Some sporadic bug causes the last sample to be (sometimes) corrupted,      
-                                v += 'p'
-                                now = datetime.now().time()                          # Probably a software bug. Unsolved yet
-                                print("%s - Considered OK" % (self.ID))
-                                f_pld.write("%s-%s-%s - Considered OK\n" % (self.ID, self.frame_cnt, now))
-                            
-                            ## Compute BER for detected packets
-                            rx_bits = ''.join(format(ord(x), 'b') for x in rx[f][3][:-2])
-                            tx_bits = ''.join(format(ord(x), 'b') for x in tx[j][3][:-2])
-                            y = int(rx_bits, 2)^int(tx_bits,2)
-                            self.error_bits = bin(y)[2:].zfill(len(tx_bits))
+        for f in range(len(rx)) :
+            if len(rx[f])>3 :
+                active_slots = np.append(active_slots,rx[f][1])
+                for j in xrange(len(tx)):
+                    self.log("Compare PLD : %s | %s" % (rx[f], tx[j]))
+                    # Check frame match
+                    if rx[f][0] == tx[j][0]:  
+                        v += 'f'
+                    ## Check for slot activity
+                    if rx[f][1] == tx[j][1]:     
+                        v += 's'
+                        ## Check for matching id
+                    if rx[f][2] == tx[j][2]:     
+                        v += 'i'
+                        ## Check for matching payload
+                        if rx[f][3][:-ERROR_FREE_BIT] == tx[j][3][:-ERROR_FREE_BIT]:    # Some sporadic bug causes the last sample to be (sometimes) corrupted,      
+                            v += 'p'                          # Probably a software bug. Unsolved yet
+                            self.log("Considered OK")
+                        
+                        ## Compute BER for detected packets
+                        rx_bits = ''.join(format(ord(x), 'b') for x in rx[f][3][:-ERROR_FREE_BIT])
+                        tx_bits = ''.join(format(ord(x), 'b') for x in tx[j][3][:-ERROR_FREE_BIT])
+                        y = int(rx_bits, 2)^int(tx_bits,2)
+                        self.error_bits = bin(y)[2:].zfill(len(tx_bits))
 
-                            h = f 
+                        h = f 
 
         if not any(active_slots)  :
             active_slots = ['0']            
@@ -393,10 +391,33 @@ class data_and_access_control(gr.sync_block):
 
         return  new_indice
 
+        
+    def handle_inst(self, msg_pmt):
+        with self.lock : 
+            if pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("ID"), pmt.PMT_NIL)) == self.ID:
+                inst_send = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("SEND"), pmt.PMT_NIL)) 
+                inst_sequence = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("SEQUENCE"), pmt.PMT_NIL))
+                frame = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("FRAME"), pmt.PMT_NIL))
+                self.log("Inst received : %s | %s | %s" % (inst_send, inst_sequence, frame))
+
+                if inst_send == "True":
+                    self.send.append({"inst" : SEND, "frame" : frame})
+                elif inst_send == "False":
+                    self.send.append({"inst" : IDLE, "frame" : frame})
+                else:
+                    self.send.append({"inst" : NOK, "frame" : frame})
+
+                self.sequence = inst_sequence
 
     def handle_busy(self, msg_pmt):
         with self.lock :        
             self.busy = pmt.to_python(msg_pmt)
+
+            for inst in self.send:
+                if int(inst["frame"]) == int(self.frame_cnt):
+                    self.send_inst = inst["inst"]
+
+            self.log("BUSY : %s | %s | %s | %s " % (self.frame_cnt, self.busy, self.send_inst, self.send))
 
             if self.busy != True :
                 if self.i < len(self.lines) :
@@ -405,16 +426,20 @@ class data_and_access_control(gr.sync_block):
                         self.i = 0
                     ########################################################################################################
                     elif self.busy == 'ACTIVE?':
-                        ## Generate an activation value following a Bernoulli distribution
-                        now = datetime.now().time()
-                        with open(self.filename_pld, "a+") as f_pld:
-                            f_pld.write("%s-%s-%s Active ?\n" % (self.ID, self.frame_cnt, now)) 
-                        self.active = any(np.random.binomial(1,self.activation_rate,1))
-                        
-                        if self.active:
+                        if self.send_inst == SEND:
                             self.message_port_pub(pmt.to_pmt("Array"), pmt.to_pmt("ACTIVE"))
-                        else:
+                            self.active = True
+                            self.log("Active frame")
+                        elif self.send_inst == IDLE:
                             self.message_port_pub(pmt.to_pmt("Array"), pmt.to_pmt("INACTIVE"))
+                            self.active = False
+                            self.log("Inactive frame")
+                        elif self.send_inst == NOK:
+                            self.message_port_pub(pmt.to_pmt("Array"), pmt.to_pmt("INACTIVE"))
+                            self.active = False
+                            self.log("Default inactive frame")
+                        else:
+                            self.log("Unknown active instruction")
 
                     else :
                     ########################################################################################################
@@ -427,9 +452,7 @@ class data_and_access_control(gr.sync_block):
                     ########################################################################################################
                     ## Scheduler requests payload array to be sent in PHY chain
                         elif self.busy == 'DATA' :
-                            now = datetime.now().time()
-                            with open(self.filename_pld, "a+") as f_pld:
-                                f_pld.write("%s-%s-%s Data sent in PHYchanel\n" % (self.ID, self.frame_cnt, now))  
+                            self.log("Data send in PHY layer") 
                             ## Data is (node_id + line_i)
                             data = self.lines[self.i][2:]     # Remove frame number and slot number
                             data = '\t'.join(data)
@@ -439,9 +462,12 @@ class data_and_access_control(gr.sync_block):
                     ########################################################################################################
                     ## Scheduler informs a frame reset (frame finished or new will start)
                     if self.busy == 'RESET_FRAME' :
-                        now = datetime.now().time()
-                        with open(self.filename_pld,"a+") as f_pld:
-                            f_pld.write("%s-%s-%s RESET\n" % (self.ID, self.frame_cnt, now)) 
+                        for elem in range(0,len(self.send)):
+                            if int(self.send[elem]["frame"]) == int(self.frame_cnt) -2:
+                                self.send.pop(elem)
+                                break
+                        self.log("RESET")
+
                         self.i=0
                         if self.active == True :
                             print "[SN "+self.ID+"] ACCESS POLICY: " + self.control + "\n"
@@ -455,13 +481,14 @@ class data_and_access_control(gr.sync_block):
                                     ## Generate new payload 
                                     self.lines = self.gen_rand_pld(self.ID,1,result[1],self.tmp_data)
                                     print "[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "\n"
-                            
+                                    self.log("[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "")
                             ## No activity in DL
                             else:
                                 result = self.compare_pld(self.lines,[4*['']])
                                 # Generate new payload 
                                 self.lines = self.gen_rand_pld(self.ID,1,result[1],self.tmp_data)
                                 print "[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "\n"
+                                self.log("[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "")
                                 self.error = 1
                                 self.detection = 0
                             ############################################################################################
@@ -486,9 +513,6 @@ class data_and_access_control(gr.sync_block):
                             # print "BER"
                             # print self.BER
                             ###################### WRITE LOG FILE #########################
-                            now = datetime.now().time()
-                            with open(self.filename_pld,"a+") as f_pld:
-                                f_pld.write("%s-%s-%s RESET - feedback ready\n" % (self.ID, self.frame_cnt, now)) 
                             if self.save_log :    
                                 with open(self.filename,"r") as f:
                                     lines = f.readlines()
@@ -496,13 +520,10 @@ class data_and_access_control(gr.sync_block):
                                         if 'Total frames' in lines[i]:
                                             lines[i+1] = str(int(self.frame_cnt)+1)+'\n'
                                         if 'Observed activation rate' in lines[i]:
-                                            if self.activation_rate == 1 :
-                                                lines[i+1] = '1.0\n'
-                                            else:
-                                                try :
-                                                    lines[i+1] = str(len(self.detection_list)/(float(self.frame_cnt)-self.frame_offset+1))+'\n'
-                                                except :
-                                                    lines[i+1] = str(len(self.detection_list)/(float(self.frame_cnt)+1))+'\n'
+                                            try :
+                                                lines[i+1] = str(len(self.detection_list)/(float(self.frame_cnt)-self.frame_offset+1))+'\n'
+                                            except :
+                                                lines[i+1] = str(len(self.detection_list)/(float(self.frame_cnt)+1))+'\n'
                                         if 'Active frames' in lines[i]:
                                             lines[i+1] = self.frame_cnt + ' ' + lines[i+1]
                                         if 'Detection rate' in lines[i]:
@@ -530,9 +551,11 @@ class data_and_access_control(gr.sync_block):
                             result = self.compare_pld(self.lines,self.RX_frame)
                             self.lines = self.gen_rand_pld(self.ID,1,result[1],self.tmp_data)
 
+
                 else :
                     self.message_port_pub(pmt.to_pmt("Array"), pmt.to_pmt("STOP"))
                     self.i = 0 
+                    self.log("STOP")
 
             self.busy = True
 
@@ -546,6 +569,7 @@ class data_and_access_control(gr.sync_block):
             l = [chr(c) for c in self.DL[1]]
             l = ''.join(l)
             self.RX = re.split(r'\t+', l)
+            self.log("Feedback from BS : %s " % (self.RX))
             if self.RX[0] == 'corr_est':
                 self.frame_cnt = self.RX[1]
                 '''

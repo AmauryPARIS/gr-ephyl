@@ -5,7 +5,14 @@ Messages</name>
   <key>ephyl_msg_mux</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.msg_mux()</make>
+  <make>ephyl.msg_mux($list_sensor)</make>
+
+  <param>
+    <name>List of sensor ID</name>
+    <key>list_sensor</key>
+    <value>[0]</value>
+    <type>raw</type>
+  </param>
 
   <sink>
     <name>frame_n</name>
@@ -22,9 +29,20 @@ Messages</name>
     <type>message</type>
   </sink>
 
+  <sink>
+    <name>ULCCH</name>
+    <type>message</type>
+  </sink>
+
   <source>
     <name>final_msg</name>
     <type>message</type>
   </source>
+
+  <source>
+    <name>feedback</name>
+    <type>message</type>
+  </source>
+
 
 </block>

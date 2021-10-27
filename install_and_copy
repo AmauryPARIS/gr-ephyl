@@ -1,0 +1,12 @@
+#!/bin/bash
+echo "Make install"
+
+cd /root/cxlb_toolchain_build/gr-ephyl/build
+make install
+cp /usr/local/lib/python2.7/dist-packages/ephyl/bs_scheduler.py /cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/bs_scheduler.py
+cp /usr/local/lib/python2.7/dist-packages/ephyl/sn_scheduler.py /cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/sn_scheduler.py
+cp /usr/local/lib/python2.7/dist-packages/ephyl/msg_mux.py /cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/msg_mux.py
+cp /usr/local/lib/python2.7/dist-packages/ephyl/access_control.py /cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/access_control.py
+cp /usr/local/lib/python2.7/dist-packages/ephyl/easy_upper.py /cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/easy_upper.py
+
+echo "Instalation done and files copied"

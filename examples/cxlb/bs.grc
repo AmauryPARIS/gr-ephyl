@@ -97,11 +97,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>True</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(208, 204)</value>
+      <value>(472, 28)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -128,7 +128,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1064, 12)</value>
+      <value>(736, 28)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -155,7 +155,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(976, 12)</value>
+      <value>(648, 28)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -171,69 +171,6 @@
     </param>
   </block>
   <block>
-    <key>variable_qtgui_range</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>25</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(848, 0)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>gain</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Absolute Gain</value>
-    </param>
-    <param>
-      <key>min_len</key>
-      <value>200</value>
-    </param>
-    <param>
-      <key>orient</key>
-      <value>Qt.Horizontal</value>
-    </param>
-    <param>
-      <key>start</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>step</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>stop</key>
-      <value>25</value>
-    </param>
-    <param>
-      <key>rangeType</key>
-      <value>float</value>
-    </param>
-    <param>
-      <key>widget</key>
-      <value>counter_slider</value>
-    </param>
-  </block>
-  <block>
     <key>variable</key>
     <param>
       <key>comment</key>
@@ -241,11 +178,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>True</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1152, 12)</value>
+      <value>(824, 28)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -272,7 +209,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 76)</value>
+      <value>(552, 28)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -284,7 +221,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1000000</value>
+      <value>1e6</value>
     </param>
   </block>
   <block>
@@ -303,7 +240,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(288, 12)</value>
+      <value>(296, 28)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -350,7 +287,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(200, 12)</value>
+      <value>(208, 28)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -397,7 +334,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(352, 196)</value>
+      <value>(824, 92)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -444,7 +381,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(504, 116)</value>
+      <value>(664, 92)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -472,7 +409,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>500</value>
+      <value>50</value>
     </param>
   </block>
   <block>
@@ -491,7 +428,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(504, 196)</value>
+      <value>(208, 92)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -515,11 +452,11 @@
     </param>
     <param>
       <key>type</key>
-      <value></value>
+      <value>intx</value>
     </param>
     <param>
       <key>value</key>
-      <value>2000</value>
+      <value>1000</value>
     </param>
   </block>
   <block>
@@ -538,7 +475,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(352, 116)</value>
+      <value>(512, 92)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -570,7 +507,7 @@
     </param>
   </block>
   <block>
-    <key>blocks_message_debug</key>
+    <key>parameter</key>
     <param>
       <key>alias</key>
       <value></value>
@@ -580,16 +517,12 @@
       <value></value>
     </param>
     <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(824, 408)</value>
+      <value>(360, 92)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -597,54 +530,27 @@
     </param>
     <param>
       <key>id</key>
-      <value>blocks_message_debug_0</value>
+      <value>T_sync</value>
     </param>
-  </block>
-  <block>
-    <key>blocks_message_strobe</key>
     <param>
-      <key>alias</key>
+      <key>label</key>
+      <value>Sync duration (ms)</value>
+    </param>
+    <param>
+      <key>short_id</key>
       <value></value>
     </param>
     <param>
-      <key>comment</key>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
       <value></value>
     </param>
     <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(32, 756)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_message_strobe_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>msg</key>
-      <value>pmt.cons(pmt.make_dict(), pmt.init_u8vector(1,[1]))</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>period</key>
-      <value>.01</value>
+      <key>value</key>
+      <value>150</value>
     </param>
   </block>
   <block>
@@ -671,7 +577,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(848, 648)</value>
+      <value>(760, 488)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -695,65 +601,6 @@
     </param>
   </block>
   <block>
-    <key>blocks_socket_pdu</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(280, 744)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>host</key>
-      <value>127.0.0.1</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_socket_pdu_0_0</value>
-    </param>
-    <param>
-      <key>mtu</key>
-      <value>10000</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>port</key>
-      <value>52002</value>
-    </param>
-    <param>
-      <key>tcp_no_delay</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>"UDP_CLIENT"</value>
-    </param>
-  </block>
-  <block>
     <key>parameter</key>
     <param>
       <key>alias</key>
@@ -769,7 +616,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(208, 116)</value>
+      <value>(8, 140)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -816,7 +663,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(376, 12)</value>
+      <value>(384, 28)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -875,11 +722,11 @@
     </param>
     <param>
       <key>exit_frame</key>
-      <value>1000</value>
+      <value>600</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(504, 524)</value>
+      <value>(456, 380)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -911,7 +758,7 @@
     </param>
     <param>
       <key>UHD</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>T_p</key>
@@ -942,7 +789,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 164)</value>
+      <value>(8, 92)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2141,7 +1988,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(208, 544)</value>
+      <value>(192, 404)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2324,7 +2171,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(856, 572)</value>
+      <value>(840, 412)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2339,51 +2186,6 @@
       <value>100</value>
     </param>
   </block>
-  <block>
-    <key>zeromq_push_msg_sink</key>
-    <param>
-      <key>address</key>
-      <value>tcp://*:5556</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(800, 748)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>zeromq_push_msg_sink_0</value>
-    </param>
-    <param>
-      <key>timeout</key>
-      <value>100</value>
-    </param>
-  </block>
-  <connection>
-    <source_block_id>blocks_message_strobe_0</source_block_id>
-    <sink_block_id>blocks_socket_pdu_0_0</sink_block_id>
-    <source_key>strobe</source_key>
-    <sink_key>pdus</sink_key>
-  </connection>
   <connection>
     <source_block_id>hier_bs_0</source_block_id>
     <sink_block_id>zeromq_pub_msg_sink_0</sink_block_id>
@@ -2395,12 +2197,6 @@
     <sink_block_id>blocks_null_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>hier_bs_0</source_block_id>
-    <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>DL</source_key>
-    <sink_key>print</sink_key>
   </connection>
   <connection>
     <source_block_id>hier_bs_0</source_block_id>

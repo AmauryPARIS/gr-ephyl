@@ -31,10 +31,14 @@ except ImportError:
 	pass
 
 # import any pure python here
-from data_and_access_control import data_and_access_control
+
 from sn_scheduler import sn_scheduler
 from tag_2_msg import tag_2_msg
 from bs_scheduler import bs_scheduler
 from tag_2_msg_char import tag_2_msg_char
 from msg_mux import msg_mux
+from access_control import access_control
+from easy_upper import easy_upper
+
+
 #

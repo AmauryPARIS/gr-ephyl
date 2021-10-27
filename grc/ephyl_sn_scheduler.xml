@@ -4,7 +4,7 @@
   <key>ephyl_sn_scheduler</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.sn_scheduler($phy_option, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate)</make>
+  <make>ephyl.sn_scheduler($phy_option, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate, $ID)</make>
  
   <param>
     <name>PHY Option</name>
@@ -75,6 +75,13 @@
     <value>1000000</value>
     <type>int</type>
   </param>
+
+  <param>
+    <name>Sensor ID</name>
+    <key>ID</key>
+    <value>"Z"</value>
+    <type>raw</type>
+  </param>
  
 
 
@@ -92,13 +99,29 @@
     <name>trig</name>
     <type>message</type>
   </sink>
+  <sink>
+    <name>inst</name>
+    <type>message</type>
+  </sink>
+  <sink>
+    <name>DLCCH</name>
+    <type>message</type>
+  </sink>
 
+  <source>
+    <name>feedback</name>
+    <type>message</type>
+  </source>
   <source>
     <name>out</name>
     <type>complex</type>
   </source>
   <source>
     <name>busy</name>
+    <type>message</type>
+  </source>
+  <source>
+    <name>ULCCH</name>
     <type>message</type>
   </source>
 
