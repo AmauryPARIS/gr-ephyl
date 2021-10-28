@@ -90,8 +90,12 @@ class easy_upper(gr.sync_block):
             # Build response for this sensor
             action = "True"
             if numpy.random.uniform() < 0.3:
-                action = "False" 
+                action = "True" 
+
             sequence = "1"
+            if numpy.random.uniform() < 0.5:
+                sequence = "2" 
+
             msg = pmt.dict_add(msg, pmt.to_pmt("ID"), pmt.to_pmt(sensor_id))
             msg = pmt.dict_add(msg, pmt.to_pmt("FRAME"), pmt.to_pmt(frame +1))
             msg = pmt.dict_add(msg, pmt.to_pmt("SEND"), pmt.to_pmt(action))
