@@ -84,7 +84,9 @@ class access_control(gr.sync_block):
         self.bs_slots = bs_slots
         self.send = []
         self.send_inst = NOK
+        self.sequ_inst = None
         self.sequence = None
+        self.crc = "wivuopnwusbywu"
         self.active = -1
 
         self.detection = 0
@@ -176,7 +178,8 @@ class access_control(gr.sync_block):
         if not any(slots) :
             slots = [0]
         #if not data :
-        data = self.rand_data(14)
+            #data = self.rand_data(14)
+        data = self.crc
         slots = map(str, slots)
         for j in range(len(slots)):
             ## Small note here, the payload is adapted if the
@@ -185,6 +188,17 @@ class access_control(gr.sync_block):
         
         self.log("Generate new payload : %s" % (res))
         return res 
+
+    def add_symb(self, sequence, data):
+        sn_id = data[0]
+        payload = data[1]
+        new_payload = []
+        for i in range(len(payload)):
+            if i in range(3):
+                new_payload += sequence
+            else:
+                new_payload += payload[i]
+        return [sn_id, "".join(new_payload)]
 
     # Compare Tx & Rx PLD
     def compare_pld(self,TX,rx) :    
@@ -401,13 +415,11 @@ class access_control(gr.sync_block):
                 self.log("Inst received : %s | %s | %s" % (inst_send, inst_sequence, frame))
 
                 if inst_send == "True":
-                    self.send.append({"inst" : SEND, "frame" : frame})
+                    self.send.append({"inst" : SEND, "sequence" : inst_sequence, "frame" : frame})
                 elif inst_send == "False":
-                    self.send.append({"inst" : IDLE, "frame" : frame})
+                    self.send.append({"inst" : IDLE, "sequence" : None, "frame" : frame})
                 else:
-                    self.send.append({"inst" : NOK, "frame" : frame})
-
-                self.sequence = inst_sequence
+                    self.send.append({"inst" : NOK, "sequence" : None, "frame" : frame})
 
     def handle_busy(self, msg_pmt):
         with self.lock :        
@@ -416,6 +428,7 @@ class access_control(gr.sync_block):
             for inst in self.send:
                 if int(inst["frame"]) == int(self.frame_cnt):
                     self.send_inst = inst["inst"]
+                    self.sequ_inst = inst["sequence"]
 
             self.log("BUSY : %s | %s | %s | %s " % (self.frame_cnt, self.busy, self.send_inst, self.send))
 
@@ -454,7 +467,11 @@ class access_control(gr.sync_block):
                         elif self.busy == 'DATA' :
                             self.log("Data send in PHY layer") 
                             ## Data is (node_id + line_i)
-                            data = self.lines[self.i][2:]     # Remove frame number and slot number
+                            data = self.lines[self.i][2:]               # Remove frame number and slot number
+                            print("Data bf : %s" % data)
+                            data = self.add_symb(self.sequ_inst, data)  # Replace first random values by sequence
+                            self.lines[self.i][3] = data[1]             # Update packet buffer
+                            print("Data af : %s - %s" % (data, self.lines[self.i]))
                             data = '\t'.join(data)
                             OUT = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(data),[ord(c) for c in data]))    # Data = encrypted node_id + line_i
                             self.message_port_pub(pmt.to_pmt("Data"), OUT) 

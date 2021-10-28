@@ -70,6 +70,7 @@ class msg_mux(gr.sync_block):
 
         self.received_packet = []
         self.received_ulcch = []
+        self.crc = "wivuopnwusbywu"
 
 
     def log(self, log):
@@ -114,6 +115,20 @@ class msg_mux(gr.sync_block):
             l = [chr(c) for c in self.data]
             l = ''.join(l)
             l = re.split(r'\t+', l)
+
+            sn_id = l[0]
+            sequence = l[1][0:3]
+            crc = l[1][3:]
+            print("MUX : %s | %s | %s vs %s" % (sn_id, sequence, crc, self.crc))
+            if sequence[0] == sequence[1] and sequence[1] == sequence[2] and crc in self.crc:
+                sequence = sequence[0]
+                status = "RX"
+            else: 
+                sequence = "error"
+                status = "BUSY"
+
+            # Find a way to return the sequence
+                
             l = [int(self.frame_n),self.slot_n] + l
             l = map(str,l)
             l = '\t'.join(l)
@@ -121,6 +136,7 @@ class msg_mux(gr.sync_block):
             # print l
 
             self.log("BS RX : %s\n" % (l))  
+            
 
             if any(self.slot_n) and any(self.data) :
                 # res = [self.frame_n,self.slot_n,self.data]
@@ -128,6 +144,6 @@ class msg_mux(gr.sync_block):
                 # print "HEEEEEEEEEEEEEE"
                 # print res
                 res_pdu = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(res),[ord(c) for c in res]))
-                self.received_packet.append(res)
+                self.received_packet.append([sn_id, sequence, status, self.frame_n])
                 self.message_port_pub(pmt.to_pmt("final_msg"), res_pdu)
                 # self.slot_n = self.data = ''
