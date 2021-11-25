@@ -5,13 +5,20 @@ Messages</name>
   <key>ephyl_msg_mux</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.msg_mux($list_sensor)</make>
+  <make>ephyl.msg_mux($list_sensor, $log)</make>
 
   <param>
     <name>List of sensor ID</name>
     <key>list_sensor</key>
     <value>[0]</value>
     <type>raw</type>
+  </param>
+
+  <param>
+    <name>Generate debug/log file</name>
+    <key>log</key>
+    <value>False</value>
+    <type>bool</type>
   </param>
 
   <sink>

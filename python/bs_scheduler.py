@@ -42,7 +42,7 @@ class bs_scheduler(gr.sync_block):
     """
     def __init__(self, num_slots=5,bch_time=20,
         guard_time=100, Slot_time=50, Proc_time = 50,
-        sample_rate=200000, UHD = True,exit_frame=0, list_sensor = ["a", "b"]):
+        sample_rate=200000, UHD = True,exit_frame=0, list_sensor = ["a", "b"], log=False):
         gr.sync_block.__init__(self,
             name="BS Scheduler",
             in_sig=[np.complex64],
@@ -62,6 +62,7 @@ class bs_scheduler(gr.sync_block):
         self.samp_rate = int(sample_rate/1000)
         self.UHD = UHD
         self.exit_frame = exit_frame
+        self.logged = log
 
         ##################################################
         # Variables
@@ -100,7 +101,7 @@ class bs_scheduler(gr.sync_block):
         return n_samp/float(self.samp_rate)
 
     def log(self, log):
-        if True:
+        if self.logged:
             now = datetime.now().time()
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s-%s\n" % ("BS", self.frame_cnt, now, log)) 

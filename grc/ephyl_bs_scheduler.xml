@@ -4,7 +4,7 @@
   <key>ephyl_bs_scheduler</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.bs_scheduler($num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $samp_rate, $UHD, $exit_frame,$list_sensor)</make>
+  <make>ephyl.bs_scheduler($num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $samp_rate, $UHD, $exit_frame,$list_sensor, $log)</make>
 
 
   <param>
@@ -75,6 +75,13 @@
     <key>list_sensor</key>
     <value>[0]</value>
     <type>raw</type>
+  </param>
+
+  <param>
+    <name>Generate debug/log file</name>
+    <key>log</key>
+    <value>False</value>
+    <type>bool</type>
   </param>
 
   <sink>

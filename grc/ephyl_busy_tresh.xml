@@ -4,13 +4,20 @@
   <key>ephyl_busy_tresh</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.busy_tresh($tresh)</make>
+  <make>ephyl.busy_tresh($tresh, $log)</make>
 
   <param>
     <name>Treshold in dB</name>
     <key>tresh</key>
     <value>5</value>
     <type>float</type>
+  </param>
+
+  <param>
+    <name>Generate debug/log file</name>
+    <key>log</key>
+    <value>False</value>
+    <type>bool</type>
   </param>
 
   <sink>

@@ -28,7 +28,7 @@ class easy_upper(gr.sync_block):
     """
     docstring for block easy_upper
     """
-    def __init__(self, BS = True, list_sensor = ["a", "b"]):
+    def __init__(self, BS = True, list_sensor = ["a", "b"], log=False):
         gr.sync_block.__init__(self,
             name="easy_upper",
             in_sig=[],
@@ -37,6 +37,7 @@ class easy_upper(gr.sync_block):
         self.BS = BS
         self.list_sensor = list_sensor
         self.count = 0
+        self.logged = log
 
         self.message_port_register_out(pmt.to_pmt("inst"))
 
@@ -49,7 +50,7 @@ class easy_upper(gr.sync_block):
             self.filename_log = "LOG_SN_easy_upper_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
 
     def log(self, frame, log):
-        if True:
+        if self.logged:
             now = datetime.now().time()
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s-%s\n" % ("UPPER", frame, now, log)) 

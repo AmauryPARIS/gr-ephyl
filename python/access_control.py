@@ -45,11 +45,13 @@ class access_control(gr.sync_block):
     """
     docstring for block access_control
     """
-    def __init__(self, bs_slots, Control = "random", save_log = False, ID = "Z"):
+    def __init__(self, bs_slots, Control = "random", save_log = False, ID = "Z", log=False):
         gr.sync_block.__init__(self,
             name="access_control",
             in_sig=[],
             out_sig=[])
+
+        self.logged = log
 
         self.message_port_register_out(pmt.to_pmt("Array"))
         self.message_port_register_out(pmt.to_pmt("Data"))
@@ -157,7 +159,7 @@ class access_control(gr.sync_block):
                 f.write(template)
 
     def log(self, log):
-        if True:
+        if self.logged:
             now = datetime.now().time()
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s-%s\n" % (self.ID, self.frame_cnt, now, log)) 

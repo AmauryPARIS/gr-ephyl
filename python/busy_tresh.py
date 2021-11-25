@@ -28,7 +28,7 @@ class busy_tresh(gr.sync_block):
     """
     docstring for block busy_tresh
     """
-    def __init__(self, tresh=5):
+    def __init__(self, tresh=5, log=False):
         gr.sync_block.__init__(self,
             name="busy_tresh",
             in_sig=[np.complex64],
@@ -41,11 +41,11 @@ class busy_tresh(gr.sync_block):
         self.power_per_slot = np.array([])
         self.sample_buffer = np.array([])
         self.compute = False
-
+        self.logged = log
         self.filename_log = "LOG_BS_busy_tresh_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
 
     def log(self, log):
-        if True:
+        if self.logged:
             now = datetime.now().time()
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s\n" % ("BS_busy_tresh", now, log)) 
