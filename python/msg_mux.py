@@ -52,7 +52,9 @@ class msg_mux(gr.sync_block):
         self.message_port_register_in(pmt.to_pmt("frame_n"))
         self.set_msg_handler(pmt.intern("frame_n"), self.handle_frame)  
         self.message_port_register_in(pmt.intern("ULCCH"))
-        self.set_msg_handler(pmt.intern("ULCCH"), self.handle_ulcch)       
+        self.set_msg_handler(pmt.intern("ULCCH"), self.handle_ulcch)      
+        self.message_port_register_in(pmt.intern("detect"))
+        self.set_msg_handler(pmt.intern("detect"), self.handle_detect)    
         
         self.message_port_register_out(pmt.to_pmt("final_msg"))
         self.message_port_register_out(pmt.to_pmt("feedback"))
@@ -79,6 +81,16 @@ class msg_mux(gr.sync_block):
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s-%s\n" % ("BS", self.frame_n, now, log)) 
 
+    def create_inst_msg(self, frame, payload):
+        self.log("Send feedback to upper layer : %s | %s | %s" % ("BS", self.frame_n, payload))
+        msg = pmt.make_dict()
+        msg = pmt.dict_add(msg, pmt.to_pmt("FRAME"), pmt.to_pmt(frame))
+        msg = pmt.dict_add(msg, pmt.to_pmt("ULCCH"), pmt.to_pmt(self.received_ulcch))    
+        msg = pmt.dict_add(msg, pmt.to_pmt("RX"), pmt.to_pmt(payload))
+        self.received_packet = []
+        self.received_ulcch = []
+        return msg
+
     def handle_frame(self, msg_pmt):
         with self.lock :
             self.frame_n = str(pmt.to_python(pmt.cdr(msg_pmt))[1])
@@ -94,20 +106,33 @@ class msg_mux(gr.sync_block):
             ulcch = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("CCH"), pmt.PMT_NIL)) 
             frame = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("FRM"), pmt.PMT_NIL)) 
             if [sn_id, ulcch] not in self.received_ulcch:
-                self.received_ulcch.append([sn_id, ulcch])
-                self.log("ULCCH received : %s | %s | %s " % (sn_id, ulcch, frame))
-                if len(self.received_ulcch) == self.sensor_count:
-                    msg = pmt.make_dict()
-                    msg = pmt.dict_add(msg, pmt.to_pmt("FRAME"), pmt.to_pmt(frame))
-                    msg = pmt.dict_add(msg, pmt.to_pmt("ULCCH"), pmt.to_pmt(self.received_ulcch))    
-                    msg = pmt.dict_add(msg, pmt.to_pmt("RX"), pmt.to_pmt(self.received_packet))
+                self.received_ulcch.append([frame, sn_id, ulcch])
+                self.log("BS : ULCCH received : SRC - %s | Frame - %s | CCH - %s " % (sn_id, frame, ulcch))
+                print("BS : ULCCH received : SRC - %s | Frame - %s | CCH - %s " % (sn_id, frame, ulcch))                
 
-                    self.message_port_pub(pmt.to_pmt("feedback"), msg)
-                    self.log("ALL ULCCH received : %s | %s | %s " % (frame, self.received_ulcch, self.received_packet))
-                    self.received_packet = []
-                    self.received_ulcch = []
-                    
+    def handle_detect(self, msg_pmt):
+        detect = pmt.to_python(msg_pmt)
+        rx = []
 
+        # Match the detect [IDLE, RX] power status to any received and demodulated packet
+        for detect_elem in range(0,len(detect)):
+            self.log("MUX slot %s : %s" % (detect_elem, detect[detect_elem]))
+            if detect[detect_elem] == "IDLE":
+                rx.append([detect_elem, detect[detect_elem]])
+            else:
+                packets = []
+                for msg_elem in range(0,len(self.received_packet)):
+                    if int(self.received_packet[msg_elem][1]) == int(detect_elem): # Check for matching slot number
+                        detect[detect_elem] = "RX"
+                        packets.append([self.received_packet[msg_elem][0], self.received_packet[msg_elem][2], self.received_packet[msg_elem][4]]) # [sn_id, sequence, frame
+                rx.append([detect_elem, detect[detect_elem], packets])
+        
+        # Frame number for the reception of dealt packets
+        frame = self.received_ulcch[0][0]
+        self.log("End frame info received : %s | %s | %s " % (frame, self.received_ulcch, rx))
+        
+        # Create and send feedback
+        self.message_port_pub(pmt.to_pmt("feedback"), self.create_inst_msg(frame, rx))
 
     def handle_data(self, msg_pmt):
         with self.lock : 
@@ -119,13 +144,15 @@ class msg_mux(gr.sync_block):
             sn_id = l[0]
             sequence = l[1][0:3]
             crc = l[1][3:]
-            print("MUX : %s | %s | %s vs %s" % (sn_id, sequence, crc, self.crc))
+            
             if sequence[0] == sequence[1] and sequence[1] == sequence[2] and crc in self.crc:
                 sequence = sequence[0]
                 status = "RX"
             else: 
                 sequence = "error"
                 status = "BUSY"
+
+            print("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
 
             # Find a way to return the sequence
                 
@@ -144,6 +171,6 @@ class msg_mux(gr.sync_block):
                 # print "HEEEEEEEEEEEEEE"
                 # print res
                 res_pdu = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(res),[ord(c) for c in res]))
-                self.received_packet.append([sn_id, sequence, status, self.frame_n])
+                self.received_packet.append([sn_id, self.slot_n, sequence, status, self.frame_n])
                 self.message_port_pub(pmt.to_pmt("final_msg"), res_pdu)
                 # self.slot_n = self.data = ''

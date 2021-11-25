@@ -41,7 +41,7 @@ from gnuradio import qtgui
 
 class demo_loop(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=250, T_s=100, bs_slots=range(3), control0='1', control1='2', control2='5', control3='7', cp_ratio=0.25, list_sensor=["A","B"]):
+    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=100, bs_slots=range(3), control0='1', control1='2', control2='5', control3='7', cp_ratio=0.25, list_sensor=["A","B"]):
         gr.top_block.__init__(self, "Demo Loop")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop")
@@ -89,7 +89,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.time_offset = time_offset = 1
         self.samp_rate = samp_rate = 1e6
         self.phase = phase = 0
-        self.noise_voltage = noise_voltage = 0
+        self.noise_voltage = noise_voltage = 0.25
         self.freq_offset = freq_offset = 0
         self.freq = freq = 2450e6
         self.frame_len = frame_len = (T_bch+len(bs_slots)*(T_s+T_g)+T_p)/float(1000)
@@ -104,7 +104,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self._phase_range = Range(0, 2*3.14, .01, 0, 200)
         self._phase_win = RangeWidget(self._phase_range, self.set_phase, 'taps phase', "counter_slider", float)
         self.top_grid_layout.addWidget(self._phase_win)
-        self._noise_voltage_range = Range(0, 10, .01, 0, 200)
+        self._noise_voltage_range = Range(0, 10, .01, 0.25, 200)
         self._noise_voltage_win = RangeWidget(self._noise_voltage_range, self.set_noise_voltage, 'Noise Amplitude', "counter_slider", float)
         self.top_grid_layout.addWidget(self._noise_voltage_win)
         self._freq_offset_range = Range(-.1, .1, .00001, 0, 200)
@@ -421,7 +421,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
-        "", "--T-p", dest="T_p", type="intx", default=250,
+        "", "--T-p", dest="T_p", type="intx", default=500,
         help="Set Proc duration (ms) [default=%default]")
     parser.add_option(
         "", "--control0", dest="control0", type="string", default='1',

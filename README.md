@@ -18,3 +18,8 @@ cd /root/cxlb_toolchain_build/gr-ephyl
 ./install_and_copy
 ```
 
+New blocks must be added in this script and the following file needs to be updated :
+
+```
+/cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/__init__.py
+```

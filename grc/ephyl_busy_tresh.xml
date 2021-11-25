@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<block>
+  <name>busy_tresh</name>
+  <key>ephyl_busy_tresh</key>
+  <category>[ephyl]</category>
+  <import>import ephyl</import>
+  <make>ephyl.busy_tresh($tresh)</make>
+
+  <param>
+    <name>Treshold in dB</name>
+    <key>tresh</key>
+    <value>5</value>
+    <type>float</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+
+  <source>
+    <name>feedback</name>
+    <type>message</type>
+  </source>
+</block>

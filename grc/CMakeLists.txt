@@ -28,5 +28,6 @@ install(FILES
     ephyl_tag_2_msg_char.xml
     ephyl_msg_mux.xml
     ephyl_access_control.xml
-    ephyl_easy_upper.xml DESTINATION share/gnuradio/grc/blocks
+    ephyl_easy_upper.xml
+    ephyl_busy_tresh.xml DESTINATION share/gnuradio/grc/blocks
 )

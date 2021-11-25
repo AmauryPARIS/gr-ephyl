@@ -38,6 +38,7 @@ EMIT=5
 GUARD =6
 PROC = 7
 
+STATES = ["SLOT_READ", "IDLE", "PKT_GEN", "LISTEN", "BCH", "EMIT", "GUARD", "PROC"]
 
 class sn_scheduler(gr.basic_block):
     """
@@ -154,19 +155,27 @@ class sn_scheduler(gr.basic_block):
                 if pmt.to_python(slot_pmt) == "STOP" :
                     self.state = IDLE
                     self.slot_cnt = 0
-                    print "[SN "+self.Id+"] SENSOR SLOTS ARE :" + str(self.slots)
+                    print "[SN "+self.Id+"] TX SENSOR SLOTS ARE :" + str(self.slots)
                     self.log("STOP : SENSOR SLOTS ARE :" + str(self.slots))
                     self.message_port_pub(pmt.to_pmt("busy"), pmt.to_pmt('RESET'))
+
                 elif pmt.to_python(slot_pmt) == "ACTIVE" :
                     self.active = True
                     self.log("Active Frame")
 
                 elif pmt.to_python(slot_pmt) == "INACTIVE" :
-                    self.active = False
-                    self.state = PROC
-                    self.send_inactive_fb_ul = True         
-                    self.log("Inactive Frame")       
-                    
+                    found = False
+                    for elem in range(0,len(self.ulcch)): 
+                        if int(self.frame_cnt) == int(self.ulcch[elem]["frame"]) and self.ulcch[elem]["packet"] == 'True':
+                            self.active = True
+                            self.log("Instruction Active Frame")
+                            found = True
+                    if not found:
+                        self.active = False
+                        self.state = PROC
+                        self.send_inactive_fb_ul = True         
+                        self.log("Inactive Frame") 
+     
                 else :
                     new_array = pmt.to_python(slot_pmt)
                     # Extract ID coming from slot control block, and remove it from the message
@@ -209,17 +218,25 @@ class sn_scheduler(gr.basic_block):
 
     def handle_trig(self, trig_pmt):
         with self.lock : 
+            d = pmt.to_python(pmt.cdr(trig_pmt))    # Collect trig message data, convert to Python format
+            l = [chr(e) for e in d]
+            l = ''.join(l)
+            l = re.split(r'\t+', l)     # l now contains wanted_tag, frame number, and offset
+            self.log("TRIG received : %s | status listen ? %s | status %s " % (l, self.state == LISTEN, self.state))
+
+            if l[0] == "end_frame":
+                self.message_port_pub(pmt.to_pmt("feedback"), self.create_inst_msg(self.dlcch)) 
+
+            elif l[0] == "corr_est":
+                self.frame_cnt = int(l[1])
+
             if self.state == LISTEN :
                 self.delay = 0
-                d = pmt.to_python(pmt.cdr(trig_pmt))    # Collect trig message data, convert to Python format
-                l = [chr(e) for e in d]
-                l = ''.join(l)
-                l = re.split(r'\t+', l)     # l now contains wanted_tag, frame number, and offset
-
-                self.log("Trig : %s" % (l))
+                
                 try :
 
                     self.frame_cnt = int(l[1])
+                    self.log("Trig - Frame : %s" % (self.frame_cnt))
                     if l[0] == self.wanted_tag:
                         self.state = BCH
                         self.slot_cnt = 0
@@ -263,13 +280,14 @@ class sn_scheduler(gr.basic_block):
                 inst_ulcch = {}
                 inst_ulcch["content"] = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("ULCCH"), pmt.PMT_NIL)) 
                 inst_ulcch["frame"] = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("FRAME"), pmt.PMT_NIL)) 
+                inst_ulcch["packet"] = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("SEND"), pmt.PMT_NIL)) 
                 if self.frame_cnt == inst_ulcch["frame"]:
                     self.message_port_pub(pmt.to_pmt("ULCCH"), self.create_cch_msg(inst_ulcch["content"]))
                     inst_ulcch["send"] = True
                 else:
                     inst_ulcch["send"] = False
                 self.ulcch.append(inst_ulcch)
-                self.log("Received new ULCCH instruction : %s" % (self.ulcch))
+                self.log("Received new ULCCH instruction : %s" % (inst_ulcch))
 
     def handle_dlcch(self, msg_pmt):
         with self.lock :
@@ -278,14 +296,14 @@ class sn_scheduler(gr.basic_block):
             frame = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("FRM"), pmt.PMT_NIL)) 
             if sn_id == self.Id: 
                 self.dlcch = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("CCH"), pmt.PMT_NIL)) 
-                if self.frame_cnt != frame:
-                    self.frame_cnt = frame
-                self.message_port_pub(pmt.to_pmt("feedback"), self.create_inst_msg(self.dlcch))             
-                self.feedback_send = True
+                # if self.frame_cnt != frame:
+                #     self.frame_cnt = frame
+                self.log("SN %s : DLCCH received : SRC - %s | Frame - %s | CCH - %s" % (sn_id, bs_id, frame, self.dlcch))
+                print("SN %s : DLCCH received : SRC - %s | Frame - %s | CCH - %s" % (sn_id, bs_id, frame, self.dlcch))
 
 
     def run_state(self,output) :
-        self.log("State : %s" % (self.state))
+        self.log("State : %s" % (STATES[self.state]))
         if self.frame_cnt == 0 and not self.inst_request_send:
             self.log("Send START DLCCH to BS")
             self.message_port_pub(pmt.to_pmt("ULCCH"), self.create_cch_msg("START"))
@@ -396,6 +414,7 @@ class sn_scheduler(gr.basic_block):
                     self.delay_t = 0
                     self.active = -1
                     self.i=0
+                    self.log("RESET proc -> slot_read")
 
                 elif self.state not in self.STATES[0] :
                     print("STATE ERROR")

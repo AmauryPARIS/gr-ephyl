@@ -1597,6 +1597,49 @@
     </param>
   </block>
   <block>
+    <key>ephyl_busy_tresh</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1392, 492)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ephyl_busy_tresh_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>tresh</key>
+      <value>5</value>
+    </param>
+  </block>
+  <block>
     <key>ephyl_msg_mux</key>
     <param>
       <key>alias</key>
@@ -2441,6 +2484,12 @@
   </connection>
   <connection>
     <source_block_id>blocks_keep_one_in_n_1</source_block_id>
+    <sink_block_id>ephyl_busy_tresh_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blocks_keep_one_in_n_1</source_block_id>
     <sink_block_id>pad_sink_0_0_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -2528,6 +2577,12 @@
     <sink_block_id>blocks_keep_m_in_n_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_busy_tresh_0</source_block_id>
+    <sink_block_id>ephyl_msg_mux_0</sink_block_id>
+    <source_key>feedback</source_key>
+    <sink_key>detect</sink_key>
   </connection>
   <connection>
     <source_block_id>ephyl_msg_mux_0</source_block_id>

@@ -8,5 +8,6 @@ cp /usr/local/lib/python2.7/dist-packages/ephyl/sn_scheduler.py /cortexlab/toolc
 cp /usr/local/lib/python2.7/dist-packages/ephyl/msg_mux.py /cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/msg_mux.py
 cp /usr/local/lib/python2.7/dist-packages/ephyl/access_control.py /cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/access_control.py
 cp /usr/local/lib/python2.7/dist-packages/ephyl/easy_upper.py /cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/easy_upper.py
+cp /usr/local/lib/python2.7/dist-packages/ephyl/busy_tresh.py /cortexlab/toolchains/current/lib/python2.7/dist-packages/ephyl/busy_tresh.py
 
 echo "Instalation done and files copied"
