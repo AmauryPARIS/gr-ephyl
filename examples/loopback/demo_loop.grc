@@ -1049,37 +1049,6 @@
     </param>
   </block>
   <block>
-    <key>blocks_message_debug</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(312, 1136)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_message_debug_0</value>
-    </param>
-  </block>
-  <block>
     <key>blocks_message_strobe</key>
     <param>
       <key>alias</key>
@@ -1914,6 +1883,10 @@
       <key>T_s</key>
       <value>T_s</value>
     </param>
+    <param>
+      <key>power_tresh_detection</key>
+      <value>power_tresh_detect</value>
+    </param>
   </block>
   <block>
     <key>hier_sensor</key>
@@ -2157,6 +2130,53 @@
     <param>
       <key>value</key>
       <value>["A","B"]</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(656, 196)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>power_tresh_detect</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Treshold value for power detection</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>5</value>
     </param>
   </block>
   <block>
@@ -3299,7 +3319,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(848, 1596)</value>
+      <value>(848, 1604)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3407,7 +3427,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(896, 1532)</value>
+      <value>(896, 1540)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3650,7 +3670,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(296, 1564)</value>
+      <value>(280, 1572)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3807,12 +3827,6 @@
   </connection>
   <connection>
     <source_block_id>ephyl_easy_upper_0</source_block_id>
-    <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>inst</source_key>
-    <sink_key>print</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>ephyl_easy_upper_0</source_block_id>
     <sink_block_id>hier_sensor_0</sink_block_id>
     <source_key>inst</source_key>
     <sink_key>Inst</sink_key>
@@ -3822,12 +3836,6 @@
     <sink_block_id>hier_sensor_0_2</sink_block_id>
     <source_key>inst</source_key>
     <sink_key>Inst</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>ephyl_easy_upper_0_0</source_block_id>
-    <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>inst</source_key>
-    <sink_key>print</sink_key>
   </connection>
   <connection>
     <source_block_id>ephyl_easy_upper_0_0</source_block_id>
@@ -3981,12 +3989,6 @@
   </connection>
   <connection>
     <source_block_id>virtual_source_1</source_block_id>
-    <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>print</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>virtual_source_1</source_block_id>
     <sink_block_id>hier_sensor_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>DLCCH</sink_key>
@@ -3996,12 +3998,6 @@
     <sink_block_id>hier_sensor_0_2</sink_block_id>
     <source_key>out</source_key>
     <sink_key>DLCCH</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>virtual_source_2</source_block_id>
-    <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>print</sink_key>
   </connection>
   <connection>
     <source_block_id>virtual_source_2</source_block_id>
