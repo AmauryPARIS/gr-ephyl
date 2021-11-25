@@ -93,13 +93,11 @@ class easy_upper(gr.sync_block):
 
             if dlcch != "START" :
                 frame = frame + 1
-                sequence = "%s" % (int(frame))
-                # if numpy.random.uniform() < 0.5:
-                #     sequence = "2" 
-                # if numpy.random.uniform() < 0.3:
-                #     action = "False" 
-                if frame == 4:
-                    action = "True"
+                sequence = "X"
+                if numpy.random.uniform() < 0.5:
+                    sequence = "Y" 
+                if numpy.random.uniform() < 0.7:
+                    action = "True" 
 
             else:
                 frame = 1
@@ -111,7 +109,7 @@ class easy_upper(gr.sync_block):
             msg = pmt.dict_add(msg, pmt.to_pmt("SEQUENCE"), pmt.to_pmt(sequence))
             msg = pmt.dict_add(msg, pmt.to_pmt("ULCCH"), pmt.to_pmt(str("ulcch_" + str(frame) + "_" + str(sensor_id))))
 
-            self.log(frame, "Input : Node %s | Frame %s | DLCCH %s - Return : Node %s | Frame %s | Send %s | Seq %s" % (sensor_id, frame, dlcch, sensor_id, frame, action, sequence) )
+            self.log(frame, "Input : Node %s | Frame %s | DLCCH %s - Return : Node %s | Frame %s | Send %s | Seq %s" % (sensor_id, int(frame)-1, dlcch, sensor_id, frame, action, sequence) )
                 
         # Send back instruction  
         self.message_port_pub(pmt.to_pmt("inst"), msg)
