@@ -46,7 +46,7 @@ class sn_scheduler(gr.basic_block):
     """
     def __init__(self, phy_option=0,
         num_slots=5, bch_time=20, guard_time=100, Slot_time=50, Proc_time = 50, 
-        wanted_tag="corr_start",length_tag_key="packet_len2",samp_rate = 32000, ID = "Z"):
+        wanted_tag="corr_start",length_tag_key="packet_len2",samp_rate = 32000, ID = "Z", log=False):
         gr.basic_block.__init__(self,
             name="Sensor Scheduler",
             in_sig=[],
@@ -58,6 +58,7 @@ class sn_scheduler(gr.basic_block):
         self.num_slots = num_slots
         self.length_tag_key = length_tag_key
         self.samp_rate = int(samp_rate/1000)
+        self.logged = log
 
         ## Here we set states data, 
         ## PS : LISTEN has a constant pseudo infinite duration to avoid timing/buffer overflow
@@ -129,7 +130,7 @@ class sn_scheduler(gr.basic_block):
         self.filename_log = "LOG_SN_"+self.Id+"_sched_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
 
     def log(self, log):
-        if True:
+        if self.logged:
             now = datetime.now().time()
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s-%s\n" % (self.Id, self.frame_cnt, now, log)) 

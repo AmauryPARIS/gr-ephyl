@@ -41,7 +41,7 @@ from gnuradio import qtgui
 
 class demo_loop(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=100, bs_slots=range(3), control0='1', control1='2', control2='5', control3='7', cp_ratio=0.25, list_sensor=["A","B"]):
+    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=100, bs_slots=range(3), control0='1', control1='2', control2='5', control3='7', cp_ratio=0.25, list_sensor=["A","B"], power_tresh_detect=5):
         gr.top_block.__init__(self, "Demo Loop")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop")
@@ -82,6 +82,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.control3 = control3
         self.cp_ratio = cp_ratio
         self.list_sensor = list_sensor
+        self.power_tresh_detect = power_tresh_detect
 
         ##################################################
         # Variables
@@ -93,6 +94,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.freq_offset = freq_offset = 0
         self.freq = freq = 2450e6
         self.frame_len = frame_len = (T_bch+len(bs_slots)*(T_s+T_g)+T_p)/float(1000)
+        self.debug_log = debug_log = True
         self.MTU = MTU = 1500
 
         ##################################################
@@ -170,6 +172,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
             id_0=list_sensor[1],
             log=True,
             samp_rate=samp_rate,
+            debug_log=debug_log,
         )
         self.hier_sensor_0 = hier_sensor(
             M=M,
@@ -183,6 +186,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
             id_0=list_sensor[0],
             log=True,
             samp_rate=samp_rate,
+            debug_log=debug_log,
         )
         self.hier_bs_0 = hier_bs(
             M=M,
@@ -195,10 +199,12 @@ class demo_loop(gr.top_block, Qt.QWidget):
             bs_slots=bs_slots,
             exit_frame=600,
             list_sensor=list_sensor,
+            power_tresh_detection=power_tresh_detect,
             samp_rate=samp_rate,
+            debug_log=debug_log,
         )
-        self.ephyl_easy_upper_0_0 = ephyl.easy_upper(True, list_sensor)
-        self.ephyl_easy_upper_0 = ephyl.easy_upper(False, list_sensor)
+        self.ephyl_easy_upper_0_0 = ephyl.easy_upper(True, list_sensor, debug_log)
+        self.ephyl_easy_upper_0 = ephyl.easy_upper(False, list_sensor, debug_log)
         self.channels_channel_model_0 = channels.channel_model(
         	noise_voltage=noise_voltage,
         	frequency_offset=freq_offset,
@@ -360,6 +366,13 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.hier_sensor_0.set_id_0(self.list_sensor[0])
         self.hier_bs_0.set_list_sensor(self.list_sensor)
 
+    def get_power_tresh_detect(self):
+        return self.power_tresh_detect
+
+    def set_power_tresh_detect(self, power_tresh_detect):
+        self.power_tresh_detect = power_tresh_detect
+        self.hier_bs_0.set_power_tresh_detection(self.power_tresh_detect)
+
     def get_time_offset(self):
         return self.time_offset
 
@@ -410,6 +423,15 @@ class demo_loop(gr.top_block, Qt.QWidget):
 
     def set_frame_len(self, frame_len):
         self.frame_len = frame_len
+
+    def get_debug_log(self):
+        return self.debug_log
+
+    def set_debug_log(self, debug_log):
+        self.debug_log = debug_log
+        self.hier_sensor_0_2.set_debug_log(self.debug_log)
+        self.hier_sensor_0.set_debug_log(self.debug_log)
+        self.hier_bs_0.set_debug_log(self.debug_log)
 
     def get_MTU(self):
         return self.MTU

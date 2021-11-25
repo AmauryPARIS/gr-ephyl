@@ -4,7 +4,7 @@
   <key>ephyl_sn_scheduler</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.sn_scheduler($phy_option, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate, $ID)</make>
+  <make>ephyl.sn_scheduler($phy_option, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate, $ID, $log)</make>
  
   <param>
     <name>PHY Option</name>
@@ -82,10 +82,13 @@
     <value>"Z"</value>
     <type>raw</type>
   </param>
- 
 
-
-
+  <param>
+    <name>Generate debug/log file</name>
+    <key>log</key>
+    <value>False</value>
+    <type>bool</type>
+  </param>
 
   <sink>
     <name>in</name>

@@ -37,7 +37,7 @@ class msg_mux(gr.sync_block):
 
     Concatenates message data coming from inputs (payload, frame & slot number)
     """
-    def __init__(self, list_sensor = ["a", "b"]):  # only default arguments here
+    def __init__(self, list_sensor = ["a", "b"], log=False):  # only default arguments here
         """arguments to this function show up as parameters in GRC"""
         gr.sync_block.__init__(
             self,
@@ -73,10 +73,11 @@ class msg_mux(gr.sync_block):
         self.received_packet = []
         self.received_ulcch = []
         self.crc = "wivuopnwusbywu"
+        self.logged = log
 
 
     def log(self, log):
-        if True:
+        if self.logged:
             now = datetime.now().time()
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s-%s\n" % ("BS", self.frame_n, now, log)) 

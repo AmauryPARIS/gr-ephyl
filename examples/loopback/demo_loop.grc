@@ -155,6 +155,33 @@
     </param>
     <param>
       <key>_coordinate</key>
+      <value>(16, 212)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>debug_log</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>True</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
       <value>(1064, 12)</value>
     </param>
     <param>
@@ -1731,11 +1758,15 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(600, 1040)</value>
+      <value>(568, 1036)</value>
     </param>
     <param>
       <key>_rotation</key>
       <value>180</value>
+    </param>
+    <param>
+      <key>log</key>
+      <value>debug_log</value>
     </param>
     <param>
       <key>id</key>
@@ -1783,6 +1814,10 @@
     <param>
       <key>_rotation</key>
       <value>180</value>
+    </param>
+    <param>
+      <key>log</key>
+      <value>debug_log</value>
     </param>
     <param>
       <key>id</key>
@@ -1838,6 +1873,10 @@
     <param>
       <key>_rotation</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>debug_log</key>
+      <value>debug_log</value>
     </param>
     <param>
       <key>T_g</key>
@@ -1923,6 +1962,10 @@
       <value>0</value>
     </param>
     <param>
+      <key>debug_log</key>
+      <value>debug_log</value>
+    </param>
+    <param>
       <key>log</key>
       <value>True</value>
     </param>
@@ -2004,6 +2047,10 @@
     <param>
       <key>_rotation</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>debug_log</key>
+      <value>debug_log</value>
     </param>
     <param>
       <key>log</key>

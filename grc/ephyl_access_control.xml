@@ -4,7 +4,7 @@
   <key>ephyl_access_control</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.access_control($bs_slots,$Control,$save_log,$ID)</make>
+  <make>ephyl.access_control($bs_slots,$Control,$save_log,$ID,$log)</make>
 
 <param>
     <name>BS Slots</name>
@@ -30,6 +30,13 @@
     <key>ID</key>
     <value>"Z"</value>
     <type>raw</type>
+  </param>
+
+  <param>
+    <name>Generate debug/log file</name>
+    <key>log</key>
+    <value>False</value>
+    <type>bool</type>
   </param>
 
   <sink>
