@@ -412,7 +412,7 @@ class access_control(gr.sync_block):
                 inst_send = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("SEND"), pmt.PMT_NIL)) 
                 inst_sequence = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("SEQUENCE"), pmt.PMT_NIL))
                 frame = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("FRAME"), pmt.PMT_NIL))
-                self.log("Inst received : %s | %s | %s" % (inst_send, inst_sequence, frame))
+                self.log("Inst received : send - %s | sequence - %s | frame - %s" % (inst_send, inst_sequence, frame))
 
                 if inst_send == "True":
                     self.send.append({"inst" : SEND, "sequence" : inst_sequence, "frame" : frame})
@@ -430,7 +430,7 @@ class access_control(gr.sync_block):
                     self.send_inst = inst["inst"]
                     self.sequ_inst = inst["sequence"]
 
-            self.log("BUSY : %s | %s | %s | %s " % (self.frame_cnt, self.busy, self.send_inst, self.send))
+            self.log("BUSY : frame - %s | status - %s | send inst - %s | list inst - %s " % (self.frame_cnt, self.busy, self.send_inst, self.send))
 
             if self.busy != True :
                 if self.i < len(self.lines) :
@@ -468,10 +468,9 @@ class access_control(gr.sync_block):
                             self.log("Data send in PHY layer") 
                             ## Data is (node_id + line_i)
                             data = self.lines[self.i][2:]               # Remove frame number and slot number
-                            print("Data bf : %s" % data)
                             data = self.add_symb(self.sequ_inst, data)  # Replace first random values by sequence
                             self.lines[self.i][3] = data[1]             # Update packet buffer
-                            print("Data af : %s - %s" % (data, self.lines[self.i]))
+
                             data = '\t'.join(data)
                             OUT = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(data),[ord(c) for c in data]))    # Data = encrypted node_id + line_i
                             self.message_port_pub(pmt.to_pmt("Data"), OUT) 
@@ -542,7 +541,7 @@ class access_control(gr.sync_block):
                                             except :
                                                 lines[i+1] = str(len(self.detection_list)/(float(self.frame_cnt)+1))+'\n'
                                         if 'Active frames' in lines[i]:
-                                            lines[i+1] = self.frame_cnt + ' ' + lines[i+1]
+                                            lines[i+1] = str(self.frame_cnt) + ' ' + lines[i+1]
                                         if 'Detection rate' in lines[i]:
                                             tmp = "{:.2E}".format(self.detection_rate[-1])
                                             lines[i+1] = tmp+'\n'
@@ -588,7 +587,7 @@ class access_control(gr.sync_block):
             self.RX = re.split(r'\t+', l)
             self.log("Feedback from BS : %s " % (self.RX))
             if self.RX[0] == 'corr_est':
-                self.frame_cnt = self.RX[1]
+                self.frame_cnt = int(self.RX[1])
                 '''
                 In case SN starts way later than BS, 
                 frame_cnt will have a start "offset", 
@@ -599,6 +598,10 @@ class access_control(gr.sync_block):
                     self.frame_offset = int(self.frame_cnt) + 1
                 elif int(self.frame_cnt) == 0 :
                     self.frame_offset = 'NaN'
+
+            elif self.RX[0] == 'end_frame':
+                self.frame_cnt = int(self.RX[1]) +1
+                self.log("Receive end frame bch - Frame n%s" % (self.frame_cnt))
 
             ## Look for a tab caracter in DL message, to avoid processing beacon message
             else:                

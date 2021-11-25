@@ -34,6 +34,11 @@ Messages</name>
     <type>message</type>
   </sink>
 
+  <sink>
+    <name>detect</name>
+    <type>message</type>
+  </sink>
+
   <source>
     <name>final_msg</name>
     <type>message</type>

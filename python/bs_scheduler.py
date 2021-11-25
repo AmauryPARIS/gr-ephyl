@@ -34,6 +34,7 @@ PUSCH = 2
 GUARD = 3
 PROC = 4
 
+STATES = ["IDLE", "BCH", "PUSCH", "GUARD", "PROC"]
 
 class bs_scheduler(gr.sync_block):
     """EPHYL Demo : Base Station 
@@ -120,9 +121,9 @@ class bs_scheduler(gr.sync_block):
             for dlcch_inst in pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("DLCCH"), pmt.PMT_NIL)) :
                 
                 dlcch_inst_norm = {"sensor" : dlcch_inst[0], "frame" : frame, "content" : dlcch_inst[1], "send" : False}
-                if frame == self.frame_cnt:
-                    self.message_port_pub(pmt.to_pmt("DLCCH"), self.create_cch_msg(dlcch_inst_norm["sensor"], dlcch_inst_norm["content"]))
-                    dlcch_inst_norm["send"] = True
+                # if frame == self.frame_cnt:
+                #     self.message_port_pub(pmt.to_pmt("DLCCH"), self.create_cch_msg(dlcch_inst_norm["sensor"], dlcch_inst_norm["content"]))
+                #     dlcch_inst_norm["send"] = True
                 self.list_dlcch.append(dlcch_inst_norm)
                 self.log("Received new DLCCH instruction : %s" % (self.list_dlcch))
 
@@ -136,10 +137,15 @@ class bs_scheduler(gr.sync_block):
         msg = pmt.dict_add(msg, pmt.to_pmt("CCH"), pmt.to_pmt(payload))
         return msg
 
-            
+    def end_frame_beacon(self):
+        msg = 'end_frame' + '\t' + str(self.frame_cnt-1)
+        d = [ord(e) for e in msg]
+        trig_msg = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(d),d))
+        self.message_port_pub(pmt.to_pmt("bcn"), trig_msg)
+        self.log("Send end message beacon")
 
     def run_state(self,Input,output1) :
-        self.log("State %s" % (self.state))
+        self.log("State %s" % (STATES[self.state]))
         if self.frame_cnt == 0 and not self.inst_request_send:
             for sensor in self.list_sensor:
                 self.log("Send START DLCCH to %s" % (sensor))
@@ -202,9 +208,11 @@ class bs_scheduler(gr.sync_block):
                 key = pmt.intern(self.STATES[1][self.state])
                 value = pmt.to_pmt(self.slot_cnt)
             self.add_item_tag(0,offset, key, value)
+
             if self.state == PROC :
-                print "[BS] ================= FRAME " + str(self.frame_cnt-1) + " FINISH ================="
-                self.dlcch_send = False
+                print "[BS] ================= FRAME " + str(self.frame_cnt-1) + " PROCESSING ================="
+                self.end_frame_beacon()
+                
 
         ###############################################################################
         ## If the cuurent state can still run completely one more time
@@ -245,7 +253,11 @@ class bs_scheduler(gr.sync_block):
 
                     trig_msg = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(d),d))
                     self.message_port_pub(pmt.to_pmt("bcn"), trig_msg)
+                    self.log("Send BCH beacon")
                     self.bcn_sent = True
+                    if self.frame_cnt != 0:
+                        print("\n")
+                        print "[BS] ================= FRAME " + str(self.frame_cnt) + " START ================="
 
                     output1[:] = [0]*len(output1)
                 else : 
