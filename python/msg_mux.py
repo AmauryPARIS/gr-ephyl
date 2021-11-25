@@ -138,20 +138,26 @@ class msg_mux(gr.sync_block):
     def handle_data(self, msg_pmt):
         with self.lock : 
             self.data = pmt.to_python(pmt.cdr(msg_pmt))
-            l = [chr(c) for c in self.data]
-            l = ''.join(l)
-            l = re.split(r'\t+', l)
+            try:
+                l = [chr(c) for c in self.data]
+                l = ''.join(l)
+                l = re.split(r'\t+', l)
 
-            sn_id = l[0]
-            sequence = l[1][0:3]
-            crc = l[1][3:]
+                sn_id = l[0]
+                sequence = l[1][0:3]
+                crc = l[1][3:]
             
-            if sequence[0] == sequence[1] and sequence[1] == sequence[2] and crc in self.crc:
-                sequence = sequence[0]
-                status = "RX"
-            else: 
+                if sequence[0] == sequence[1] and sequence[1] == sequence[2] and crc in self.crc:
+                    sequence = sequence[0]
+                    status = "RX"
+                else: 
+                    sequence = "error"
+                    status = "BUSY"
+            except:
+                sn_id = "error"
                 sequence = "error"
-                status = "BUSY"
+                crc = "error"
+                status = "error"
 
             print("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
 
