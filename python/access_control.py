@@ -174,7 +174,7 @@ class access_control(gr.sync_block):
         res =  ''.join(random.choice(letters) for i in xrange(len))
         return res 
 
-    # Generate random payload
+    # Generate random payload // !! // -> Modified to always use the same sequence (integrity check performed at BS)
     def gen_rand_pld(self,ID,n=1,slots=[0],data=False) :    
         res = []
         if not any(slots) :
