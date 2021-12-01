@@ -125,7 +125,7 @@ class msg_mux(gr.sync_block):
                 for msg_elem in range(0,len(self.received_packet)):
                     if int(self.received_packet[msg_elem][1]) == int(detect_elem): # Check for matching slot number
                         detect[detect_elem] = "RX"
-                        packets.append([self.received_packet[msg_elem][0], self.received_packet[msg_elem][2], self.received_packet[msg_elem][4]]) # [sn_id, sequence, frame
+                        packets.append([self.received_packet[msg_elem][0], self.received_packet[msg_elem][2]]) # [sn_id, sequence]
                 rx.append([detect_elem, detect[detect_elem], packets])
         
         # Frame number for the reception of dealt packets
