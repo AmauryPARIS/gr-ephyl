@@ -102,6 +102,7 @@ class easy_upper(gr.sync_block):
             else:
                 frame = 1
                 sequence = "A" 
+                action = "True"
 
             msg = pmt.dict_add(msg, pmt.to_pmt("ID"), pmt.to_pmt(sensor_id))
             msg = pmt.dict_add(msg, pmt.to_pmt("FRAME"), pmt.to_pmt(frame))
