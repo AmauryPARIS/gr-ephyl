@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Demo Loop
-# GNU Radio version: 3.7.14.0
+# GNU Radio version: 3.7.13.5
 ##################################################
 
 if __name__ == '__main__':
@@ -41,7 +41,7 @@ from gnuradio import qtgui
 
 class demo_loop(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=100, bs_slots=range(3), control0='1', control1='2', control2='5', control3='7', cp_ratio=0.25, list_sensor=["A","B"], power_tresh_detect=5):
+    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=100, bs_slots=range(5), control0='random', control1='1:2', control2='5', control3='7', cp_ratio=0.25, list_sensor=["A","B"], power_tresh_detect=5):
         gr.top_block.__init__(self, "Demo Loop")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop")
@@ -169,10 +169,10 @@ class demo_loop(gr.top_block, Qt.QWidget):
             T_s=T_s,
             bs_slots=bs_slots,
             control=control1,
-            id_0=list_sensor[1],
+            debug_log=True,
+            id_0="B",
             log=True,
             samp_rate=samp_rate,
-            debug_log=debug_log,
         )
         self.hier_sensor_0 = hier_sensor(
             M=M,
@@ -183,10 +183,10 @@ class demo_loop(gr.top_block, Qt.QWidget):
             T_s=T_s,
             bs_slots=bs_slots,
             control=control0,
-            id_0=list_sensor[0],
+            debug_log=True,
+            id_0="A",
             log=True,
             samp_rate=samp_rate,
-            debug_log=debug_log,
         )
         self.hier_bs_0 = hier_bs(
             M=M,
@@ -197,11 +197,11 @@ class demo_loop(gr.top_block, Qt.QWidget):
             T_s=T_s,
             UHD=False,
             bs_slots=bs_slots,
+            debug_log=True,
             exit_frame=600,
-            list_sensor=list_sensor,
-            power_tresh_detection=power_tresh_detect,
+            list_sensor=["A","B"],
+            power_tresh_detection=5,
             samp_rate=samp_rate,
-            debug_log=debug_log,
         )
         self.ephyl_easy_upper_0_0 = ephyl.easy_upper(True, list_sensor, debug_log)
         self.ephyl_easy_upper_0 = ephyl.easy_upper(False, list_sensor, debug_log)
@@ -362,16 +362,12 @@ class demo_loop(gr.top_block, Qt.QWidget):
 
     def set_list_sensor(self, list_sensor):
         self.list_sensor = list_sensor
-        self.hier_sensor_0_2.set_id_0(self.list_sensor[1])
-        self.hier_sensor_0.set_id_0(self.list_sensor[0])
-        self.hier_bs_0.set_list_sensor(self.list_sensor)
 
     def get_power_tresh_detect(self):
         return self.power_tresh_detect
 
     def set_power_tresh_detect(self, power_tresh_detect):
         self.power_tresh_detect = power_tresh_detect
-        self.hier_bs_0.set_power_tresh_detection(self.power_tresh_detect)
 
     def get_time_offset(self):
         return self.time_offset
@@ -429,9 +425,6 @@ class demo_loop(gr.top_block, Qt.QWidget):
 
     def set_debug_log(self, debug_log):
         self.debug_log = debug_log
-        self.hier_sensor_0_2.set_debug_log(self.debug_log)
-        self.hier_sensor_0.set_debug_log(self.debug_log)
-        self.hier_bs_0.set_debug_log(self.debug_log)
 
     def get_MTU(self):
         return self.MTU
@@ -446,10 +439,10 @@ def argument_parser():
         "", "--T-p", dest="T_p", type="intx", default=500,
         help="Set Proc duration (ms) [default=%default]")
     parser.add_option(
-        "", "--control0", dest="control0", type="string", default='1',
+        "", "--control0", dest="control0", type="string", default='random',
         help="Set Control [default=%default]")
     parser.add_option(
-        "", "--control1", dest="control1", type="string", default='2',
+        "", "--control1", dest="control1", type="string", default='1:2',
         help="Set Control [default=%default]")
     parser.add_option(
         "", "--control2", dest="control2", type="string", default='5',

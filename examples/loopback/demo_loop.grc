@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.14'?>
+<?grc format='1' created='3.7.13'?>
 <flow_graph>
   <timestamp>Mon Nov  5 15:30:13 2018</timestamp>
   <block>
@@ -1433,7 +1433,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>range(3)</value>
+      <value>range(5)</value>
     </param>
   </block>
   <block>
@@ -1543,7 +1543,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1</value>
+      <value>random</value>
     </param>
   </block>
   <block>
@@ -1590,7 +1590,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>2</value>
+      <value>1:2</value>
     </param>
   </block>
   <block>
@@ -1876,7 +1876,7 @@
     </param>
     <param>
       <key>debug_log</key>
-      <value>debug_log</value>
+      <value>True</value>
     </param>
     <param>
       <key>T_g</key>
@@ -1888,7 +1888,7 @@
     </param>
     <param>
       <key>list_sensor</key>
-      <value>list_sensor</value>
+      <value>["A","B"]</value>
     </param>
     <param>
       <key>M</key>
@@ -1924,7 +1924,7 @@
     </param>
     <param>
       <key>power_tresh_detection</key>
-      <value>power_tresh_detect</value>
+      <value>5</value>
     </param>
   </block>
   <block>
@@ -1963,7 +1963,7 @@
     </param>
     <param>
       <key>debug_log</key>
-      <value>debug_log</value>
+      <value>True</value>
     </param>
     <param>
       <key>log</key>
@@ -2003,7 +2003,7 @@
     </param>
     <param>
       <key>id_0</key>
-      <value>list_sensor[0]</value>
+      <value>"A"</value>
     </param>
     <param>
       <key>control</key>
@@ -2050,7 +2050,7 @@
     </param>
     <param>
       <key>debug_log</key>
-      <value>debug_log</value>
+      <value>True</value>
     </param>
     <param>
       <key>log</key>
@@ -2090,7 +2090,7 @@
     </param>
     <param>
       <key>id_0</key>
-      <value>list_sensor[1]</value>
+      <value>"B"</value>
     </param>
     <param>
       <key>control</key>
@@ -3951,12 +3951,6 @@
     <sink_key>feedback</sink_key>
   </connection>
   <connection>
-    <source_block_id>hier_sensor_0</source_block_id>
-    <sink_block_id>zeromq_pub_msg_sink_0</sink_block_id>
-    <source_key>feedback</source_key>
-    <sink_key>in</sink_key>
-  </connection>
-  <connection>
     <source_block_id>hier_sensor_0_2</source_block_id>
     <sink_block_id>blocks_null_sink_1_0</sink_block_id>
     <source_key>0</source_key>
@@ -4051,11 +4045,5 @@
     <sink_block_id>hier_bs_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>ULCCH</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>zeromq_sub_msg_source_0</source_block_id>
-    <sink_block_id>hier_sensor_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>Inst</sink_key>
   </connection>
 </flow_graph>
