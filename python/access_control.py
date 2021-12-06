@@ -464,10 +464,12 @@ class access_control(gr.sync_block):
                             tmp = self.lines[self.i]
                             if self.active==True:     # If sensor is active for the current frame
                                 self.message_port_pub(pmt.to_pmt("Array"), pmt.to_pmt(tmp))   # Send 1st char of each line (aka slots)
+                                self.log("Request slot schedule - slot %s | i %s | lines %s" % (tmp, self.i, self.lines))
+
                     ########################################################################################################
                     ## Scheduler requests payload array to be sent in PHY chain
                         elif self.busy == 'DATA' :
-                            self.log("Data send in PHY layer") 
+                            
                             ## Data is (node_id + line_i)
                             data = self.lines[self.i][2:]               # Remove frame number and slot number
                             data = self.add_symb(self.sequ_inst, data)  # Replace first random values by sequence
@@ -476,6 +478,7 @@ class access_control(gr.sync_block):
                             data = '\t'.join(data)
                             OUT = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(data),[ord(c) for c in data]))    # Data = encrypted node_id + line_i
                             self.message_port_pub(pmt.to_pmt("Data"), OUT) 
+                            self.log("Data send in PHY layer - data %s | i %s | lines %s" % (data, self.i, self.lines)) 
                         self.i += 1
                     ########################################################################################################
                     ## Scheduler informs a frame reset (frame finished or new will start)
