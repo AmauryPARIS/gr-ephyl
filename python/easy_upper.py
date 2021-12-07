@@ -28,7 +28,7 @@ class easy_upper(gr.sync_block):
     """
     docstring for block easy_upper
     """
-    def __init__(self, BS = True, list_sensor = ["a", "b"], log=False):
+    def __init__(self, BS = True, list_sensor = ["a", "b"], log=False, list_slots = [0]):
         gr.sync_block.__init__(self,
             name="easy_upper",
             in_sig=[],
@@ -38,6 +38,7 @@ class easy_upper(gr.sync_block):
         self.list_sensor = list_sensor
         self.count = 0
         self.logged = log
+        self.slots = list_slots
 
         self.message_port_register_out(pmt.to_pmt("inst"))
 
@@ -90,19 +91,29 @@ class easy_upper(gr.sync_block):
 
             # Build response for this sensor
             action = "False"
+            sequence = []
+            frame = frame + 1
+            
+            if numpy.random.uniform() < 0.7:
+                action = "True" 
+                for slot in self.slots:
+                    if numpy.random.uniform() < 0.5:
+                        if numpy.random.uniform() < 0.5:
+                            sequence.append([slot, "Y"])
+                        else:
+                            sequence.append([slot, "X"])
+                    else:
+                        sequence.append([slot, False])
+                
+                if len(sequence) == 0:
+                    action = "False"
 
-            if dlcch != "START" :
-                frame = frame + 1
-                sequence = "X"
-                if numpy.random.uniform() < 0.5:
-                    sequence = "Y" 
-                if numpy.random.uniform() < 0.7:
-                    action = "True" 
+            
 
-            else:
-                frame = 1
-                sequence = "A" 
-                action = "True"
+            # if sensor_id == "A":
+            #     sequence = [[0, "X"], [1, False], [2, False], [3, False], [4, "X"]] 
+            # else:
+            #     sequence = [[0, False], [1, False], [2, "Y"], [3, False], [4, "Y"]] 
 
             msg = pmt.dict_add(msg, pmt.to_pmt("ID"), pmt.to_pmt(sensor_id))
             msg = pmt.dict_add(msg, pmt.to_pmt("FRAME"), pmt.to_pmt(frame))

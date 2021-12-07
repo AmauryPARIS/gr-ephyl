@@ -121,12 +121,15 @@ class msg_mux(gr.sync_block):
             if detect[detect_elem] == "IDLE":
                 rx.append([detect_elem, detect[detect_elem]])
             else:
-                packets = []
+                packets = None
                 for msg_elem in range(0,len(self.received_packet)):
                     if int(self.received_packet[msg_elem][1]) == int(detect_elem): # Check for matching slot number
-                        detect[detect_elem] = "RX"
-                        packets.append([self.received_packet[msg_elem][0], self.received_packet[msg_elem][2]]) # [sn_id, sequence]
-                rx.append([detect_elem, detect[detect_elem], packets])
+                        if self.received_packet[msg_elem][3] == "BUSY":
+                            rx.append([detect_elem, detect[detect_elem]])
+                        else:
+                            detect[detect_elem] = "RX"
+                            packets = [self.received_packet[msg_elem][0], self.received_packet[msg_elem][2]] # [sn_id, sequence]
+                            rx.append([detect_elem, detect[detect_elem], packets])
         
         # Frame number for the reception of dealt packets
         frame = self.received_ulcch[0][0]
@@ -138,6 +141,7 @@ class msg_mux(gr.sync_block):
     def handle_data(self, msg_pmt):
         with self.lock : 
             self.data = pmt.to_python(pmt.cdr(msg_pmt))
+
             try:
                 l = [chr(c) for c in self.data]
                 l = ''.join(l)
@@ -146,6 +150,8 @@ class msg_mux(gr.sync_block):
                 sn_id = l[0]
                 sequence = l[1][0:3]
                 crc = l[1][3:]
+
+                self.log("Received - SN %s | seq %s | crc %s vs %s" % (sn_id, sequence, crc, self.crc))
             
                 if sequence[0] == sequence[1] and sequence[1] == sequence[2] and crc in self.crc:
                     sequence = sequence[0]
@@ -154,12 +160,13 @@ class msg_mux(gr.sync_block):
                     sequence = "error"
                     status = "BUSY"
             except:
+                self.log("Received error - data %s" % ([chr(c) for c in self.data]))
                 sn_id = "error"
                 sequence = "error"
                 crc = "error"
-                status = "error"
+                status = "busy"
 
-            print("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
+            self.log("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
 
             # Find a way to return the sequence
                 
