@@ -264,95 +264,10 @@ class access_control(gr.sync_block):
         remaining = list(set(map(str, self.bs_slots)) - set(active_slots))
         remaining.sort()
         next = str(int(max(used_slots))+1)
-        #################################################################
-        # Use all slots
-        if self.control == 'all' :
-            new_slots = self.bs_slots   
-        #################################################################
-        elif self.control == 'random' :
-            new_slots = np.random.choice(self.bs_slots, 1).tolist()
-        #################################################################
-        ## Static slots as parameter separated by colon. e.g. '0:2:5:6'
-        elif self.control[0].isdigit() :
-            tmp_slots = map(int,re.split(r':+', self.control))
-            test = [tmp_slots[i] in self.bs_slots for i in range(len(tmp_slots))]
-            if False not in test :
-                new_slots = tmp_slots
-        #################################################################            
-        # Increment each frame
-        elif self.control == 'increment' :
-            new_slots = [int(used_slots[0])]
-            if new_slots[0]+1 not in self.bs_slots :
-                new_slots = ['0']
-            else:
-                new_slots = [next]
-
-        #################################################################                
-        elif self.control == 'basic' :
-            '''
-            With basic Control Policy (Othmane):
-            If success, keep one of the good usedslots
-            If failure, increment
-            (old version: find remaining unused slots, if none choose 2 random)
-            '''
-            if v.count('p') > 0 :
-                new_slots = rx[h][1]
-            else :
-                if remaining :
-                    new_slots = np.random.choice(remaining, min(1,len(remaining))).tolist()
-                else :
-                    new_slots = np.random.choice(self.bs_slots, 1).tolist()
-
-            # if v.count('p') > 0 :
-            #     # new_slots = [tx[h][1]]
-            #     new_slots = used_slots
-            # else :
-            #     new_slots = [int(used_slots[0])]
-            #     if new_slots[0]+1 not in self.bs_slots :
-            #         new_slots = ['0']
-            #     else:
-            #         new_slots = [next]
-
 
         #################################################################
-        # With UCB
-        elif 'ucb' in self.control:
-            #  In this example, nch channels are emulated
-            #  then the number of times that this channel is selected is higher.
-            try :
-                tmp = re.split(r':+', self.control)
-                self.alfa = float(tmp[1])
-            except:
-                print "UCB : Invalid alpha parameter. Setting it to 0.8"
-                self.alfa=0.8
-
-            self.watch += 1
-            # Emulation of the channel occupancy  (it does not need to be implemented)
-            nch=len(self.bs_slots)  # number of channels  
-            ratio_global=nch*[0.0]
-
-            # If for example, bs_slots==[0,1,2,3,4] and active_slots==[1,2,4],
-            # result is stat_per = [False,True,True,False,True]
-            stat_per = [(str(self.bs_slots[i]) in active_slots) for i in self.bs_slots]
-            # print "[SN "+self.ID+"] STAT PER : ", stat_per
-
-            for k in xrange(nch):
-                if (stat_per[k]==True):
-                    self.ratio_ch[k] += 1 
-                ratio_global[k]  = float(self.ratio_ch[k])/float(self.watch)
-
-            # print "[SN "+self.ID+"] Ratio of resource occupancy : ", ratio_global
-
-            # UCB learning: it is the function to be included   
-            new_indice = self.compute_ucb(nch,stat_per[self.indice],self.watch)
-
-            new_slots = [new_indice]
-
-        #################################################################
-        # With No Control Policy, keep old slots
-        else :
-            self.control == 'NONE'
-            new_slots = used_slots
+        # Prepare for all slots
+        new_slots = self.bs_slots   
             
         ############################################################################################
         # print "[SN "+self.ID+"] Used Slots " + str(used_slots) + "\n"
@@ -379,34 +294,6 @@ class access_control(gr.sync_block):
         new_slots.sort()
 
         return [v,new_slots,active_slots,self.error]
-
-
-    def compute_ucb(self, nch, rewards, time_ucb):
-        # Input variables: rward(packet detection per slot), 
-        # chsel (NumberTimesChannelSelected), 
-        # watch(GlobalTime)
-        xmean=nch*[0]
-        bias=nch*[0]
-        x=nch*[0]
-        # self.alfa=0.8
-        maxval=-1.0
-        # Save variables
-        self.time_ucb=time_ucb
-        if  (rewards==True) : 
-            self.rward[self.indice]+=1 
-        # For each channel 
-        for k in xrange(nch):
-            xmean[k]=float(self.rward[k])/float(1+self.chsel[k])
-            bias[k]=math.sqrt(  self.alfa*math.log(1+self.time_ucb)/float(1+self.chsel[k]) )
-            x[k]=xmean[k]+bias[k]
-            if x[k]>maxval:
-               maxval=x[k]
-               new_indice=k
-        self.chsel[new_indice]+= 1 
-        self.indice=new_indice
-
-        return  new_indice
-
         
     def handle_inst(self, msg_pmt):
         with self.lock : 
@@ -415,6 +302,7 @@ class access_control(gr.sync_block):
                 inst_sequence = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("SEQUENCE"), pmt.PMT_NIL))
                 frame = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("FRAME"), pmt.PMT_NIL))
                 self.log("Inst received : send - %s | sequence - %s | frame - %s" % (inst_send, inst_sequence, frame))
+                print("SN %s - Inst received : send - %s | sequence - %s | frame - %s" % (self.ID, inst_send, inst_sequence, frame))
 
                 if inst_send == "True":
                     self.send.append({"inst" : SEND, "sequence" : inst_sequence, "frame" : frame})
@@ -423,6 +311,17 @@ class access_control(gr.sync_block):
                 else:
                     self.send.append({"inst" : NOK, "sequence" : None, "frame" : frame})
 
+    def apply_slot_sched(self):
+        self.log("BEGIN Apply slot sched - sequ inst %s | lines %s" % (reversed(self.sequ_inst), self.lines))
+        if len(self.sequ_inst) == len(self.lines):
+            for inst in reversed(self.sequ_inst):
+                slot_nbr = int(inst[0])
+                sequ = str(inst[1])
+                if sequ is "False":
+                    self.log("POP Apply slot sched - slot %s | lines %s" % (slot_nbr, self.lines))
+                    self.lines.pop(slot_nbr)
+            self.log("Apply slot sched - sequ inst %s | lines %s" % (self.sequ_inst, self.lines))
+                
     def handle_busy(self, msg_pmt):
         with self.lock :        
             self.busy = pmt.to_python(msg_pmt)
@@ -445,6 +344,7 @@ class access_control(gr.sync_block):
                             self.message_port_pub(pmt.to_pmt("Array"), pmt.to_pmt("ACTIVE"))
                             self.active = True
                             self.log("Active frame")
+                            self.apply_slot_sched()
                         elif self.send_inst == IDLE:
                             self.message_port_pub(pmt.to_pmt("Array"), pmt.to_pmt("INACTIVE"))
                             self.active = False
@@ -472,7 +372,8 @@ class access_control(gr.sync_block):
                             
                             ## Data is (node_id + line_i)
                             data = self.lines[self.i][2:]               # Remove frame number and slot number
-                            data = self.add_symb(self.sequ_inst, data)  # Replace first random values by sequence
+                            slot_nbr = int(self.lines[self.i][1])
+                            data = self.add_symb(self.sequ_inst[slot_nbr][1], data)  # Replace first random values by sequence
                             self.lines[self.i][3] = data[1]             # Update packet buffer
 
                             data = '\t'.join(data)

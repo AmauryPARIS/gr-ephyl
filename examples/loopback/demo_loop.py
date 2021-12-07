@@ -203,8 +203,8 @@ class demo_loop(gr.top_block, Qt.QWidget):
             power_tresh_detection=5,
             samp_rate=samp_rate,
         )
-        self.ephyl_easy_upper_0_0 = ephyl.easy_upper(True, list_sensor, debug_log)
-        self.ephyl_easy_upper_0 = ephyl.easy_upper(False, list_sensor, debug_log)
+        self.ephyl_easy_upper_0_0 = ephyl.easy_upper(True, list_sensor, debug_log, bs_slots)
+        self.ephyl_easy_upper_0 = ephyl.easy_upper(False, list_sensor, debug_log, bs_slots)
         self.channels_channel_model_0 = channels.channel_model(
         	noise_voltage=noise_voltage,
         	frequency_offset=freq_offset,

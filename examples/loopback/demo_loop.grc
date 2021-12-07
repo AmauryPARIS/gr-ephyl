@@ -1784,6 +1784,10 @@
       <key>minoutbuf</key>
       <value>0</value>
     </param>
+    <param>
+      <key>list_slots</key>
+      <value>bs_slots</value>
+    </param>
   </block>
   <block>
     <key>ephyl_easy_upper</key>
@@ -1834,6 +1838,10 @@
     <param>
       <key>minoutbuf</key>
       <value>0</value>
+    </param>
+    <param>
+      <key>list_slots</key>
+      <value>bs_slots</value>
     </param>
   </block>
   <block>

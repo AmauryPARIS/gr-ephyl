@@ -4,7 +4,7 @@
   <key>ephyl_easy_upper</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.easy_upper($BS, $list_sensor, $log)</make>
+  <make>ephyl.easy_upper($BS, $list_sensor, $log, $list_slots)</make>
 
   <param>
     <name>Base station</name>
@@ -25,6 +25,13 @@
     <key>log</key>
     <value>False</value>
     <type>bool</type>
+  </param>
+
+  <param>
+    <name>Slots</name>
+    <key>list_slots</key>
+    <value>[0]</value>
+    <type>raw</type>
   </param>
 
   <sink>
