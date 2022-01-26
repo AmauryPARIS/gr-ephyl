@@ -70,6 +70,7 @@ class bs_scheduler(gr.sync_block):
         self.state = BCH
         self.list_sensor = list_sensor
         self.filename_log = "LOG_BS_sched_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
+        self.filename_log_state = "STATE_BS.txt"
         # self.state = IDLE  # DEBUG (no uhd)
         # self.state = -1
         self.state_dbg = -1
@@ -106,6 +107,12 @@ class bs_scheduler(gr.sync_block):
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s-%s\n" % ("BS", self.frame_cnt, now, log)) 
 
+    def log_state(self, offset):
+        if self.logged:
+            now = datetime.now().time()
+            with open(self.filename_log_state,"a+") as f_log:
+                f_log.write("%s-%s-%s-%s-%s\n" % ("BS", self.frame_cnt, now, STATES[self.state], offset)) 
+
     def to_samples(self,duration) :
         return int(duration*self.samp_rate)
 
@@ -118,6 +125,7 @@ class bs_scheduler(gr.sync_block):
 
     def handle_inst(self, msg_pmt):
         with self.lock :
+            msg_pmt = pmt.deserialize_str(pmt.to_python(msg_pmt))
             frame = int(pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("FRAME"), pmt.PMT_NIL)))
             for dlcch_inst in pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("DLCCH"), pmt.PMT_NIL)) :
                 
@@ -209,6 +217,7 @@ class bs_scheduler(gr.sync_block):
                 key = pmt.intern(self.STATES[1][self.state])
                 value = pmt.to_pmt(self.slot_cnt)
             self.add_item_tag(0,offset, key, value)
+            self.log_state(offset)
 
             if self.state == PROC :
                 print "[BS] ================= FRAME " + str(self.frame_cnt-1) + " PROCESSING ================="
@@ -242,6 +251,7 @@ class bs_scheduler(gr.sync_block):
                     #         offset = self.nitems_read(0)-500*self.num_slots                            
                     else:
                         offset = self.nitems_read(0)+1000
+                        #offset = self.nitems_read(0)+20000
 
                     '''
                     We have to deconstruct the offset before appending it,
@@ -254,7 +264,7 @@ class bs_scheduler(gr.sync_block):
 
                     trig_msg = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(d),d))
                     self.message_port_pub(pmt.to_pmt("bcn"), trig_msg)
-                    self.log("Send BCH beacon")
+                    self.log("Send BCH beacon - offset : %s" % (str(offset)))
                     self.bcn_sent = True
                     if self.frame_cnt != 0:
                         print("\n")

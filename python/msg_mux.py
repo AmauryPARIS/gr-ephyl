@@ -62,6 +62,7 @@ class msg_mux(gr.sync_block):
         self.lock = threading.Lock()
 
         self.sensor_count = len(list_sensor)
+        self.list_sensor = list_sensor
 
         self.frame_msg = 0
         self.frame_n = 0
@@ -69,6 +70,7 @@ class msg_mux(gr.sync_block):
         self.data = ''
         self.filename = "BS_mux_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
         self.filename_log = "LOG_BS_mux_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
+        self.filename_log_status = "RX_BS.txt"
 
         self.received_packet = []
         self.received_ulcch = []
@@ -82,8 +84,14 @@ class msg_mux(gr.sync_block):
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s-%s\n" % ("BS", self.frame_n, now, log)) 
 
+    def log_status(self, log):
+        if self.logged:
+            now = datetime.now().time()
+            with open(self.filename_log_status,"a+") as f_log:
+                f_log.write("%s\n" % (log)) 
+
     def create_inst_msg(self, frame, payload):
-        self.log("Send feedback to upper layer : %s | %s | %s" % ("BS", self.frame_n, payload))
+        self.log("Send feedback to upper layer : %s | %s | %s" % ("BS", frame, payload))
         msg = pmt.make_dict()
         msg = pmt.dict_add(msg, pmt.to_pmt("FRAME"), pmt.to_pmt(frame))
         msg = pmt.dict_add(msg, pmt.to_pmt("ULCCH"), pmt.to_pmt(self.received_ulcch))    
@@ -130,13 +138,58 @@ class msg_mux(gr.sync_block):
                             detect[detect_elem] = "RX"
                             packets = [self.received_packet[msg_elem][0], self.received_packet[msg_elem][2]] # [sn_id, sequence]
                             rx.append([detect_elem, detect[detect_elem], packets])
+                if len(self.received_packet) == 0:
+                    rx.append([detect_elem, detect[detect_elem]])
         
         # Frame number for the reception of dealt packets
-        frame = self.received_ulcch[0][0]
+        if len(self.received_ulcch) != 0:
+            frame = self.received_ulcch[0][0]
+        else:
+            frame = self.frame_n
         self.log("End frame info received : %s | %s | %s " % (frame, self.received_ulcch, rx))
-        
+        print("BS - feedback : frame - %s | ulcch - %s | rx - %s " % (frame, self.received_ulcch, rx))
+
+        for i in range(0,len(rx)):
+            if len(rx[i]) == 2:
+                self.log_status("%s-%s-%s" % (frame, rx[i][0], rx[i][1]))
+            else:
+                self.log_status("%s-%s-%s-%s-%s" % (frame, rx[i][0], rx[i][1], rx[i][2][0], rx[i][2][1]))
+
         # Create and send feedback
         self.message_port_pub(pmt.to_pmt("feedback"), self.create_inst_msg(frame, rx))
+
+    def intergity_check(self, sn_id, sequence, crc):
+        id_check = False
+        sequence_check = False
+        crc_check = False
+
+        # Sequence integrity verification
+        if sequence[0] == sequence[1] and sequence[1] == sequence[2]:
+            sequence_check = True
+
+        # Sensor ID integrity verification
+        if sn_id in self.list_sensor:
+            id_check = True
+        
+        # Integrity verification
+        og_crc = []
+        for i in range(len(self.crc)):
+            if i in range(3):
+                og_crc += sequence[i]
+            elif i == 3:
+                og_crc += sn_id
+            else:
+                og_crc += self.crc[i]
+        og_crc = "".join(og_crc)
+
+        if crc == og_crc[3:]:
+            crc_check = True
+        
+        # Return final state
+        if id_check and sequence_check and crc_check:
+            return True 
+        else:
+            return False 
 
     def handle_data(self, msg_pmt):
         with self.lock : 
@@ -151,9 +204,9 @@ class msg_mux(gr.sync_block):
                 sequence = l[1][0:3]
                 crc = l[1][3:]
 
-                self.log("Received - SN %s | seq %s | crc %s vs %s" % (sn_id, sequence, crc, self.crc))
+                self.log("Received - SN %s | seq %s | crc %s" % (sn_id, sequence, crc))
             
-                if sequence[0] == sequence[1] and sequence[1] == sequence[2] and crc in self.crc:
+                if self.intergity_check(sn_id, sequence, crc):
                     sequence = sequence[0]
                     status = "RX"
                 else: 
@@ -164,7 +217,8 @@ class msg_mux(gr.sync_block):
                 sn_id = "error"
                 sequence = "error"
                 crc = "error"
-                status = "busy"
+                status = "BUSY"
+
 
             self.log("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
 
@@ -176,7 +230,7 @@ class msg_mux(gr.sync_block):
             # print "HERE"
             # print l
 
-            self.log("BS RX : %s\n" % (l))  
+            self.log("test BS RX : %s\n" % (l))  
             
 
             if any(self.slot_n) and any(self.data) :

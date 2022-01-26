@@ -38,7 +38,8 @@ GR_PYTHON_INSTALL(
     msg_mux.py
     access_control.py
     easy_upper.py
-    busy_tresh.py DESTINATION ${GR_PYTHON_DIR}/ephyl
+    busy_tresh.py
+    DESTINATION ${GR_PYTHON_DIR}/ephyl
 )
 
 ########################################################################
@@ -59,3 +60,4 @@ GR_ADD_TEST(qa_msg_mux ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_msg_m
 GR_ADD_TEST(qa_access_control ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_access_control.py)
 GR_ADD_TEST(qa_easy_upper ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_easy_upper.py)
 GR_ADD_TEST(qa_busy_tresh ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_busy_tresh.py)
+GR_ADD_TEST(qa_gate ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_gate.py)

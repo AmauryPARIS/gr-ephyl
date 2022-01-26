@@ -156,7 +156,7 @@ class sn_scheduler(gr.basic_block):
                 if pmt.to_python(slot_pmt) == "STOP" :
                     self.state = IDLE
                     self.slot_cnt = 0
-                    print "[SN "+self.Id+"] TX SENSOR SLOTS ARE :" + str(self.slots)
+                    #print "[SN "+self.Id+"] TX SENSOR SLOTS ARE :" + str(self.slots)
                     self.log("STOP : SENSOR SLOTS ARE :" + str(self.slots))
                     self.message_port_pub(pmt.to_pmt("busy"), pmt.to_pmt('RESET'))
 
@@ -250,11 +250,15 @@ class sn_scheduler(gr.basic_block):
                             offset = 0
 
                         self.delay = self.nitems_written(0)-offset
+                        #self.delay = self.nitems_written(0)-0
                         if self.delay>0:
                             self.samp_cnt = self.delay
                         else:
                             self.samp_cnt= 200000 
+                            
+                        self.log("Offset %s - self.delay %s - self.samp_cnt %s" % (offset, self.delay, self.samp_cnt))
                         return 0
+                        
                 except:
                     pass
 
@@ -277,6 +281,7 @@ class sn_scheduler(gr.basic_block):
 
     def handle_inst(self, msg_pmt):
         with self.lock : 
+            msg_pmt = pmt.deserialize_str(pmt.to_python(msg_pmt))
             if pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("ID"), pmt.PMT_NIL)) == self.Id:
                 inst_ulcch = {}
                 inst_ulcch["content"] = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("ULCCH"), pmt.PMT_NIL)) 
@@ -323,6 +328,7 @@ class sn_scheduler(gr.basic_block):
         self.samp_cnt += len(output)    # Sample count related to current state
         state_samp = self.to_samples(self.STATES[2][self.state])      
         diff = state_samp - self.samp_cnt       # Act as a timer
+        self.log("Sample count %s - state samp %s - diff %s - len(output) %s" % (self.samp_cnt, state_samp, diff, len(output)))
 
         if self.state in (EMIT,GUARD,BCH,PROC):
             self.i += len(output)

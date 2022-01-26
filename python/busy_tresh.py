@@ -43,6 +43,8 @@ class busy_tresh(gr.sync_block):
         self.compute = False
         self.logged = log
         self.filename_log = "LOG_BS_busy_tresh_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
+        self.filename_log_state = "STATE_Busy_Tresh.txt"
+        self.frame = 0
 
     def log(self, log):
         if self.logged:
@@ -50,6 +52,11 @@ class busy_tresh(gr.sync_block):
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s\n" % ("BS_busy_tresh", now, log)) 
 
+    def log_state(self, state, offset):
+        if self.logged:
+            now = datetime.now().time()
+            with open(self.filename_log_state,"a+") as f_log:
+                f_log.write("%s-%s-%s-%s-%s\n" % ("BS", self.frame, now, state, offset)) 
 
     def power(self):
         if self.sample_buffer.size != 0:
@@ -77,7 +84,7 @@ class busy_tresh(gr.sync_block):
         in0 = input_items[0]
         tags = self.get_tags_in_window(0, 0, len(in0))
 
-        self.log("Work function - tag count : %s - len input : %s, nitems_read : %s\n" % (len(tags), len(in0), self.nitems_read(0)))
+        #self.log("Work function - tag count : %s - len input : %s, nitems_read : %s\n" % (len(tags), len(in0), self.nitems_read(0)))
 
         start = None
         stop = None
@@ -105,10 +112,14 @@ class busy_tresh(gr.sync_block):
             elif key == 'FRAME':
                 send_feedback = True
                 frame = value
-                self.log("FRAME")
+                key = "PROC"
+                self.frame = frame
+                self.log("FRAME %s" % (frame))
             
             else:
                 self.log("Unknown tag : %s - %s" % (key, value))
+
+            self.log_state(key, tag.offset)
 
         # Define gate for wanted "pusch" samples
         if start == None and self.compute == True:
@@ -116,7 +127,7 @@ class busy_tresh(gr.sync_block):
         if stop == None and self.compute == True:
             stop = len(in0)
 
-        self.log("Start - stop : %s-%s\n" % (start,stop))
+        #self.log("Start - stop : %s-%s\n" % (start,stop))
 
         # Get wanted samples
         if start is not None and stop is not None:
@@ -131,9 +142,10 @@ class busy_tresh(gr.sync_block):
 
         # Compute IDLE/BUSY slot and send feedback to MSG MUX
         if send_feedback:
-            print("BS - Power tresh : Frame %s | Power %s" % (frame, self.power_per_slot))
+            #print("BS - Power tresh : Frame %s | Power %s" % (frame, self.power_per_slot))
             self.feedback()
             self.log("End Frame : Send feedback to msg mux\n")
+            self.log("Power per slot : Frame %s | Power %s" % (frame, self.power_per_slot))
 
         self.consume(0, len(in0))
 

@@ -24,5 +24,6 @@ install(FILES
     api.h
     turbofsk_tx.h
     turbofsk_tx.h
-    turbofsk_rx.h DESTINATION include/ephyl
+    turbofsk_rx.h
+    gate.h DESTINATION include/ephyl
 )

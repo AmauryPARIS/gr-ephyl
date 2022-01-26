@@ -26,11 +26,13 @@
  */
 
 #include "qa_ephyl.h"
+#include "qa_gate.h"
 
 CppUnit::TestSuite *
 qa_ephyl::suite()
 {
   CppUnit::TestSuite *s = new CppUnit::TestSuite("ephyl");
+  s->addTest(gr::ephyl::qa_gate::suite());
 
   return s;
 }

@@ -130,33 +130,7 @@ class access_control(gr.sync_block):
         if self.save_log :
             self.filename = "SN-"+self.ID+"_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
             
-            with open(self.filename,"a+") as f:
-                template =                                          \
-                "SN-"+self.ID                                       \
-                +"\n"+"======================"                      \
-                +"\n"+"Access Policy: "                             \
-                +"\n"+self.control                                  \
-                +"\n"+"======================"                      \
-                +"\n"+"Total frames: "                              \
-                +"\n"                                               \
-                +"\n"+"======================"                      \
-                +"\n"+"Observed activation rate: "                  \
-                +"\n"                                               \
-                +"\n"+"======================"                      \
-                +"\n"+"Active frames: "                             \
-                +"\n"                                               \
-                +"\n"+"======================"                      \
-                +"\n"+"Detection rate: "                            \
-                +"\n\n"                                             \
-                +"\n"+"======================"                      \
-                +"\n"+"PER (Packet Error Rate): "                   \
-                +"\n\n"                                             \
-                +"\n"+"======================"                      \
-                +"\n"+"BER (Bit Error Rate): "                      \
-                +"\n"                                               \
-                +"\n"+"======================"                      \
-                +"\n"
-                f.write(template)
+
 
     def log(self, log):
         if self.logged:
@@ -192,12 +166,15 @@ class access_control(gr.sync_block):
         return res 
 
     def add_symb(self, sequence, data):
+        self.log("add sym : seq %s - data %s" % (sequence, data))
         sn_id = data[0]
         payload = data[1]
         new_payload = []
         for i in range(len(payload)):
             if i in range(3):
                 new_payload += sequence
+            elif i == 3:
+                new_payload += sn_id
             else:
                 new_payload += payload[i]
         return [sn_id, "".join(new_payload)]
@@ -297,6 +274,7 @@ class access_control(gr.sync_block):
         
     def handle_inst(self, msg_pmt):
         with self.lock : 
+            msg_pmt = pmt.deserialize_str(pmt.to_python(msg_pmt))
             if pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("ID"), pmt.PMT_NIL)) == self.ID:
                 inst_send = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("SEND"), pmt.PMT_NIL)) 
                 inst_sequence = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("SEQUENCE"), pmt.PMT_NIL))
@@ -392,7 +370,7 @@ class access_control(gr.sync_block):
 
                         self.i=0
                         if self.active == True :
-                            print "[SN "+self.ID+"] ACCESS POLICY: " + self.control + "\n"
+                            #print "[SN "+self.ID+"] ACCESS POLICY: " + self.control + "\n"
                             ##################### PROCESS RECEIVED FRAMES ##############################
                             ## Activity in DL :
                             if any(self.RX_frame) :
@@ -409,7 +387,7 @@ class access_control(gr.sync_block):
                                 result = self.compare_pld(self.lines,[4*['']])
                                 # Generate new payload 
                                 self.lines = self.gen_rand_pld(self.ID,1,result[1],self.tmp_data)
-                                print "[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "\n"
+                                #print "[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "\n"
                                 self.log("[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "")
                                 self.error = 1
                                 self.detection = 0
@@ -434,33 +412,33 @@ class access_control(gr.sync_block):
                             self.BER = self.error_bit_cnt/float(self.cnt*len(self.error_bits))
                             # print "BER"
                             # print self.BER
-                            ###################### WRITE LOG FILE #########################
-                            if self.save_log :    
-                                with open(self.filename,"r") as f:
-                                    lines = f.readlines()
-                                    for i in range(len(lines)):
-                                        if 'Total frames' in lines[i]:
-                                            lines[i+1] = str(int(self.frame_cnt)+1)+'\n'
-                                        if 'Observed activation rate' in lines[i]:
-                                            try :
-                                                lines[i+1] = str(len(self.detection_list)/(float(self.frame_cnt)-self.frame_offset+1))+'\n'
-                                            except :
-                                                lines[i+1] = str(len(self.detection_list)/(float(self.frame_cnt)+1))+'\n'
-                                        if 'Active frames' in lines[i]:
-                                            lines[i+1] = str(self.frame_cnt) + ' ' + lines[i+1]
-                                        if 'Detection rate' in lines[i]:
-                                            tmp = "{:.2E}".format(self.detection_rate[-1])
-                                            lines[i+1] = tmp+'\n'
-                                            lines[i+2] = ' '.join(map(str,self.detection_list))+'\n'
-                                        if 'PER' in lines[i]:
-                                            tmp = "{:.2E}".format(self.PER[-1])
-                                            lines[i+1] = tmp+'\n'
-                                            lines[i+2] = ' '.join(map(str,self.error_list))+'\n'
-                                        if 'BER' in lines[i]:
-                                            tmp = "{:.2E}".format(self.BER)
-                                            lines[i+1] = tmp+'\n'
-                                with open(self.filename,"w") as f:
-                                    f.write(''.join(lines))
+                            # ###################### WRITE LOG FILE #########################
+                            # if self.save_log :    
+                            #     with open(self.filename,"r") as f:
+                            #         lines = f.readlines()
+                            #         for i in range(len(lines)):
+                            #             if 'Total frames' in lines[i]:
+                            #                 lines[i+1] = str(int(self.frame_cnt)+1)+'\n'
+                            #             if 'Observed activation rate' in lines[i]:
+                            #                 try :
+                            #                     lines[i+1] = str(len(self.detection_list)/(float(self.frame_cnt)-self.frame_offset+1))+'\n'
+                            #                 except :
+                            #                     lines[i+1] = str(len(self.detection_list)/(float(self.frame_cnt)+1))+'\n'
+                            #             if 'Active frames' in lines[i]:
+                            #                 lines[i+1] = str(self.frame_cnt) + ' ' + lines[i+1]
+                            #             if 'Detection rate' in lines[i]:
+                            #                 tmp = "{:.2E}".format(self.detection_rate[-1])
+                            #                 lines[i+1] = tmp+'\n'
+                            #                 lines[i+2] = ' '.join(map(str,self.detection_list))+'\n'
+                            #             if 'PER' in lines[i]:
+                            #                 tmp = "{:.2E}".format(self.PER[-1])
+                            #                 lines[i+1] = tmp+'\n'
+                            #                 lines[i+2] = ' '.join(map(str,self.error_list))+'\n'
+                            #             if 'BER' in lines[i]:
+                            #                 tmp = "{:.2E}".format(self.BER)
+                            #                 lines[i+1] = tmp+'\n'
+                            #     with open(self.filename,"w") as f:
+                            #         f.write(''.join(lines))
 
                             self.RX_frame = [] 
 
