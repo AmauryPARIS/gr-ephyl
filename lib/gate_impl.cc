@@ -74,6 +74,19 @@ namespace gr {
     }
 
     int
+    gate_impl::detect_stop_sig (const gr_complex &in_samples_dB, int ninput_items)
+    {
+      for (int i = m_index_offset; i < ninput_items; i++){
+        if (in_samples_dB[i] < m_power_thresh:
+          m_open = false;
+          m_index_offset = 0;
+          return i;
+      }
+      m_index_offset = ninput_items - i;
+      return ninput_items;
+    }
+
+    int
     gate_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
                        gr_vector_const_void_star &input_items,
