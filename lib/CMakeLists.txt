@@ -29,6 +29,7 @@ list(APPEND ephyl_sources
     turbofsk_tx_impl.cc
     turbofsk_rx_impl.cc
     init_turbofsk.cc
+    gate_impl.cc
 )
 
 set(ephyl_sources "${ephyl_sources}" PARENT_SCOPE)
@@ -66,6 +67,7 @@ include_directories(${CPPUNIT_INCLUDE_DIRS})
 list(APPEND test_ephyl_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/test_ephyl.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qa_ephyl.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/qa_gate.cc
 )
 
 add_executable(test-ephyl ${test_ephyl_sources})

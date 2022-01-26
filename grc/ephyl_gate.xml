@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<block>
+  <name>gate</name>
+  <key>ephyl_gate</key>
+  <category>[ephyl]</category>
+  <import>import ephyl</import>
+  <make>ephyl.gate($power_thresh, $symb_len)</make>
+
+  <param>
+    <name>Threshold [dB]</name>
+    <key>power_thresh</key>
+    <type>int</type>
+  </param>
+
+  <param>
+    <name>Symbol length</name>
+    <key>symb_len</key>
+    <type>int</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+</block>

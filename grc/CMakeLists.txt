@@ -29,5 +29,6 @@ install(FILES
     ephyl_msg_mux.xml
     ephyl_access_control.xml
     ephyl_easy_upper.xml
-    ephyl_busy_tresh.xml DESTINATION share/gnuradio/grc/blocks
+    ephyl_busy_tresh.xml
+    ephyl_gate.xml DESTINATION share/gnuradio/grc/blocks
 )
