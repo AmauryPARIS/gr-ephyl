@@ -26,13 +26,13 @@ from gnuradio import channels
 from gnuradio import eng_notation
 from gnuradio import gr
 from gnuradio import qtgui
+from gnuradio import zeromq
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from gnuradio.qtgui import Range, RangeWidget
 from hier_bs import hier_bs  # grc-generated hier_block
 from hier_sensor import hier_sensor  # grc-generated hier_block
 from optparse import OptionParser
-import ephyl
 import math, sys, numpy as np, random,string
 import pmt
 import sip
@@ -41,7 +41,7 @@ from gnuradio import qtgui
 
 class demo_loop(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=100, bs_slots=range(5), control0='random', control1='1:2', control2='5', control3='7', cp_ratio=0.25, list_sensor=["A","B"], power_tresh_detect=5):
+    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=100, bs_slots=range(1), control0='random', control1='1:2', control2='5', control3='7', cp_ratio=0.25, list_sensor=["A","B"], power_tresh_detect=5):
         gr.top_block.__init__(self, "Demo Loop")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop")
@@ -112,6 +112,61 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self._freq_offset_range = Range(-.1, .1, .00001, 0, 200)
         self._freq_offset_win = RangeWidget(self._freq_offset_range, self.set_freq_offset, 'Frequency Offset (Multiples of Sub-carrier spacing)', "counter_slider", float)
         self.top_grid_layout.addWidget(self._freq_offset_win)
+        self.zeromq_sub_msg_source_0_0 = zeromq.sub_msg_source('tcp://localhost:5561', 100)
+        self.zeromq_sub_msg_source_0 = zeromq.sub_msg_source('tcp://localhost:5559', 100)
+        self.zeromq_pub_msg_sink_0_0 = zeromq.pub_msg_sink('tcp://*:5562', 100)
+        self.zeromq_pub_msg_sink_0 = zeromq.pub_msg_sink('tcp://*:5560', 100)
+        self.qtgui_time_sink_x_1 = qtgui.time_sink_c(
+        	1024, #size
+        	samp_rate, #samp_rate
+        	"", #name
+        	1 #number of inputs
+        )
+        self.qtgui_time_sink_x_1.set_update_time(0.10)
+        self.qtgui_time_sink_x_1.set_y_axis(-1, 1)
+
+        self.qtgui_time_sink_x_1.set_y_label('Amplitude', "")
+
+        self.qtgui_time_sink_x_1.enable_tags(-1, True)
+        self.qtgui_time_sink_x_1.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_1.enable_autoscale(False)
+        self.qtgui_time_sink_x_1.enable_grid(False)
+        self.qtgui_time_sink_x_1.enable_axis_labels(True)
+        self.qtgui_time_sink_x_1.enable_control_panel(False)
+        self.qtgui_time_sink_x_1.enable_stem_plot(False)
+
+        if not True:
+          self.qtgui_time_sink_x_1.disable_legend()
+
+        labels = ['', '', '', '', '',
+                  '', '', '', '', '']
+        widths = [1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1]
+        colors = ["blue", "red", "green", "black", "cyan",
+                  "magenta", "yellow", "dark red", "dark green", "blue"]
+        styles = [1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+                   -1, -1, -1, -1, -1]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0]
+
+        for i in xrange(2):
+            if len(labels[i]) == 0:
+                if(i % 2 == 0):
+                    self.qtgui_time_sink_x_1.set_line_label(i, "Re{{Data {0}}}".format(i/2))
+                else:
+                    self.qtgui_time_sink_x_1.set_line_label(i, "Im{{Data {0}}}".format(i/2))
+            else:
+                self.qtgui_time_sink_x_1.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_1.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_1.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_1.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_1.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_1.set_line_alpha(i, alphas[i])
+
+        self._qtgui_time_sink_x_1_win = sip.wrapinstance(self.qtgui_time_sink_x_1.pyqwidget(), Qt.QWidget)
+        self.top_grid_layout.addWidget(self._qtgui_time_sink_x_1_win)
         self.qtgui_time_sink_x_0_0_0_1_0_0 = qtgui.time_sink_f(
         	int(frame_len*samp_rate)/int(2*M*(1+cp_ratio)), #size
         	samp_rate/int(2*M*(1+cp_ratio)), #samp_rate
@@ -203,8 +258,6 @@ class demo_loop(gr.top_block, Qt.QWidget):
             power_tresh_detection=5,
             samp_rate=samp_rate,
         )
-        self.ephyl_easy_upper_0_0 = ephyl.easy_upper(True, list_sensor, debug_log, bs_slots)
-        self.ephyl_easy_upper_0 = ephyl.easy_upper(False, list_sensor, debug_log, bs_slots)
         self.channels_channel_model_0 = channels.channel_model(
         	noise_voltage=noise_voltage,
         	frequency_offset=freq_offset,
@@ -218,6 +271,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.blocks_socket_pdu_0 = blocks.socket_pdu("UDP_SERVER", '', '52002', MTU, True)
         self.blocks_null_sink_1_0 = blocks.null_sink(gr.sizeof_float*1)
         self.blocks_null_sink_1 = blocks.null_sink(gr.sizeof_float*1)
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0, ))
         self.blocks_message_strobe_0 = blocks.message_strobe(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1,[1])), .01)
         self.blocks_complex_to_real_0 = blocks.complex_to_real(1)
         self.blocks_add_xx_0_0 = blocks.add_vcc(1)
@@ -230,26 +284,28 @@ class demo_loop(gr.top_block, Qt.QWidget):
         self.msg_connect((self.blocks_message_strobe_0, 'strobe'), (self.blocks_socket_pdu_0_0, 'pdus'))
         self.msg_connect((self.blocks_socket_pdu_0_0, 'pdus'), (self.hier_sensor_0, 'DL'))
         self.msg_connect((self.blocks_socket_pdu_0_0, 'pdus'), (self.hier_sensor_0_2, 'DL'))
-        self.msg_connect((self.ephyl_easy_upper_0, 'inst'), (self.hier_sensor_0, 'Inst'))
-        self.msg_connect((self.ephyl_easy_upper_0, 'inst'), (self.hier_sensor_0_2, 'Inst'))
-        self.msg_connect((self.ephyl_easy_upper_0_0, 'inst'), (self.hier_bs_0, 'inst'))
         self.msg_connect((self.hier_bs_0, 'BCH'), (self.blocks_socket_pdu_0, 'pdus'))
         self.msg_connect((self.hier_bs_0, 'DL'), (self.blocks_socket_pdu_0, 'pdus'))
-        self.msg_connect((self.hier_bs_0, 'feedback'), (self.ephyl_easy_upper_0_0, 'feedback'))
         self.msg_connect((self.hier_bs_0, 'DLCCH'), (self.hier_sensor_0, 'DLCCH'))
         self.msg_connect((self.hier_bs_0, 'DLCCH'), (self.hier_sensor_0_2, 'DLCCH'))
-        self.msg_connect((self.hier_sensor_0, 'feedback'), (self.ephyl_easy_upper_0, 'feedback'))
+        self.msg_connect((self.hier_bs_0, 'feedback'), (self.zeromq_pub_msg_sink_0_0, 'in'))
         self.msg_connect((self.hier_sensor_0, 'ULCCH'), (self.hier_bs_0, 'ULCCH'))
-        self.msg_connect((self.hier_sensor_0_2, 'feedback'), (self.ephyl_easy_upper_0, 'feedback'))
+        self.msg_connect((self.hier_sensor_0, 'feedback'), (self.zeromq_pub_msg_sink_0, 'in'))
         self.msg_connect((self.hier_sensor_0_2, 'ULCCH'), (self.hier_bs_0, 'ULCCH'))
+        self.msg_connect((self.hier_sensor_0_2, 'feedback'), (self.zeromq_pub_msg_sink_0, 'in'))
+        self.msg_connect((self.zeromq_sub_msg_source_0, 'out'), (self.hier_sensor_0, 'Inst'))
+        self.msg_connect((self.zeromq_sub_msg_source_0, 'out'), (self.hier_sensor_0_2, 'Inst'))
+        self.msg_connect((self.zeromq_sub_msg_source_0_0, 'out'), (self.hier_bs_0, 'inst'))
         self.connect((self.blocks_add_xx_0_0, 0), (self.channels_channel_model_0, 0))
         self.connect((self.blocks_complex_to_real_0, 0), (self.qtgui_time_sink_x_0_0_0_1_0_0, 0))
+        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_add_xx_0_0, 1))
         self.connect((self.blocks_throttle_0, 0), (self.hier_bs_0, 0))
+        self.connect((self.blocks_throttle_0, 0), (self.qtgui_time_sink_x_1, 0))
         self.connect((self.channels_channel_model_0, 0), (self.blocks_throttle_0, 0))
         self.connect((self.hier_bs_0, 0), (self.blocks_complex_to_real_0, 0))
         self.connect((self.hier_sensor_0, 1), (self.blocks_add_xx_0_0, 0))
         self.connect((self.hier_sensor_0, 0), (self.blocks_null_sink_1, 0))
-        self.connect((self.hier_sensor_0_2, 1), (self.blocks_add_xx_0_0, 1))
+        self.connect((self.hier_sensor_0_2, 1), (self.blocks_multiply_const_vxx_0, 0))
         self.connect((self.hier_sensor_0_2, 0), (self.blocks_null_sink_1_0, 0))
 
     def closeEvent(self, event):
@@ -381,6 +437,7 @@ class demo_loop(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
+        self.qtgui_time_sink_x_1.set_samp_rate(self.samp_rate)
         self.qtgui_time_sink_x_0_0_0_1_0_0.set_samp_rate(self.samp_rate/int(2*self.M*(1+self.cp_ratio)))
         self.hier_sensor_0_2.set_samp_rate(self.samp_rate)
         self.hier_sensor_0.set_samp_rate(self.samp_rate)
