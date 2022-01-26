@@ -66,13 +66,12 @@ namespace gr {
     gate_impl::detect_start_sig (const gr_complex &in_samples_dB, int ninput_items)
     {
       for (int i = 0; i < ninput_items; i++){
-        if (in_samples_dB[i] < m_power_thresh:
+        if (in_samples_dB[i] > m_power_thresh:
           m_open = true;
           return i;
       }
       return 0;
     }
-
 
     int
     gate_impl::general_work (int noutput_items,
