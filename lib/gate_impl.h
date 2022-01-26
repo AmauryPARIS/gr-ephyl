@@ -39,6 +39,7 @@ namespace gr {
       // Where all the action really happens
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
       int detect_start_sig (const gr_complex &in_samples_dB, int ninput_items);
+      int detect_stop_sig (const gr_complex &in_samples_dB, int ninput_items)
 
       int general_work(int noutput_items,
            gr_vector_int &ninput_items,
