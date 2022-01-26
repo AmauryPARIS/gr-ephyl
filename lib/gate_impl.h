@@ -29,8 +29,10 @@ namespace gr {
     class gate_impl : public gate
     {
      private:
-      int32_t m_power_thresh;            /// Threshold value in dB to set the start and end of the signal 
-      int32_t m_symb_len;            /// Sample length of one symbol with the cyclic prefix
+      int32_t m_power_thresh;             /// Threshold value in dB to set the start and end of the signal 
+      int32_t m_symb_len;                 /// Sample length of one symbol with the cyclic prefix
+      int32_t m_open;                     /// Bool to declare if the signal is transmitted (true) or not (false)
+      uint32_t m_index_offset;            /// Index the number of sample transmitted for the incomplete and last symbol of the latest work call  
 
      public:
       gate_impl(int power_thresh, int symb_len);
@@ -39,7 +41,8 @@ namespace gr {
       // Where all the action really happens
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
       int detect_start_sig (const gr_complex &in_samples_dB, int ninput_items);
-      int detect_stop_sig (const gr_complex &in_samples_dB, int ninput_items)
+      int detect_stop_sig (const gr_complex &in_samples_dB, int ninput_items);
+      double power (const gr_complex &samples, int length);
 
       int general_work(int noutput_items,
            gr_vector_int &ninput_items,
