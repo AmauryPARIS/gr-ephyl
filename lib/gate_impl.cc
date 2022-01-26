@@ -45,6 +45,8 @@ namespace gr {
     {
       m_power_thresh  =   power_thresh;
       m_symb_len      =   symb_len;
+      m_open          =   false;
+      m_index_offset  =   0;
     }
 
     /*
@@ -61,13 +63,25 @@ namespace gr {
     }
 
     int
+    gate_impl::detect_start_sig (const gr_complex &in_samples_dB, int ninput_items)
+    {
+      for (int i = 0; i < ninput_items; i++){
+        if (in_samples_dB[i] < m_power_thresh:
+          m_open = true;
+          return i;
+      }
+      return 0;
+    }
+
+
+    int
     gate_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-      const <+ITYPE+> *in = (const <+ITYPE+> *) input_items[0];
-      <+OTYPE+> *out = (<+OTYPE+> *) output_items[0];
+      const gr_complex *in = (const gr_complex *) input_items[0];
+      gr_complex *out = (gr_complex *) output_items[0];
 
       // Do <+signal processing+>
       // Tell runtime system how many input items we consumed on
