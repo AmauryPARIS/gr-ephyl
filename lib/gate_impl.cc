@@ -24,6 +24,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "gate_impl.h"
+#include <math.h>
 
 namespace gr {
   namespace ephyl {
@@ -84,6 +85,18 @@ namespace gr {
       }
       m_index_offset = ninput_items - i;
       return ninput_items;
+    }
+
+    dou
+    gate_impl::power (const gr_complex &samples, int length)
+    {
+      double linear_power[length];
+      double log_power[length];
+
+      linear_power = pow(pow(samples.real(), 2) + pow(samples.img(), 2),0.5);
+      log_power = 10 * log10(linear_power);
+
+      return log_power;
     }
 
     int
