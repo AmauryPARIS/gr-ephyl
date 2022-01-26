@@ -40,9 +40,12 @@ namespace gr {
      */
     gate_impl::gate_impl(int power_thresh, int symb_len)
       : gr::block("gate",
-              gr::io_signature::make(<+MIN_IN+>, <+MAX_IN+>, sizeof(<+ITYPE+>)),
-              gr::io_signature::make(<+MIN_OUT+>, <+MAX_OUT+>, sizeof(<+OTYPE+>)))
-    {}
+              gr::io_signature::make(1, 1, sizeof(gr_complex)),
+              gr::io_signature::make(1, 1, sizeof(gr_complex)))
+    {
+      m_power_thresh  =   power_thresh;
+      m_symb_len      =   symb_len;
+    }
 
     /*
      * Our virtual destructor.

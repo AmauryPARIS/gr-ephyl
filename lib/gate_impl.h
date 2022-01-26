@@ -29,7 +29,8 @@ namespace gr {
     class gate_impl : public gate
     {
      private:
-      // Nothing to declare in this block.
+      int32_t m_power_thresh;            /// Threshold value in dB to set the start and end of the signal 
+      int32_t m_symb_len;            /// Sample length of one symbol with the cyclic prefix
 
      public:
       gate_impl(int power_thresh, int symb_len);
