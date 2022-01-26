@@ -843,6 +843,37 @@
     </param>
   </block>
   <block>
+    <key>blocks_message_debug</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(728, 568)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>blocks_message_debug_0</value>
+    </param>
+  </block>
+  <block>
     <key>blocks_pdu_to_tagged_stream</key>
     <param>
       <key>alias</key>
@@ -862,7 +893,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(496, 404)</value>
+      <value>(520, 372)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3234,6 +3265,12 @@
     <sink_block_id>virtual_sink_0_1_0_0_0</sink_block_id>
     <source_key>Array</source_key>
     <sink_key>in</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_access_control_0</source_block_id>
+    <sink_block_id>blocks_message_debug_0</sink_block_id>
+    <source_key>Data</source_key>
+    <sink_key>print</sink_key>
   </connection>
   <connection>
     <source_block_id>ephyl_access_control_0</source_block_id>
