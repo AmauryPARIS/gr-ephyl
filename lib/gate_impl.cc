@@ -25,6 +25,7 @@
 #include <gnuradio/io_signature.h>
 #include "gate_impl.h"
 #include <math.h>
+#include <cmath>
 
 namespace gr {
   namespace ephyl {
@@ -44,7 +45,7 @@ namespace gr {
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex)))
     {
-      m_power_thresh  =   power_thresh;
+      m_power_thresh  =   (double) power_thresh;
       m_symb_len      =   symb_len;
       m_open          =   false;
       m_index_offset  =   0;
@@ -64,39 +65,43 @@ namespace gr {
     }
 
     int
-    gate_impl::detect_start_sig (const gr_complex &in_samples_dB, int ninput_items)
+    gate_impl::detect_start_sig (const double *in_samples_dB, const int &ninput_items)
     {
       for (int i = 0; i < ninput_items; i++){
-        if (in_samples_dB[i] > m_power_thresh:
+        if (in_samples_dB[i] > m_power_thresh){
           m_open = true;
           return i;
+        }
       }
       return 0;
     }
 
     int
-    gate_impl::detect_stop_sig (const gr_complex &in_samples_dB, int ninput_items)
+    gate_impl::detect_stop_sig (const double *in_samples_dB, const int &ninput_items)
     {
-      for (int i = m_index_offset; i < ninput_items; i++){
-        if (in_samples_dB[i] < m_power_thresh:
+      int i = 0;
+      for (i = m_index_offset; i < ninput_items; i+m_symb_len){
+        if (in_samples_dB[i] < m_power_thresh) {
           m_open = false;
           m_index_offset = 0;
           return i;
+        }
       }
       m_index_offset = ninput_items - i;
       return ninput_items;
     }
 
-    dou
-    gate_impl::power (const gr_complex &samples, int length)
+    void
+    gate_impl::power (const gr_complex *samples, double *log_power, const int &length)
     {
-      double linear_power[length];
-      double log_power[length];
+      double linear_power;
 
-      linear_power = pow(pow(samples.real(), 2) + pow(samples.img(), 2),0.5);
-      log_power = 10 * log10(linear_power);
-
-      return log_power;
+      for (int i = 0; i < length; i++){
+        linear_power = pow(pow(samples[i].real(), 2) + pow(samples[i].imag(), 2),0.5);
+        log_power[i] = 10 * log10(linear_power);
+      }
+      
+      return;
     }
 
     int
@@ -107,14 +112,31 @@ namespace gr {
     {
       const gr_complex *in = (const gr_complex *) input_items[0];
       gr_complex *out = (gr_complex *) output_items[0];
+      const int &ninputitems = (int &) ninput_items[0];
 
-      // Do <+signal processing+>
-      // Tell runtime system how many input items we consumed on
-      // each input stream.
-      consume_each (noutput_items);
+      double log_power[ninputitems];
+      int start_sig = 0;
+      int stop_sig = 0;
+
+      power(in, log_power, ninputitems);
+
+      if (m_open == false) {
+        start_sig = detect_start_sig(log_power, ninputitems);
+      }
+
+      if (m_open == true) {
+        stop_sig == detect_stop_sig(log_power, ninputitems);
+        int signal_sample_length = stop_sig - start_sig;
+        for (int i = start_sig; i < stop_sig; i++) {
+          out[i - start_sig] = in[i];
+        }
+        produce(0, signal_sample_length);
+      }
+
+      consume_each (ninputitems);
 
       // Tell runtime system how many output items we produced.
-      return noutput_items;
+      return WORK_CALLED_PRODUCE;
     }
 
   } /* namespace ephyl */
