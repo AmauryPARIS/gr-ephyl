@@ -26,6 +26,7 @@
 #include "gate_impl.h"
 #include <math.h>
 #include <cmath>
+#include <iostream>
 
 namespace gr {
   namespace ephyl {
@@ -61,7 +62,7 @@ namespace gr {
     void
     gate_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
+      ninput_items_required[0] = noutput_items;
     }
 
     int
@@ -77,17 +78,19 @@ namespace gr {
     }
 
     int
-    gate_impl::detect_stop_sig (const double *in_samples_dB, const int &ninput_items)
+    gate_impl::detect_stop_sig (const double *in_samples_dB, int ninput_items)
     {
       int i = 0;
-      for (i = m_index_offset; i < ninput_items; i+m_symb_len){
+      std::cout << "GATE - search stop index offset : " << m_index_offset << "\n";
+      for (i = m_symb_len - m_index_offset; i < ninput_items; i = i + m_symb_len){
         if (in_samples_dB[i] < m_power_thresh) {
           m_open = false;
           m_index_offset = 0;
           return i;
         }
       }
-      m_index_offset = ninput_items - i;
+      m_index_offset = ninput_items - (i - m_symb_len);
+      std::cout << "GATE - Stop not found - n input items : " << ninput_items << " - index offset : " << m_index_offset << " - i : " << i << "\n";
       return ninput_items;
     }
 
@@ -122,15 +125,21 @@ namespace gr {
 
       if (m_open == false) {
         start_sig = detect_start_sig(log_power, ninputitems);
+        if (start_sig != 0) {
+          std::cout << "GATE - Start found : " << start_sig << " - ninputitems " << ninputitems << "\n";
+        }
+        
       }
-
+      
       if (m_open == true) {
-        stop_sig == detect_stop_sig(log_power, ninputitems);
+        stop_sig = detect_stop_sig(log_power + start_sig, ninputitems - start_sig) + start_sig;
+        std::cout << "GATE - nimput items : " << ninputitems << " - start : " << start_sig << " - stop : " << stop_sig << "\n";
         int signal_sample_length = stop_sig - start_sig;
         for (int i = start_sig; i < stop_sig; i++) {
           out[i - start_sig] = in[i];
         }
         produce(0, signal_sample_length);
+        std::cout << "GATE - ################  \n";
       }
 
       consume_each (ninputitems);
