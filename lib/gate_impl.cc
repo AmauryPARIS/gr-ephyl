@@ -27,6 +27,7 @@
 #include <math.h>
 #include <cmath>
 #include <iostream>
+#include <fstream>
 
 namespace gr {
   namespace ephyl {
@@ -50,6 +51,7 @@ namespace gr {
       m_symb_len      =   symb_len;
       m_open          =   false;
       m_index_offset  =   0;
+      myfile.open ("example.txt");
     }
 
     /*
@@ -94,7 +96,7 @@ namespace gr {
       return ninput_items;
     }
 
-    void
+    double *
     gate_impl::power (const gr_complex *samples, double *log_power, const int &length)
     {
       double linear_power;
@@ -102,9 +104,13 @@ namespace gr {
       for (int i = 0; i < length; i++){
         linear_power = pow(pow(samples[i].real(), 2) + pow(samples[i].imag(), 2),0.5);
         log_power[i] = 10 * log10(linear_power);
+        if (linear_power != 0 ) {
+          myfile << nitems_read(0) << "," << samples[i].real() << "," << samples[i].real() << "," << samples[i].imag() << "," << linear_power << "," << log_power[i] << "\n";
+        }
+        // std::cout << "power," << samples[i].real() << "," << samples[i].imag() << "," << linear_power << "," << log_power[i] << "\n";
       }
       
-      return;
+      return log_power;
     }
 
     int
@@ -117,14 +123,30 @@ namespace gr {
       gr_complex *out = (gr_complex *) output_items[0];
       const int &ninputitems = (int &) ninput_items[0];
 
-      double log_power[ninputitems];
+      double empty_log_power[ninputitems];
       int start_sig = 0;
       int stop_sig = 0;
 
-      power(in, log_power, ninputitems);
+      double *log_power = power(in, empty_log_power, ninputitems);
+
+      double sum;
+      double average;
+      double min = 1000;
+      double max = -1000;
+      for(int i = 0; i < ninputitems; ++i)
+      {
+          if (log_power[i] > max) {
+            max = log_power[i];
+          }
+          if (log_power[i] < min) {
+            min = log_power[i];
+          }
+      }
+
+      // std::cout << "GATE - power value - min : " << min << " - max : " << max << "\n";
 
       if (m_open == false) {
-        start_sig = detect_start_sig(log_power, ninputitems);
+        start_sig = std::max(0, detect_start_sig(log_power, ninputitems)-10);
         if (start_sig != 0) {
           std::cout << "GATE - Start found : " << start_sig << " - ninputitems " << ninputitems << "\n";
         }
@@ -139,12 +161,10 @@ namespace gr {
           out[i - start_sig] = in[i];
         }
         produce(0, signal_sample_length);
-        std::cout << "GATE - ################  \n";
+        std::cout << "GATE - produce " << signal_sample_length << " samples - total : " << nitems_written(0) << " ################  \n";
       }
 
       consume_each (ninputitems);
-
-      // Tell runtime system how many output items we produced.
       return WORK_CALLED_PRODUCE;
     }
 
