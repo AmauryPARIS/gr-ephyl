@@ -221,6 +221,7 @@ class msg_mux(gr.sync_block):
 
 
             self.log("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
+            print("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
 
             # Find a way to return the sequence
                 
