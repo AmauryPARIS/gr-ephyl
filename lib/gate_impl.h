@@ -22,6 +22,9 @@
 #define INCLUDED_EPHYL_GATE_IMPL_H
 
 #include <ephyl/gate.h>
+#include <iostream>
+#include <fstream>
+using namespace std;
 
 namespace gr {
   namespace ephyl {
@@ -33,6 +36,7 @@ namespace gr {
       int32_t m_symb_len;                 /// Sample length of one symbol with the cyclic prefix
       int32_t m_open;                     /// Bool to declare if the signal is transmitted (true) or not (false)
       uint32_t m_index_offset;            /// Index the number of sample transmitted for the incomplete and last symbol of the latest work call  
+      ofstream myfile;
 
      public:
       gate_impl(int power_thresh, int symb_len);
@@ -42,7 +46,7 @@ namespace gr {
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
       int detect_start_sig (const double *in_samples_dB, const int &ninput_items);
       int detect_stop_sig (const double *in_samples_dB, int ninput_items);
-      void power (const gr_complex *samples, double *log_power, const int &length);
+      double * power (const gr_complex *samples, double *log_power, const int &length);
 
       int general_work(int noutput_items,
            gr_vector_int &ninput_items,
