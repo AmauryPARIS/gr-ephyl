@@ -116,6 +116,8 @@ class sync_analysis:
             fig.suptitle('Power [dB] per frame - Colored samples match the RX slot for the BS\n %s' % (title))
         elif anal_type == "symbol":
             fig.suptitle('Power [dB] per samples - Each line match the fourth first symbol of a PUSCH and each plot match the %s samples of one symbol\n %s' % (self.symb_len, title))
+        elif anal_type == "symbol_iq":
+            fig.suptitle('IQ values per samples - Each line match the fourth first symbol of a PUSCH and each plot match the %s samples of one symbol \nI in blue - Q in red\n%s' % (self.symb_len, title))
         elif anal_type == "sig_start":
             fig.suptitle('Histogram for the number of samples between the symbol start and the signal start per power threshold value in [dB]\n Signal start detected by power threshold - Green is RX signal and red are BUSY signal\n %s' % (title))
         elif anal_type == "sig_start_nomod":
@@ -373,9 +375,15 @@ class sync_analysis:
         print("You got NO power on this frame")
         return 0
 
-    def analyse_symbol(self, meta, sp, remark):
-        fig, axs = self.set_subplot(note = remark, anal_type = "symbol")
-        
+    def analyse_symbol(self, meta, sp, remark, sig_type):
+        if sig_type == "dB":
+            fig, axs = self.set_subplot(note = remark, anal_type = "symbol")
+        elif sig_type == "IQ":
+            fig, axs = self.set_subplot(note = remark, anal_type = "symbol_iq")
+        else:
+            print("Error - unknown type of analysis")
+            return 0
+
         ind_hor_subplt = 0
         ind_ver_subplt = 0
         ind_symb = 0
@@ -384,13 +392,13 @@ class sync_analysis:
         self.downsampling_factor = 1
 
         if self.local:
-            self.sig_tresh = -2
+            self.sig_tresh = -5
 
         for frame_meta in meta:
             
             print("Frame %s " % (frame_meta["frame"]))
             samples = self.get_samples(frame_meta, sp)
-            X, samples_power = self.compute_samples_power(samples)
+            X, samples_power = self.compute_samples_power(samples) #no resamp
 
             frame_rx_status = ""
             for rx_status in frame_meta["rx"]:
@@ -401,7 +409,7 @@ class sync_analysis:
                 sig_start = self.get_symb_sig_start(samples_power) 
                 print("index samp push start : %s" % (frame_meta["push"][0][0]))
                 print("value %s, %s, %s" % (sp[frame_meta["push"][0][0]-1], sp[frame_meta["push"][0][0]], sp[frame_meta["push"][0][0]+1]))
-                print("mod index samp push start : x%s" % (frame_meta["push"][0][0] % self.symb_len))
+                print("mod index samp push start : %s" % (frame_meta["push"][0][0] % self.symb_len))
                 sig_start_sample = (frame_meta["push"][0][0] + self.get_samp_sig_start(samples_power)) % self.symb_len
 
                 for i in range(0,4):
@@ -409,11 +417,18 @@ class sync_analysis:
                     axis = axs[ind_ver_subplt, ind_hor_subplt]
                     index_start = sig_start + (i * self.symb_len)
                     index_stop = sig_start + ((i+1) * self.symb_len) -1
-                    fmt = self.set_plot_vis(frame_meta["rx"][0][1].replace("\n",""))
-                    axis.plot(X[index_start:index_stop], samples_power[index_start:index_stop] ,fmt, linewidth=1)
-                    if not self.local:
-                        axis.set_ylim([-22, -20])
-                    axis.set_title("frme_%s_sp_%s_to_%s" % (frame_meta["frame"], index_start, index_stop, ))
+
+                    if sig_type == "dB":
+                        fmt = self.set_plot_vis(frame_meta["rx"][0][1].replace("\n",""))
+                        axis.plot(X[index_start:index_stop], samples_power[index_start:index_stop] ,fmt, linewidth=1)
+                        if not self.local:
+                            axis.set_ylim([-22, -20])
+
+                    elif sig_type == "IQ":
+                        axis.plot(X[index_start:index_stop], np.real(samples[index_start:index_stop]) ,"b", linewidth=1)
+                        axis.plot(X[index_start:index_stop], np.imag(samples[index_start:index_stop]) ,"r", linewidth=1)
+
+                    axis.set_title("frme_%s_sp_%s_to_%s" % (frame_meta["frame"], index_start, index_stop))
 
                     # Subplot index
 
@@ -434,10 +449,13 @@ class sync_analysis:
                         for ax in axs.flat:
                             ax.set(xlabel='Samples', ylabel='Power [dB]')
 
-                        plt.savefig("task_%s_SYMB_start_for_frames_%s_to_%s.png" % (self.task, start_frame_plt, frame_meta["frame"]))
+                        plt.savefig("task_%s_SYMB_start_for_frames_%s_to_%s_sig_%s.png" % (self.task, start_frame_plt, frame_meta["frame"], sig_type))
                         plt.clf()
 
-                        fig, axs = self.set_subplot(note = remark, anal_type = "symbol")
+                        if sig_type == "dB":
+                            fig, axs = self.set_subplot(note = remark, anal_type = "symbol")
+                        elif sig_type == "IQ":
+                            fig, axs = self.set_subplot(note = remark, anal_type = "symbol_iq")
 
                         ind_hor_subplt = 0
                         ind_ver_subplt = 0
@@ -453,28 +471,4 @@ class sync_analysis:
             push_index_stop = frame["push"][0][1]
 
             print("%s,%s,%s,%s" % (frame["frame"], sp[push_index-1], sp[push_index], sp[push_index+1]))
-
-
-# TODO: régler le ylim pour les plots d'analyse des symbols (il doit y avoir des zéros qui cause des power dB = +inf, impossible à avoir sur l'axe ...)
-# il faut trouver l'origine des zéros, normalement on ne devrait pas en avoir beaucoup du fait qu'on est sur un signal reel.
-# Une ou deux valeurs qui font chier ?
-
-# TODO: tracer l'allure générale de la trame qui est analysée pour être sur de ce qu'on regarde ... 
-# trame 20 je ne dois avoir que du bruit 
-
-# Frame 18
-# /root/cxlb_toolchain_build/gr-ephyl/apps/sync_analysis.py:141: RuntimeWarning: divide by zero encountered in log10
-#   samples_power = 10*np.log10(samples_power)
-# Frame 20
-# /root/cxlb_toolchain_build/gr-ephyl/apps/sync_analysis.py:141: RuntimeWarning: divide by zero encountered in log10
-#   samples_power = 10*np.log10(samples_power)
-# Traceback (most recent call last):
-#   File "main.py", line 42, in <module>
-#     sa.analyse_symbol(frame_meta, sp, REMARK)
-#   File "/root/cxlb_toolchain_build/gr-ephyl/apps/sync_analysis.py", line 255, in analyse_symbol
-#     min_index = self.get_sig_start(samples_power) - 10 * self.symb_len
-# TypeError: unsupported operand type(s) for -: 'NoneType' and 'int'
-
-
-
 
