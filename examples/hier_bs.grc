@@ -451,7 +451,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>int(-33)</value>
+      <value>int(-35)</value>
     </param>
   </block>
   <block>
@@ -952,7 +952,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(632, 260)</value>
+      <value>(720, 260)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1152,7 +1152,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1184, 708)</value>
+      <value>(1168, 700)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1831,6 +1831,53 @@
     </param>
   </block>
   <block>
+    <key>ephyl_gate</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>2</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(432, 284)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ephyl_gate_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>symb_len</key>
+      <value>int(M*(1+cp_ratio))</value>
+    </param>
+    <param>
+      <key>power_thresh</key>
+      <value>power_tresh_detection</value>
+    </param>
+  </block>
+  <block>
     <key>ephyl_msg_mux</key>
     <param>
       <key>alias</key>
@@ -1875,53 +1922,6 @@
     <param>
       <key>minoutbuf</key>
       <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>ephyl_power_gate</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(368, 268)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>ephyl_power_gate_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>symb_w_cp_len</key>
-      <value>int(M*(1+cp_ratio))</value>
-    </param>
-    <param>
-      <key>power_tresh</key>
-      <value>int(thresh_gate_overtheair) if UHD else int(thresh_gate_local)</value>
     </param>
   </block>
   <block>
@@ -2273,7 +2273,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1776, 628)</value>
+      <value>(1864, 644)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2445,7 +2445,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1672, 228)</value>
+      <value>(1752, 252)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2462,6 +2462,49 @@
     <param>
       <key>label</key>
       <value>BS Frame</value>
+    </param>
+    <param>
+      <key>num_streams</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>optional</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>pad_sink</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1176, 236)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pad_sink_0_0_1_0</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>BS gate</value>
     </param>
     <param>
       <key>num_streams</key>
@@ -2574,7 +2617,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1416, 788)</value>
+      <value>(1392, 692)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2826,6 +2869,12 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
+    <source_block_id>blocks_vector_to_stream_0</source_block_id>
+    <sink_block_id>pad_sink_0_0_1_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
     <source_block_id>digital_constellation_decoder_cb_0</source_block_id>
     <sink_block_id>virtual_sink_0_1_1</sink_block_id>
     <source_key>0</source_key>
@@ -2875,7 +2924,13 @@
   </connection>
   <connection>
     <source_block_id>ephyl_bs_scheduler_0</source_block_id>
-    <sink_block_id>ephyl_power_gate_0</sink_block_id>
+    <sink_block_id>blocks_file_sink_0_1</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_bs_scheduler_0</source_block_id>
+    <sink_block_id>ephyl_gate_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -2884,6 +2939,12 @@
     <sink_block_id>ephyl_msg_mux_0</sink_block_id>
     <source_key>feedback</source_key>
     <sink_key>detect</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ephyl_gate_0</source_block_id>
+    <sink_block_id>blocks_keep_m_in_n_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>ephyl_msg_mux_0</source_block_id>
@@ -2896,12 +2957,6 @@
     <sink_block_id>pad_sink_0_0</sink_block_id>
     <source_key>final_msg</source_key>
     <sink_key>in</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>ephyl_power_gate_0</source_block_id>
-    <sink_block_id>blocks_keep_m_in_n_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>ephyl_tag_2_msg_char_0</source_block_id>
@@ -2924,12 +2979,6 @@
   <connection>
     <source_block_id>fft_vxx_0</source_block_id>
     <sink_block_id>blocks_vector_to_stream_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>pad_source_0</source_block_id>
-    <sink_block_id>blocks_file_sink_0_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
