@@ -81,7 +81,7 @@ class sync_analysis:
     def set_analysis_parameters(self, nb_subplot_per_img = 20, hor_nbr_subplt = 4, zoom = True, symb_len = 80, sig_tresh = -30):
         # Analysis 
         if self.raw_sig:
-            self.downsampling_factor = 250
+            self.downsampling_factor = 1
         else:
             self.downsampling_factor = 25
 
