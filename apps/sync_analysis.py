@@ -7,25 +7,32 @@ import matplotlib.pyplot as plt
 
 class sync_analysis:
 
-    def __init__(self, local = False, task = 19023, raw_sig = False):
+    def __init__(self, local = False, task = 19023, sig = "raw"):
         self.local = local
         self.task = task 
-        self.raw_sig = raw_sig
+        #self.raw_sig = sig
+        self.sig = sig
     
     def set_data_files(self):
         # Path to data files 
         if self.local:
-            path_to = "/root/"
+            path_to = "/root/%s/" % (self.task)
         else:
             path_to = "/root/analysis/task_%s/node8/task_%s_container_0/root/cxlb_toolchain_build/gr-ephyl/examples/ml_mac/" % (self.task, self.task)
         
         # Raw signal files vs one carrier signal files
-        if self.raw_sig:
+        if self.sig == "raw":
             self.states_file = path_to + "STATE_BS.txt"
             self.samples_file = path_to + "BS_complex_2_32b"
-        else:
+        elif self.sig == "carrier":
             self.states_file = path_to + "STATE_Busy_Tresh.txt"
             self.samples_file = path_to + "BS_carrier_complex_2_32b"
+        elif self.sig == "fft_sn":
+            self.states_file = path_to + "STATE_Busy_Tresh.txt"
+            self.samples_file = path_to + "bin_file_SN_complex_fft_2_32b_carrier"
+        elif self.sig == "fft_bs":
+            self.states_file = path_to + "STATE_Busy_Tresh.txt"
+            self.samples_file = path_to + "bin_file_BS_complex_fft_2_32b_carrier"
 
         # RX status files [BUSY/IDLE/RX]
         self.rx_file = path_to + "RX_BS.txt"
@@ -52,7 +59,7 @@ class sync_analysis:
 
             for i in range(0,len(states_lines)):
                 intels = states_lines[i].split("-")
-                index_correc = 0 if not self.raw_sig else 1
+                index_correc = 0 if self.sig != "raw" else 1
                 if int(intels[1]) == frame + index_correc and intels[3] == "PROC":
                     end_frame = int(intels[4]) - 1
                 elif int(intels[1]) == frame + index_correc -1 and intels[3] == "PUSCH":
@@ -78,10 +85,10 @@ class sync_analysis:
         # Remove first and last frame because of missing samples
         return metadata[1:-1]
 
-    def set_analysis_parameters(self, nb_subplot_per_img = 20, hor_nbr_subplt = 4, zoom = True, symb_len = 80, sig_tresh = -30):
+    def set_analysis_parameters(self, nb_subplot_per_img = 20, hor_nbr_subplt = 4, zoom = True, symb_len = 80, sig_tresh = -30, fft_len = 64):
         # Analysis 
-        if self.raw_sig:
-            self.downsampling_factor = 1
+        if self.sig == "raw":
+            self.downsampling_factor = 10
         else:
             self.downsampling_factor = 25
 
@@ -90,6 +97,7 @@ class sync_analysis:
         self.ver_number_of_subplot = int(self.number_of_subplot_per_image / self.hor_number_of_subplot)
         self.zoom = zoom
         self.symb_len = symb_len
+        self.fft_len = fft_len
         self.sig_tresh = sig_tresh
         if self.local:
             self.min_tresh_sig_start = -10
@@ -101,10 +109,14 @@ class sync_analysis:
     
     def set_subplot(self, note, anal_type):
         fig, axs = plt.subplots(self.hor_number_of_subplot, self.ver_number_of_subplot, figsize=(15,15))
-        if self.raw_sig:
+        if self.sig == "raw":
             data_type = "RAW_SIG"
-        else:
+        elif self.sig == "carrier":
             data_type = "SIG_CARRIER"
+        elif self.sig == "fft_sn":
+            data_type = "ALL_CARRIER_SN"
+        elif self.sig == "fft_bs":
+            data_type = "ALL_CARRIER_BS"
         
         if self.local:
             sig_type = "Simulation"
@@ -122,6 +134,12 @@ class sync_analysis:
             fig.suptitle('Histogram for the number of samples between the symbol start and the signal start per power threshold value in [dB]\n Signal start detected by power threshold - Green is RX signal and red are BUSY signal\n %s' % (title))
         elif anal_type == "sig_start_nomod":
             fig.suptitle('First sample index to detect the thresh [dB] - Mean over each PUSH slot\n %s' % (title))
+        elif anal_type == "frm_iq":
+            fig.suptitle('IQ samples for each frame - All samples or just the beggining of the frame can be printed\n %s' % (title))
+        elif anal_type == "fft" and self.sig == "fft_bs":
+            fig.suptitle('IQ values for each OFDM carrier - BS side\n %s' % (title))
+        elif anal_type == "fft" and self.sig == "fft_sn":    
+            fig.suptitle('IQ values for each OFDM carrier - SN side\n %s' % (title))
         fig.tight_layout(pad=3)
 
         return fig, axs
@@ -204,8 +222,11 @@ class sync_analysis:
         mean_RX_sig_start = np.mean(RX_sig_start, axis=0)
         mean_BUSY_sig_start = np.mean(BUSY_sig_start, axis=0)
         plt.figure(figsize=(10, 10))
-        if len(mean_RX_sig_start) > 1:
-            plt.plot(np.arange(self.min_tresh_sig_start,self.max_tresh_sig_start), mean_RX_sig_start, '-g', linewidth=0.75, label='RX')
+        try:
+            if len(mean_RX_sig_start) > 1:
+                lt.plot(np.arange(self.min_tresh_sig_start,self.max_tresh_sig_start), mean_RX_sig_start, '-g', linewidth=0.75, label='RX')
+        except:
+            print("pas de données rx")
         try:
             plt.plot(np.arange(self.min_tresh_sig_start,self.max_tresh_sig_start), mean_BUSY_sig_start, '-r', linewidth=0.75, label='BUSY')
         except:
@@ -353,6 +374,61 @@ class sync_analysis:
 
         return RX_sig_start, BUSY_sig_start, RX_sig_start_nomod, BUSY_sig_start_nomod
 
+    def anaylise_IQ_frame(self, metadata, sp, remark):
+
+        fig, axs = self.set_subplot(note = remark, anal_type = "frm_iq")
+
+        start = 990
+        end = 7000
+
+        ind_hor_subplt = 0
+        ind_ver_subplt = 0
+        ind_frame = 0
+
+        for frame in metadata:
+            print("\nFrame nbr %s" % (frame["frame"]))
+            plot_name = "Frame_%s" % frame["frame"]
+            axis = axs[ind_ver_subplt, ind_hor_subplt]
+
+            samples = self.get_samples(frame, sp)  
+
+            X = np.arange(start, end)
+            samples = samples[start:end]
+
+            axis.plot(X, np.real(samples), 'r', linewidth=0.75)
+            axis.plot(X, np.imag(samples), 'b', linewidth=0.75)
+
+            axis_dB = axis.twinx()
+            X_dB, samples_power = self.compute_samples_power(samples)
+            axis_dB.plot(X, samples_power, '--g', linewidth=0.75) 
+            fig.tight_layout()
+
+            status = self.get_status(frame, 0) 
+            axis.set_title("frame_%s_%s" % (frame["frame"], status))
+
+            # Subplot index
+            ind_frame += 1
+            if ind_hor_subplt == self.hor_number_of_subplot:
+                ind_ver_subplt += 1
+                ind_hor_subplt = 0
+            else:
+                ind_hor_subplt += 1
+
+            if ind_frame == self.number_of_subplot_per_image or frame["frame"] == len(metadata):
+                
+                for ax in axs.flat:
+                    ax.set(xlabel='Samples', ylabel='IQ')
+
+                plt.savefig("task_%s_frames_%s_to_%s_IQ_sp_%s_to_%s.png" % (self.task, frame["frame"] - ind_frame, frame["frame"], start, end))
+                plt.clf()
+                print("Figure %s generated" % ("task_%s_frames_%s_to_%s_IQ_sp_%s_to_%s.png" % (self.task, frame["frame"] - ind_frame, frame["frame"], start, end)))
+
+                fig, axs = self.set_subplot(note = remark, anal_type = "frm_iq")
+
+                ind_hor_subplt = 0
+                ind_ver_subplt = 0
+                ind_frame = 0
+
     def get_frame_meta(self, metadata, frame_index):
         for frame_meta in metadata:
             if frame_index == frame_meta["frame"]:
@@ -471,4 +547,62 @@ class sync_analysis:
             push_index_stop = frame["push"][0][1]
 
             print("%s,%s,%s,%s" % (frame["frame"], sp[push_index-1], sp[push_index], sp[push_index+1]))
+
+    def analyse_fft(self, metada, sp, remark):
+        samples_length = len(sp)
+        fig, axs = self.set_subplot(note = remark, anal_type = "fft")
+        ind_hor_subplt = 0
+        ind_ver_subplt = 0
+        ind_symb = 0
+        X = np.arange(self.fft_len)
+
+        for index_sp in range(0, samples_length, self.fft_len):
+            axis = axs[ind_ver_subplt, ind_hor_subplt]
+            index_start = index_sp
+            index_stop = index_sp + self.fft_len
+            
+            print("Carrier check - symb %s" % (int(index_sp / self.fft_len)))
+            print("Real value")
+            for index in range(0,self.fft_len):
+                if np.real(sp[index_start:index_stop])[index] != 0:
+                    print("Sample - %s" % (index))
+            
+            print("Imag value")
+            for index in range(0,self.fft_len):
+                if np.imag(sp[index_start:index_stop])[index] != 0:
+                    print("Sample - %s" % (index))
+                
+            axis.plot(X, np.real(sp[index_start:index_stop]) ,"b", linewidth=1)
+            axis.plot(X, np.imag(sp[index_start:index_stop]) ,"r", linewidth=1)
+            axis.set_title("sample_%s" % (index_sp / self.fft_len))
+            axis.set_ylim([-3, +3])
+
+            # INDEX
+            if ind_hor_subplt == 0 and ind_ver_subplt == 0:
+                start_frame_plt = int(index_sp / self.fft_len)
+
+            ind_symb += 1
+            if ind_hor_subplt == self.ver_number_of_subplot-1:
+                ind_ver_subplt += 1
+                ind_hor_subplt = 0
+            else:
+                ind_hor_subplt += 1
+
+            
+
+            if ind_symb == self.number_of_subplot_per_image :
+                
+                for ax in axs.flat:
+                    ax.set(xlabel='Samples', ylabel='Power [dB]')
+
+                plt.savefig("task_%s_FFT_SYMB_%s_to_%s_sig_%s.png" % (self.task, start_frame_plt, int(index_sp / self.fft_len), self.sig))
+                plt.clf()
+                print("CREATED - task_%s_FFT_SYMB_%s_to_%s_sig_%s.png" % (self.task, start_frame_plt, int(index_sp / self.fft_len), self.sig))
+
+
+                fig, axs = self.set_subplot(note = remark, anal_type = "fft")
+
+                ind_hor_subplt = 0
+                ind_ver_subplt = 0
+                ind_symb = 0
 
