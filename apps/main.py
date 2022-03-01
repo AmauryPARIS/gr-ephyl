@@ -7,8 +7,8 @@ if True:
     ##### Compile data and metadata #####
     print("## - Start data and metadata collection")
     REMARK = "1 sensor"
-    sa = sync_analysis(local = True, 
-                    task = "carrier_1", 
+    sa = sync_analysis(local = False, 
+                    task = "19024", 
                     sig = "raw")
     sa.set_data_files()
     sp = sa.get_file_samples()
@@ -31,7 +31,9 @@ if True:
                                 symb_len = 40)
 
     # RX_sig_start, BUSY_sig_start, RX_sig_start_nomod, BUSY_sig_start_nomod = sa.anaylise_frame(metadata, sp, REMARK, sig_start_analysis = True)
-    sa.anaylise_IQ_frame(metadata, sp, REMARK)
+    #sa.anaylise_IQ_frames(metadata, sp, REMARK)
+    sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 8, start = 0, end = 1000)
+    sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 9, start = 0, end = 1000)
     
     ###### Analyse de l'échantillon de départ du signal sur toute la trame - Basé sur une fourchette de valeur de threshold  ######
     ## PRODUCE : task_XXXX_samp_start_by_power_tresh.png ##

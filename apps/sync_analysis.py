@@ -135,7 +135,9 @@ class sync_analysis:
         elif anal_type == "sig_start_nomod":
             fig.suptitle('First sample index to detect the thresh [dB] - Mean over each PUSH slot\n %s' % (title))
         elif anal_type == "frm_iq":
-            fig.suptitle('IQ samples for each frame - All samples or just the beggining of the frame can be printed\n %s' % (title))
+            fig.suptitle('IQ samples for each frame- One plot is a frame - All samples or just the beggining of the frame can be printed\n %s' % (title))
+        elif anal_type == "one_frm_iq":
+            fig.suptitle('Symbol for a chosen frame with dB and IQ samples value - One plot is one symbol\n %s' % (title))
         elif anal_type == "fft" and self.sig == "fft_bs":
             fig.suptitle('IQ values for each OFDM carrier - BS side\n %s' % (title))
         elif anal_type == "fft" and self.sig == "fft_sn":    
@@ -374,12 +376,9 @@ class sync_analysis:
 
         return RX_sig_start, BUSY_sig_start, RX_sig_start_nomod, BUSY_sig_start_nomod
 
-    def anaylise_IQ_frame(self, metadata, sp, remark):
+    def anaylise_IQ_frames(self, metadata, sp, remark):
 
         fig, axs = self.set_subplot(note = remark, anal_type = "frm_iq")
-
-        start = 990
-        end = 7000
 
         ind_hor_subplt = 0
         ind_ver_subplt = 0
@@ -391,6 +390,9 @@ class sync_analysis:
             axis = axs[ind_ver_subplt, ind_hor_subplt]
 
             samples = self.get_samples(frame, sp)  
+
+            start = 0
+            end = len(samples)  
 
             X = np.arange(start, end)
             samples = samples[start:end]
@@ -428,6 +430,83 @@ class sync_analysis:
                 ind_hor_subplt = 0
                 ind_ver_subplt = 0
                 ind_frame = 0
+
+    def anaylise_IQ_symb_one_frame(self, metadata, sp, remark, frame_nbr, start, end):
+
+        fig, axs = self.set_subplot(note = remark, anal_type = "one_frm_iq")
+
+        
+
+        ind_hor_subplt = 0
+        ind_ver_subplt = 0
+        ind_symb = 0
+
+        for frame in metadata:
+            if frame["frame"] == frame_nbr:
+                print("\nFrame nbr %s" % (frame["frame"]))
+
+                
+                self.zoom = True # Only display push samples
+                samples = self.get_samples(frame, sp)  
+
+                # Zoom on subpart of data
+                X = np.arange(0, len(samples))
+                X_dB, samples_power = self.compute_samples_power(samples)
+                
+                status = self.get_status(frame, 0) 
+
+                symb_start = max(0, start)
+                symb_stop = min(end, int(len(samples)/self.symb_len))
+
+                for index_symb in range(symb_start, symb_stop):
+                    
+                    axis = axs[ind_ver_subplt, ind_hor_subplt]
+                    axis.set_title("symb_%s_frm_%s_%s" % (index_symb, frame["frame"], status))
+
+                    # IQ samples
+                    index_samp_start = index_symb * self.symb_len
+                    index_samp_stop = (index_symb + 1) * self.symb_len -1
+                    axis.plot(X[index_samp_start:index_samp_stop], np.real(samples[index_samp_start:index_samp_stop]), 'r', linewidth=0.75, label = 'I')
+                    axis.plot(X[index_samp_start:index_samp_stop], np.imag(samples[index_samp_start:index_samp_stop]), 'b', linewidth=0.75, label = 'Q')
+                    axis_dB = axis.twinx()
+                    axis_dB.plot(X[index_samp_start:index_samp_stop], samples_power[index_samp_start:index_samp_stop], 'g', linewidth=0.75, label = 'dB') 
+                    fig.tight_layout()
+                    if self.local:
+                        axis.set_ylim([-5, 5])
+                        axis_dB.set_ylim([-15, 10])
+
+                    # Legend
+                    if ind_hor_subplt == 0:
+                        axis.set(ylabel='IQ')
+                    if ind_hor_subplt == self.hor_number_of_subplot:
+                        axis_dB.set(ylabel='Power [dB]')
+                    if ind_ver_subplt == self.ver_number_of_subplot:
+                        axis.set(xlabel='Samples')
+                    if ind_hor_subplt == 0 and ind_ver_subplt == 0:
+                        axis.legend(loc=0)
+                        axis_dB.legend(loc=0)
+
+                    # Subplot index
+                    ind_symb += 1
+                    if ind_hor_subplt == self.hor_number_of_subplot:
+                        ind_ver_subplt += 1
+                        ind_hor_subplt = 0
+                    else:
+                        ind_hor_subplt += 1
+
+                    if ind_symb == self.number_of_subplot_per_image or frame["frame"] == len(metadata):
+                        
+                        fig_name = "task_%s_frame_%s_symb_%s_to_%s_IQ_dB.png" % (self.task, frame["frame"], index_symb - ind_symb, index_symb)
+                        plt.savefig(fig_name)
+                        plt.clf()
+                        print("Figure %s generated" % fig_name)
+
+                        fig, axs = self.set_subplot(note = remark, anal_type = "one_frm_iq")
+
+                        ind_hor_subplt = 0
+                        ind_ver_subplt = 0
+                        ind_symb = 0
+                continue
 
     def get_frame_meta(self, metadata, frame_index):
         for frame_meta in metadata:
