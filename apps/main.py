@@ -1,8 +1,9 @@
 from sync_analysis import sync_analysis 
 import matplotlib.pyplot as plt
 import numpy as np
+# import thread   
 
-if True:
+if False:
     ###################################################################################
     ##### Compile data and metadata #####
     print("## - Start data and metadata collection")
@@ -32,8 +33,13 @@ if True:
 
     # RX_sig_start, BUSY_sig_start, RX_sig_start_nomod, BUSY_sig_start_nomod = sa.anaylise_frame(metadata, sp, REMARK, sig_start_analysis = True)
     #sa.anaylise_IQ_frames(metadata, sp, REMARK)
-    sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 8, start = 0, end = 1000)
-    sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 9, start = 0, end = 1000)
+
+    sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 8, start = 680, end = 779)
+    # sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 9, start = 990, end = 1089)
+    # sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 14, start = 1115, end = 1214)
+    # sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 15, start = 605, end = 704)
+    # sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 147, start = 0, end = 2000)
+    # sa.anaylise_IQ_symb_one_frame(metadata, sp, REMARK, frame_nbr = 148, start = 0, end = 2000)
     
     ###### Analyse de l'échantillon de départ du signal sur toute la trame - Basé sur une fourchette de valeur de threshold  ######
     ## PRODUCE : task_XXXX_samp_start_by_power_tresh.png ##
@@ -63,7 +69,7 @@ if True:
     # sa.analyse_symbol(metadata, sp, REMARK, "IQ")
 
 
-if False:
+if True:
 
     ##### Analyse des valeurs de symboles pour chaque porteuse ######
     
@@ -72,7 +78,7 @@ if False:
     print("## - Start data and metadata collection")
     REMARK = "1 sensor"
     sa = sync_analysis(local = True, 
-                    task = "carrier_8", 
+                    task = "carrier_1", 
                     sig = "fft_sn")
     sa.set_analysis_parameters(nb_subplot_per_img = 40, 
                 hor_nbr_subplt = 10, 

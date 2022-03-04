@@ -139,9 +139,9 @@ class sync_analysis:
         elif anal_type == "one_frm_iq":
             fig.suptitle('Symbol for a chosen frame with dB and IQ samples value - One plot is one symbol\n %s' % (title))
         elif anal_type == "fft" and self.sig == "fft_bs":
-            fig.suptitle('IQ values for each OFDM carrier - BS side\n %s' % (title))
+            fig.suptitle('I (Red) and Q (Blue) values for each OFDM carrier - BS side\n %s' % (title))
         elif anal_type == "fft" and self.sig == "fft_sn":    
-            fig.suptitle('IQ values for each OFDM carrier - SN side\n %s' % (title))
+            fig.suptitle('I (Red) and Q (Blue) values for each OFDM carrier - SN side\n %s' % (title))
         fig.tight_layout(pad=3)
 
         return fig, axs
@@ -458,6 +458,7 @@ class sync_analysis:
                 symb_start = max(0, start)
                 symb_stop = min(end, int(len(samples)/self.symb_len))
 
+
                 for index_symb in range(symb_start, symb_stop):
                     
                     axis = axs[ind_ver_subplt, ind_hor_subplt]
@@ -474,6 +475,9 @@ class sync_analysis:
                     if self.local:
                         axis.set_ylim([-5, 5])
                         axis_dB.set_ylim([-15, 10])
+                    else:
+                        axis.set_ylim([-0.1, 0.075])
+                        axis_dB.set_ylim([-30,-10])
 
                     # Legend
                     if ind_hor_subplt == 0:
@@ -496,7 +500,7 @@ class sync_analysis:
 
                     if ind_symb == self.number_of_subplot_per_image or frame["frame"] == len(metadata):
                         
-                        fig_name = "task_%s_frame_%s_symb_%s_to_%s_IQ_dB.png" % (self.task, frame["frame"], index_symb - ind_symb, index_symb)
+                        fig_name = "task_%s_frame_%s_symb_%s_to_%s_IQ_dB.png" % (self.task, frame["frame"], index_symb - ind_symb +1, index_symb)
                         plt.savefig(fig_name)
                         plt.clf()
                         print("Figure %s generated" % fig_name)
@@ -651,10 +655,10 @@ class sync_analysis:
                 if np.imag(sp[index_start:index_stop])[index] != 0:
                     print("Sample - %s" % (index))
                 
-            axis.plot(X, np.real(sp[index_start:index_stop]) ,"b", linewidth=1)
-            axis.plot(X, np.imag(sp[index_start:index_stop]) ,"r", linewidth=1)
+            axis.plot(X, np.real(sp[index_start:index_stop]) ,"r", linewidth=1)
+            axis.plot(X, np.imag(sp[index_start:index_stop]) ,"--b", linewidth=0.5)
             axis.set_title("sample_%s" % (index_sp / self.fft_len))
-            axis.set_ylim([-3, +3])
+            # axis.set_ylim([-3, +3])
 
             # INDEX
             if ind_hor_subplt == 0 and ind_ver_subplt == 0:
