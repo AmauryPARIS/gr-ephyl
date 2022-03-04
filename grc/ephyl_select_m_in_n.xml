@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<block>
+  <name>select_m_in_n</name>
+  <key>ephyl_select_m_in_n</key>
+  <category>[ephyl]</category>
+  <import>import ephyl</import>
+  <make>ephyl.select_m_in_n($choice, $m, $n, $offset)</make>
+
+  <param>
+    <name>Type of selection</name>
+    <key>choice</key>
+    <value>0</value>
+    <type>enum</type>
+      <option>
+          <name>low power</name>
+          <key>0</key>
+      </option>
+      <option>
+          <name>high power</name>
+          <key>1</key>
+      </option>
+      <option>
+          <name>first samples</name>
+          <key>2</key>
+      </option>
+      <option>
+          <name>last samples</name>
+          <key>3</key>
+      </option>
+  </param>
+
+  <param>
+    <name>M</name>
+    <key>m</key>
+    <value>1</value>
+    <type>int</type>
+  </param>
+
+  <param>
+    <name>N</name>
+    <key>n</key>
+    <value>2</value>
+    <type>int</type>
+  </param>
+
+  <param>
+    <name>Offset</name>
+    <key>offset</key>
+    <value>0</value>
+    <type>int</type>
+  </param>
+
+ 
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+
+  
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+</block>
