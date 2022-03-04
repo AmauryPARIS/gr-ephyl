@@ -30,6 +30,7 @@ list(APPEND ephyl_sources
     turbofsk_rx_impl.cc
     init_turbofsk.cc
     gate_impl.cc
+    select_m_in_n_impl.cc
 )
 
 set(ephyl_sources "${ephyl_sources}" PARENT_SCOPE)

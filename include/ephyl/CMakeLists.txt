@@ -25,5 +25,6 @@ install(FILES
     turbofsk_tx.h
     turbofsk_tx.h
     turbofsk_rx.h
-    gate.h DESTINATION include/ephyl
+    gate.h
+    select_m_in_n.h DESTINATION include/ephyl
 )
