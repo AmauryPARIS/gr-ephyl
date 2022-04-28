@@ -174,6 +174,7 @@ class bs_scheduler(gr.sync_block):
             output1 = np.delete(output1,slice(len(output1)+self.diff,len(output1)))    # Since diff is negative
 
             if self.state == BCH :
+                output1[:] = [0.01]*len(output1)
                 self.slot_cnt += 1
 
             elif self.state == PUSCH : 
@@ -184,6 +185,7 @@ class bs_scheduler(gr.sync_block):
                         self.list_dlcch[elem]["send"] = True
 
             elif self.state == GUARD :
+                output1[:] = [0.01]*len(output1)
                 self.slot_cnt += 1
                 if self.slot_cnt < self.num_slots :
                     # Return to PUSCH
@@ -192,6 +194,7 @@ class bs_scheduler(gr.sync_block):
                     self.slot_cnt = -1
 
             elif self.state == PROC : 
+                output1[:] = [0.01]*len(output1)
                 if self.exit_frame == 0 or self.frame_cnt <= self.exit_frame:
                     self.next_state()   # In order to jump the idle state
                 else :
@@ -202,7 +205,7 @@ class bs_scheduler(gr.sync_block):
                 exit(1)
 
             else :
-                output1[:] = [0]*len(output1)
+                output1[:] = [0.01]*len(output1)
 
             self.next_state()
             
@@ -252,6 +255,7 @@ class bs_scheduler(gr.sync_block):
                     else:
                         offset = self.nitems_read(0)+1000
                         #offset = self.nitems_read(0)+20000
+                        
 
                     '''
                     We have to deconstruct the offset before appending it,
@@ -270,18 +274,19 @@ class bs_scheduler(gr.sync_block):
                         print("\n")
                         print "[BS] ================= FRAME " + str(self.frame_cnt) + " START ================="
 
-                    output1[:] = [0]*len(output1)
+                    output1[:] = [0.01]*len(output1)
                 else : 
-                    output1[:] = [0]*len(output1)
+                    output1[:] = [0.01]*len(output1)
 
             else :
-                output1[:] = [0]*len(output1)
+                output1[:] = [0.01]*len(output1)
 
             self.samp_cnt += len(output1)
         ###############################################################################
 
-        if self.state != BCH :
-            output1[:] = Input[:len(output1)]
+        # if self.state != BCH :
+        #     self.log("Weird transmit data at %s" % (str(STATES[self.state])))
+        #     output1[:] = Input[:len(output1)]
 
         self.to_return1 = len(output1)
 

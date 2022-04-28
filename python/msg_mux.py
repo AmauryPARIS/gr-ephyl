@@ -37,7 +37,7 @@ class msg_mux(gr.sync_block):
 
     Concatenates message data coming from inputs (payload, frame & slot number)
     """
-    def __init__(self, list_sensor = ["a", "b"], log=False):  # only default arguments here
+    def __init__(self, phy_option=0, list_sensor = ["a", "b"], log=False):  # only default arguments here
         """arguments to this function show up as parameters in GRC"""
         gr.sync_block.__init__(
             self,
@@ -63,6 +63,7 @@ class msg_mux(gr.sync_block):
 
         self.sensor_count = len(list_sensor)
         self.list_sensor = list_sensor
+        self.phy_option = phy_option
 
         self.frame_msg = 0
         self.frame_n = 0
@@ -122,22 +123,25 @@ class msg_mux(gr.sync_block):
     def handle_detect(self, msg_pmt):
         detect = pmt.to_python(msg_pmt)
         rx = []
-
+        log = []
         # Match the detect [IDLE, RX] power status to any received and demodulated packet
         for detect_elem in range(0,len(detect)):
             self.log("MUX slot %s : %s" % (detect_elem, detect[detect_elem]))
             if detect[detect_elem] == "IDLE":
                 rx.append([detect_elem, detect[detect_elem]])
+                log.append([detect_elem, detect[detect_elem]])
             else:
                 packets = None
                 for msg_elem in range(0,len(self.received_packet)):
                     if int(self.received_packet[msg_elem][1]) == int(detect_elem): # Check for matching slot number
                         if self.received_packet[msg_elem][3] == "BUSY":
                             rx.append([detect_elem, detect[detect_elem]])
+                            log.append([detect_elem, detect[detect_elem]])
                         else:
                             detect[detect_elem] = "RX"
                             packets = [self.received_packet[msg_elem][0], self.received_packet[msg_elem][2]] # [sn_id, sequence]
                             rx.append([detect_elem, detect[detect_elem], packets])
+                            log.append([detect_elem, packets])
                 if len(self.received_packet) == 0:
                     rx.append([detect_elem, detect[detect_elem]])
         
@@ -148,6 +152,7 @@ class msg_mux(gr.sync_block):
             frame = self.frame_n
         self.log("End frame info received : %s | %s | %s " % (frame, self.received_ulcch, rx))
         print("BS - feedback : frame - %s | ulcch - %s | rx - %s " % (frame, self.received_ulcch, rx))
+        # print("feedback,BS,%s,%s" % (frame,log))
 
         for i in range(0,len(rx)):
             if len(rx[i]) == 2:
@@ -193,18 +198,26 @@ class msg_mux(gr.sync_block):
 
     def handle_data(self, msg_pmt):
         with self.lock : 
-            self.data = pmt.to_python(pmt.cdr(msg_pmt))
-
             try:
-                l = [chr(c) for c in self.data]
-                l = ''.join(l)
-                l = re.split(r'\t+', l)
+                if self.phy_option in [0, 1] :# nb iot phy 
+                    self.data = pmt.to_python(pmt.cdr(msg_pmt))
+                    l = [chr(c) for c in self.data]
+                    l = ''.join(l)
+                    l = re.split(r'\t+', l)
 
+                elif self.phy_option == 2: # lora phy
+                    self.data = pmt.to_python(msg_pmt)
+                    l = self.data 
+                    l = re.split(r'\t+', l)
+
+                else :
+                    self.log("MSG MUX - Unknown PHY option %s" % (self.phy_option))
+                    
                 sn_id = l[0]
                 sequence = l[1][0:3]
                 crc = l[1][3:]
 
-                self.log("Received - SN %s | seq %s | crc %s" % (sn_id, sequence, crc))
+                self.log("Received - SN %s | seq %s | crc %s | raw %s" % (sn_id, sequence, crc, self.data))
             
                 if self.intergity_check(sn_id, sequence, crc):
                     sequence = sequence[0]
@@ -213,7 +226,11 @@ class msg_mux(gr.sync_block):
                     sequence = "error"
                     status = "BUSY"
             except:
-                self.log("Received error - data %s" % ([chr(c) for c in self.data]))
+                if all(isinstance(c, int) for c in self.data):
+                    self.log("Received error - data %s" % ([chr(c) for c in self.data]))
+                else: 
+                    self.log("Received error - data not int : %s" % (self.data))
+                    # print(self.data)
                 sn_id = "error"
                 sequence = "error"
                 crc = "error"
@@ -221,7 +238,7 @@ class msg_mux(gr.sync_block):
 
 
             self.log("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
-            print("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
+            # print("BS - Message Mux : SRC - %s | Sequence - %s | Status - %s" % (sn_id, sequence, status))
 
             # Find a way to return the sequence
                 

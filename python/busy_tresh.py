@@ -28,7 +28,7 @@ class busy_tresh(gr.sync_block):
     """
     docstring for block busy_tresh
     """
-    def __init__(self, tresh=5, log=False):
+    def __init__(self, tresh, log=False):
         gr.sync_block.__init__(self,
             name="busy_tresh",
             in_sig=[np.complex64],
@@ -70,6 +70,7 @@ class busy_tresh(gr.sync_block):
 
     def feedback(self):
         feedback = []
+        self.log("feedback - power slot %s - tresh %s" % (self.power_per_slot, self.power_tresh))
         for slot_power in self.power_per_slot:
             if slot_power > self.power_tresh:
                 feedback.append("BUSY")
@@ -142,7 +143,7 @@ class busy_tresh(gr.sync_block):
 
         # Compute IDLE/BUSY slot and send feedback to MSG MUX
         if send_feedback:
-            #print("BS - Power tresh : Frame %s | Power %s" % (frame, self.power_per_slot))
+            print("BS - Power tresh : Frame %s | Power %s" % (frame, self.power_per_slot))
             self.feedback()
             self.log("End Frame : Send feedback to msg mux\n")
             self.log("Power per slot : Frame %s | Power %s" % (frame, self.power_per_slot))

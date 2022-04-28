@@ -4,20 +4,34 @@
   <key>ephyl_access_control</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.access_control($bs_slots,$Control,$save_log,$ID,$log)</make>
+  <make>ephyl.access_control($phy_option, $bs_slots,$save_log,$ID)</make>
 
-<param>
+  <param>
+    <name>PHY Option</name>
+    <key>phy_option</key>
+    <value></value>
+    <type>enum</type>
+    <option>
+      <name>SC-FDMA</name>
+      <key>0</key>
+    </option>
+    <option>
+      <name>TurboFSK</name>
+      <key>1</key>
+    </option>
+    <option>
+      <name>LoRa</name>
+      <key>2</key>
+    </option>
+  </param>
+
+  <param>
     <name>BS Slots</name>
     <key>bs_slots</key>
     <value>[0]</value>
     <type>raw</type>
   </param>
-  <param>
-    <name>Access Control</name>
-    <key>Control</key>
-    <value>"basic"</value>
-    <type>raw</type>
-  </param>
+
   <param>
     <name>Save Log</name>
     <key>save_log</key>
@@ -30,13 +44,6 @@
     <key>ID</key>
     <value>"Z"</value>
     <type>raw</type>
-  </param>
-
-  <param>
-    <name>Generate debug/log file</name>
-    <key>log</key>
-    <value>False</value>
-    <type>bool</type>
   </param>
 
   <sink>
