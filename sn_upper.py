@@ -25,7 +25,7 @@ while True:
     frame = frame + 1
     
     for slot in up.slots:
-        if numpy.random.uniform() < 0.5:
+        if numpy.random.uniform() < 0.9:
             if numpy.random.uniform() < 0.5:
                 sequence.append([slot, "Y"])
             else:
