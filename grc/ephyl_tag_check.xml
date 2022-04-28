@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<block>
+  <name>tag_check</name>
+  <key>ephyl_tag_check</key>
+  <category>[ephyl]</category>
+  <import>import ephyl</import>
+  <make>ephyl.tag_check($title)</make>
+
+  <param>
+    <name>Name</name>
+    <key>title</key>
+    <type>raw</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+
+</block>
