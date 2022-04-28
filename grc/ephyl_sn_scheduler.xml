@@ -4,13 +4,25 @@
   <key>ephyl_sn_scheduler</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.sn_scheduler($phy_option, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate, $ID, $log)</make>
+  <make>ephyl.sn_scheduler($phy_option, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate, $ID, $log, $sf, $cr, $crc)</make>
  
   <param>
     <name>PHY Option</name>
     <key>phy_option</key>
-    <value>0</value>
-    <type>int</type>
+    <value></value>
+    <type>enum</type>
+    <option>
+      <name>SC-FDMA</name>
+      <key>0</key>
+    </option>
+    <option>
+      <name>TurboFSK</name>
+      <key>1</key>
+    </option>
+    <option>
+      <name>LoRa</name>
+      <key>2</key>
+    </option>
   </param>
 
   <param>
@@ -72,7 +84,7 @@
   <param>
     <name>Sample rate</name>
     <key>samp_rate</key>
-    <value>1000000</value>
+    <value>100000</value>
     <type>int</type>
   </param>
 
@@ -88,6 +100,30 @@
     <key>log</key>
     <value>False</value>
     <type>bool</type>
+  </param>
+
+  <param>
+    <name>LoRa SF</name>
+    <key>sf</key>
+    <value>7</value>
+    <type>int</type>
+    <hide>#if str($phy_option()) == '2' then 'none' else 'all'#</hide>
+  </param>
+
+  <param>
+    <name>LoRa CR</name>
+    <key>cr</key>
+    <value>4</value>
+    <type>int</type>
+    <hide>#if str($phy_option()) == '2' then 'none' else 'all'#</hide>
+  </param>
+
+  <param>
+    <name>LoRa CRC</name>
+    <key>crc</key>
+    <value>True</value>
+    <type>bool</type>
+    <hide>#if str($phy_option()) == '2' then 'none' else 'all'#</hide>
   </param>
 
   <sink>

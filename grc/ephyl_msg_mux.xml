@@ -5,7 +5,26 @@ Messages</name>
   <key>ephyl_msg_mux</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.msg_mux($list_sensor, $log)</make>
+  <make>ephyl.msg_mux($phy_option, $list_sensor, $log)</make>
+
+  <param>
+    <name>PHY Option</name>
+    <key>phy_option</key>
+    <value></value>
+    <type>enum</type>
+    <option>
+      <name>SC-FDMA</name>
+      <key>0</key>
+    </option>
+    <option>
+      <name>TurboFSK</name>
+      <key>1</key>
+    </option>
+    <option>
+      <name>LoRa</name>
+      <key>2</key>
+    </option>
+  </param>
 
   <param>
     <name>List of sensor ID</name>

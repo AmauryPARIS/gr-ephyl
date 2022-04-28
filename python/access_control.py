@@ -45,13 +45,17 @@ class access_control(gr.sync_block):
     """
     docstring for block access_control
     """
-    def __init__(self, bs_slots, Control = "random", save_log = False, ID = "Z", log=False):
+    def __init__(self, phy_option, bs_slots, save_log = False, ID = "Z"):
         gr.sync_block.__init__(self,
             name="access_control",
             in_sig=[],
             out_sig=[])
 
-        self.logged = log
+        self.save_log = save_log
+        self.ID = ID
+        if self.save_log :
+            # self.filename = "SN-"+self.ID+"_"+time.strftime("%d%m%Y-%H%M%S")+".txt" # Score 
+            self.filename_log = "LOG_SN_"+self.ID+"_access_"+time.strftime("%d%m%Y-%H%M%S")+".txt" # Debug
 
         self.message_port_register_out(pmt.to_pmt("Array"))
         self.message_port_register_out(pmt.to_pmt("Data"))
@@ -67,9 +71,9 @@ class access_control(gr.sync_block):
         self.set_msg_handler(pmt.intern("inst"), self.handle_inst)      
 
         self.lock = threading.Lock()
-        self.ID = ID
+        
 
-        self.filename_log = "LOG_SN_"+self.ID+"_access_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
+        
         self.save_detail_log = True
 
         self.slot_n = -1
@@ -81,8 +85,7 @@ class access_control(gr.sync_block):
 
         self.frame_offset = 0
 
-        self.control = Control
-
+        self.phy_option = phy_option
         self.bs_slots = bs_slots
         self.send = []
         self.send_inst = NOK
@@ -126,14 +129,9 @@ class access_control(gr.sync_block):
         self.error = 0
         self.detection = 0
         
-        self.save_log = save_log
-        if self.save_log :
-            self.filename = "SN-"+self.ID+"_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
-            
-
 
     def log(self, log):
-        if self.logged:
+        if self.save_log:
             now = datetime.now().time()
             with open(self.filename_log,"a+") as f_log:
                 f_log.write("%s-%s-%s-%s\n" % (self.ID, self.frame_cnt, now, log)) 
@@ -281,6 +279,7 @@ class access_control(gr.sync_block):
                 frame = pmt.to_python(pmt.dict_ref(msg_pmt, pmt.to_pmt("FRAME"), pmt.PMT_NIL))
                 self.log("Inst received : send - %s | sequence - %s | frame - %s" % (inst_send, inst_sequence, frame))
                 print("SN %s - Inst received : send - %s | sequence - %s | frame - %s" % (self.ID, inst_send, inst_sequence, frame))
+                # print("instructions,SN%s,%s,%s,%s" % (self.ID, self.ID, frame, [("%s,%s" % (elem[0], elem[1])) for elem in inst_sequence]))
 
                 if inst_send == "True":
                     self.send.append({"inst" : SEND, "sequence" : inst_sequence, "frame" : frame})
@@ -353,9 +352,13 @@ class access_control(gr.sync_block):
                             slot_nbr = int(self.lines[self.i][1])
                             data = self.add_symb(self.sequ_inst[slot_nbr][1], data)  # Replace first random values by sequence
                             self.lines[self.i][3] = data[1]             # Update packet buffer
-
                             data = '\t'.join(data)
-                            OUT = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(data),[ord(c) for c in data]))    # Data = encrypted node_id + line_i
+
+                            if self.phy_option == 0 or self.phy_option == 1: # sc-fdma + turbofsk
+                                OUT = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(data),[ord(c) for c in data]))    # Data = encrypted node_id + line_i
+                            elif self.phy_option == 2: # lora
+                                OUT = pmt.intern(bytes(data.encode("utf-8")))
+
                             self.message_port_pub(pmt.to_pmt("Data"), OUT) 
                             self.log("Data send in PHY layer - data %s | i %s | lines %s" % (data, self.i, self.lines)) 
                         self.i += 1
@@ -380,7 +383,7 @@ class access_control(gr.sync_block):
                                     result = self.compare_pld(self.lines,self.RX_frame)
                                     ## Generate new payload 
                                     self.lines = self.gen_rand_pld(self.ID,1,result[1],self.tmp_data)
-                                    print "[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "\n"
+                                    # print "[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "\n"
                                     self.log("[SN "+self.ID+"] Score of Frame " + str(self.frame_cnt) +  " : " + str(result[0]) + "")
                             ## No activity in DL
                             else:

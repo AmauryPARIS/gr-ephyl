@@ -46,7 +46,7 @@ class sn_scheduler(gr.basic_block):
     """
     def __init__(self, phy_option=0,
         num_slots=5, bch_time=20, guard_time=100, Slot_time=50, Proc_time = 50, 
-        wanted_tag="corr_start",length_tag_key="packet_len2",samp_rate = 32000, ID = "Z", log=False):
+        wanted_tag="corr_start",length_tag_key="packet_len2",samp_rate = 32000, ID = "Z", log=False, sf=7, cr=4, crc=True):
         gr.basic_block.__init__(self,
             name="Sensor Scheduler",
             in_sig=[],
@@ -59,6 +59,10 @@ class sn_scheduler(gr.basic_block):
         self.length_tag_key = length_tag_key
         self.samp_rate = int(samp_rate/1000)
         self.logged = log
+
+        self.lora_sf = sf
+        self.lora_cr = cr
+        self.lora_crc = crc
 
         ## Here we set states data, 
         ## PS : LISTEN has a constant pseudo infinite duration to avoid timing/buffer overflow
@@ -174,11 +178,12 @@ class sn_scheduler(gr.basic_block):
                     if not found:
                         self.active = False
                         self.state = PROC
-                        self.send_inactive_fb_ul = True         
-                        self.log("Inactive Frame") 
+                        self.send_inactive_fb_ul = True      
+                        self.log("Inactive Frame")
      
                 else :
                     new_array = pmt.to_python(slot_pmt)
+                    self.log("Slot control - new_array : %s" % (new_array))
                     # Extract ID coming from slot control block, and remove it from the message
                     #self.Id = new_array[2]
 
@@ -207,10 +212,22 @@ class sn_scheduler(gr.basic_block):
                 elif self.phy_option==1 :   # TurboFSK PHY option
                     # /*  OUT = (64*32)+(1+(IN+16)/8)*4*137+(1+int((1+(IN+16)/8)*4/5))*137 */
                     self.signal_len = 4  # TO BE UPDATED
+                elif self.phy_option==2: # LoRa PHY Option
+                    len_msg = len(self.slot_msg[0]) # data to be transmited [bytes]
+                    len_crc = 4 if self.lora_crc else 0
+                    len_msg = (len_msg * 2) + 5 + 4 # whitening + header + crc [bytes]
+                    len_msg = 8 + (int((len_msg - (self.lora_sf-2))/self.lora_sf)+1) * (4+self.lora_cr) # Interleaver
+                    len_msg = (len_msg + 12)*4 + 1  # modulate and preamble - each symbol worth 2**sf samples, except from one symbol in the preamble
+                                                    # This symbol is worth 2**sf / 4 samples 
+                                                    # The signal is therfore received as pdu of 2**sf / 4 samples
+                    self.signal_len = len_msg
 
                 self.msg_out = np.append(self.msg_out,pmt.to_python(pmt.cdr(msg_pmt)))   # Collect message data, convert to Python format:
                 self.pdu_cnt += 1
+                self.log("Store msg - size : %s - count : %s - slot msg : %s" % (self.signal_len, self.pdu_cnt, self.slot_msg))
+
                 if self.pdu_cnt == self.signal_len:   # Signal reconstructed 
+                    self.log("Store msg - signal reconstructed")
                     self.pdu_cnt=0
                     self.msg_full = np.array(self.msg_full.tolist() + [self.msg_out.tolist()])    # Store the N signals in N-dim array, analyze carefully before modifying
                     self.msg_out = np.array([])
@@ -249,7 +266,7 @@ class sn_scheduler(gr.basic_block):
                             print "Offset non valid"
                             offset = 0
 
-                        self.delay = self.nitems_written(0)-offset
+                        self.delay = self.nitems_written(0)-offset # Consider that sensors and 
                         #self.delay = self.nitems_written(0)-0
                         if self.delay>0:
                             self.samp_cnt = self.delay
