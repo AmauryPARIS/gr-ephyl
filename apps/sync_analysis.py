@@ -33,6 +33,8 @@ class sync_analysis:
         elif self.sig == "fft_bs":
             self.states_file = path_to + "STATE_Busy_Tresh.txt"
             self.samples_file = path_to + "bin_file_BS_complex_fft_2_32b_carrier"
+        elif self.sig == "lora":
+            self.samples_file = path_to + "lora_tx"
 
         # RX status files [BUSY/IDLE/RX]
         self.rx_file = path_to + "RX_BS.txt"
