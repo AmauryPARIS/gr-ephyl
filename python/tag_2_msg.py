@@ -33,7 +33,7 @@ class tag_2_msg(gr.sync_block):
         gr.sync_block.__init__(
             self,
             name='Tag detection to Message',   # will show up in GRC
-            in_sig=[np.uint8],
+            in_sig=[np.complex64],
             out_sig=[]
         )
         self.wanted_tag = wanted_tag
