@@ -39,7 +39,7 @@ GR_PYTHON_INSTALL(
     access_control.py
     easy_upper.py
     busy_tresh.py
-    DESTINATION ${GR_PYTHON_DIR}/ephyl
+    tag_check.py DESTINATION ${GR_PYTHON_DIR}/ephyl
 )
 
 ########################################################################
@@ -62,3 +62,4 @@ GR_ADD_TEST(qa_easy_upper ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ea
 GR_ADD_TEST(qa_busy_tresh ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_busy_tresh.py)
 GR_ADD_TEST(qa_gate ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_gate.py)
 GR_ADD_TEST(qa_select_m_in_n ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_select_m_in_n.py)
+GR_ADD_TEST(qa_tag_check ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_tag_check.py)

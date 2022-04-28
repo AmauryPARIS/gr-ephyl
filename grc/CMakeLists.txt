@@ -31,5 +31,6 @@ install(FILES
     ephyl_easy_upper.xml
     ephyl_busy_tresh.xml
     ephyl_gate.xml
-    ephyl_select_m_in_n.xml DESTINATION share/gnuradio/grc/blocks
+    ephyl_select_m_in_n.xml
+    ephyl_tag_check.xml DESTINATION share/gnuradio/grc/blocks
 )
