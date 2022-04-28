@@ -69,7 +69,7 @@ if False:
     # sa.analyse_symbol(metadata, sp, REMARK, "IQ")
 
 
-if True:
+if False:
 
     ##### Analyse des valeurs de symboles pour chaque porteuse ######
     
@@ -93,6 +93,14 @@ if True:
 
     sa.analyse_fft(metadata, sp, REMARK)
 
+if True:
+    sa = sync_analysis(local = True, 
+                    task = "", 
+                    sig = "lora")
+    sa.set_data_files()
+    sp = sa.get_file_samples()
+    print("Lora len : %s" % (len(sp)))   
+    print("Ex : %s" % (sp[0]))         
 
 
 
