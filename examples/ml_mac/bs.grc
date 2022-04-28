@@ -491,7 +491,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1e6</value>
+      <value>int(sample_rate)</value>
     </param>
   </block>
   <block>
@@ -847,7 +847,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(768, 456)</value>
+      <value>(880, 552)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -965,6 +965,53 @@
     </param>
   </block>
   <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(936, 172)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>debug_log</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>log</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>intx</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>False</value>
+    </param>
+  </block>
+  <block>
     <key>hier_bs</key>
     <param>
       <key>T_bch</key>
@@ -1004,7 +1051,7 @@
     </param>
     <param>
       <key>debug_log</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>T_g</key>
@@ -1032,7 +1079,7 @@
     </param>
     <param>
       <key>N</key>
-      <value>N</value>
+      <value>1</value>
     </param>
     <param>
       <key>UHD</key>
@@ -1147,6 +1194,194 @@
     <param>
       <key>value</key>
       <value>["A","B"]</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1376, 236)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>lora_bw</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Bandwidth - LoRa</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>eng_float</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>250e3</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1376, 428)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>lora_cr</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Coding rate - LoRa [0-4]</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>intx</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>4</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1376, 524)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>lora_crc</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>CRC</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>intx</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>True</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1376, 332)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>lora_sf</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Spreading factor - LoRa</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>intx</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>7</value>
     </param>
   </block>
   <block>
@@ -1287,7 +1522,54 @@
     </param>
     <param>
       <key>value</key>
-      <value>-20</value>
+      <value>-30</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(16, 212)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>sample_rate</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Sample Rate</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>eng_float</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>1e6</value>
     </param>
   </block>
   <block>
@@ -1396,7 +1678,7 @@
     </param>
     <param>
       <key>bw0</key>
-      <value>0</value>
+      <value>250e3</value>
     </param>
     <param>
       <key>center_freq0</key>
@@ -2568,7 +2850,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(144, 308)</value>
+      <value>(144, 284)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2864,7 +3146,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(48, 452)</value>
+      <value>(48, 444)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2911,7 +3193,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(120, 548)</value>
+      <value>(120, 540)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2958,7 +3240,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(120, 652)</value>
+      <value>(120, 636)</value>
     </param>
     <param>
       <key>_rotation</key>

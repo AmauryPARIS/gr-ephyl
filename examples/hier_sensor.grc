@@ -909,7 +909,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(488, 316)</value>
+      <value>(488, 236)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1604,53 +1604,6 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(216, 564)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>control</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Slot Access Policy</value>
-    </param>
-    <param>
-      <key>short_id</key>
-      <value></value>
-    </param>
-    <param>
-      <key>hide</key>
-      <value>none</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>string</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>all</value>
-    </param>
-  </block>
-  <block>
-    <key>parameter</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
       <value>0</value>
     </param>
     <param>
@@ -1940,10 +1893,6 @@
   <block>
     <key>ephyl_access_control</key>
     <param>
-      <key>Control</key>
-      <value>control</value>
-    </param>
-    <param>
       <key>bs_slots</key>
       <value>bs_slots</value>
     </param>
@@ -1972,10 +1921,6 @@
       <value>0</value>
     </param>
     <param>
-      <key>log</key>
-      <value>debug_log</value>
-    </param>
-    <param>
       <key>id</key>
       <value>ephyl_access_control_0</value>
     </param>
@@ -1985,6 +1930,10 @@
     </param>
     <param>
       <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>phy_option</key>
       <value>0</value>
     </param>
     <param>
@@ -2041,6 +1990,18 @@
     <param>
       <key>length_tag_key</key>
       <value>"packet_len2"</value>
+    </param>
+    <param>
+      <key>cr</key>
+      <value>4</value>
+    </param>
+    <param>
+      <key>crc</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>sf</key>
+      <value>7</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -2420,7 +2381,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(728, 316)</value>
+      <value>(728, 236)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2480,49 +2441,6 @@
     <param>
       <key>label</key>
       <value>UL</value>
-    </param>
-    <param>
-      <key>num_streams</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>optional</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>pad_sink</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(944, 900)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>pad_sink_0_0_0_0_0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>const</value>
     </param>
     <param>
       <key>num_streams</key>
@@ -3155,12 +3073,6 @@
   <connection>
     <source_block_id>blocks_float_to_complex_0</source_block_id>
     <sink_block_id>blocks_stream_mux_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_float_to_complex_0</source_block_id>
-    <sink_block_id>pad_sink_0_0_0_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
