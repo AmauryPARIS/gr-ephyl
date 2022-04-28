@@ -25,7 +25,7 @@ import time
 
 class sn_multislot_dyn_ephyl(gr.top_block):
 
-    def __init__(self, M=32, N=1, T_bch=200, T_g=50, T_p=1000, T_s=150, bs_slots=range(1), cp_ratio=0.25, ip_bs_addr='mnode3', ip_decision_layer_addr='localhost', port_sn_feedback=5560, port_sn_inst=5559, sn_id='A'):
+    def __init__(self, M=32, N=1, T_bch=200, T_g=50, T_p=1000, T_s=150, bs_slots=range(1), cp_ratio=0.25, debug_log=False, ip_bs_addr='mnode3', ip_decision_layer_addr='localhost', lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_sn_feedback=5560, port_sn_inst=5559, sample_rate=1e6, sn_id='A'):
         gr.top_block.__init__(self, "Sensor flowgraph")
 
         ##################################################
@@ -39,10 +39,16 @@ class sn_multislot_dyn_ephyl(gr.top_block):
         self.T_s = T_s
         self.bs_slots = bs_slots
         self.cp_ratio = cp_ratio
+        self.debug_log = debug_log
         self.ip_bs_addr = ip_bs_addr
         self.ip_decision_layer_addr = ip_decision_layer_addr
+        self.lora_bw = lora_bw
+        self.lora_cr = lora_cr
+        self.lora_crc = lora_crc
+        self.lora_sf = lora_sf
         self.port_sn_feedback = port_sn_feedback
         self.port_sn_inst = port_sn_inst
+        self.sample_rate = sample_rate
         self.sn_id = sn_id
 
         ##################################################
@@ -52,7 +58,7 @@ class sn_multislot_dyn_ephyl(gr.top_block):
         self.port_ulcch = port_ulcch = 5601 + incr_port_sensor_ulcch
         self.port_sync = port_sync = 5556
         self.port_dlcch = port_dlcch = 5600
-        self.samp_rate = samp_rate = 1e6
+        self.samp_rate = samp_rate = int(sample_rate)
         self.gain = gain = 25
         self.freq = freq = 2450e6
         self.frame_len = frame_len = (T_bch+len(bs_slots)*(T_s+T_g)+T_p)/float(1000)
@@ -85,18 +91,18 @@ class sn_multislot_dyn_ephyl(gr.top_block):
         self.uhd_usrp_sink_0_0.set_center_freq(freq, 0)
         self.uhd_usrp_sink_0_0.set_gain(gain, 0)
         self.uhd_usrp_sink_0_0.set_antenna('TX/RX', 0)
+        self.uhd_usrp_sink_0_0.set_bandwidth(250e3, 0)
         self.hier_sensor_0 = hier_sensor(
             M=M,
-            N=N,
+            N=1,
             T_bch=T_bch,
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
             bs_slots=bs_slots,
-            control=all,
-            debug_log=True,
-            id_0=sn_id,
-            log=True,
+            debug_log=False,
+            id_0="A",
+            log=debug_log,
             samp_rate=samp_rate,
         )
         self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_float*1)
@@ -126,7 +132,6 @@ class sn_multislot_dyn_ephyl(gr.top_block):
 
     def set_N(self, N):
         self.N = N
-        self.hier_sensor_0.set_N(self.N)
 
     def get_T_bch(self):
         return self.T_bch
@@ -174,6 +179,13 @@ class sn_multislot_dyn_ephyl(gr.top_block):
     def set_cp_ratio(self, cp_ratio):
         self.cp_ratio = cp_ratio
 
+    def get_debug_log(self):
+        return self.debug_log
+
+    def set_debug_log(self, debug_log):
+        self.debug_log = debug_log
+        self.hier_sensor_0.set_log(self.debug_log)
+
     def get_ip_bs_addr(self):
         return self.ip_bs_addr
 
@@ -189,6 +201,30 @@ class sn_multislot_dyn_ephyl(gr.top_block):
         self.ip_decision_layer_addr = ip_decision_layer_addr
         self.set_addr_sn_inst(str("tcp://" + str(self.ip_decision_layer_addr) + ":" + str(self.port_sn_inst)))
 
+    def get_lora_bw(self):
+        return self.lora_bw
+
+    def set_lora_bw(self, lora_bw):
+        self.lora_bw = lora_bw
+
+    def get_lora_cr(self):
+        return self.lora_cr
+
+    def set_lora_cr(self, lora_cr):
+        self.lora_cr = lora_cr
+
+    def get_lora_crc(self):
+        return self.lora_crc
+
+    def set_lora_crc(self, lora_crc):
+        self.lora_crc = lora_crc
+
+    def get_lora_sf(self):
+        return self.lora_sf
+
+    def set_lora_sf(self, lora_sf):
+        self.lora_sf = lora_sf
+
     def get_port_sn_feedback(self):
         return self.port_sn_feedback
 
@@ -203,13 +239,19 @@ class sn_multislot_dyn_ephyl(gr.top_block):
         self.port_sn_inst = port_sn_inst
         self.set_addr_sn_inst(str("tcp://" + str(self.ip_decision_layer_addr) + ":" + str(self.port_sn_inst)))
 
+    def get_sample_rate(self):
+        return self.sample_rate
+
+    def set_sample_rate(self, sample_rate):
+        self.sample_rate = sample_rate
+        self.set_samp_rate(int(self.sample_rate))
+
     def get_sn_id(self):
         return self.sn_id
 
     def set_sn_id(self, sn_id):
         self.sn_id = sn_id
         self.set_incr_port_sensor_ulcch(0 if self.sn_id == "A" else 1)
-        self.hier_sensor_0.set_id_0(self.sn_id)
 
     def get_incr_port_sensor_ulcch(self):
         return self.incr_port_sensor_ulcch
@@ -312,11 +354,29 @@ def argument_parser():
         "", "--T-p", dest="T_p", type="intx", default=1000,
         help="Set Proc duration (ms) [default=%default]")
     parser.add_option(
+        "", "--debug-log", dest="debug_log", type="intx", default=False,
+        help="Set log [default=%default]")
+    parser.add_option(
         "", "--ip-bs-addr", dest="ip_bs_addr", type="string", default='mnode3',
         help="Set IP/name of BS [default=%default]")
     parser.add_option(
         "", "--ip-decision-layer-addr", dest="ip_decision_layer_addr", type="string", default='localhost',
         help="Set IP/name of decision layer [default=%default]")
+    parser.add_option(
+        "", "--lora-bw", dest="lora_bw", type="eng_float", default=eng_notation.num_to_str(250e3),
+        help="Set Bandwidth - LoRa [default=%default]")
+    parser.add_option(
+        "", "--lora-cr", dest="lora_cr", type="intx", default=4,
+        help="Set Coding rate - LoRa [0-4] [default=%default]")
+    parser.add_option(
+        "", "--lora-crc", dest="lora_crc", type="intx", default=True,
+        help="Set CRC [default=%default]")
+    parser.add_option(
+        "", "--lora-sf", dest="lora_sf", type="intx", default=7,
+        help="Set Spreading factor - LoRa [default=%default]")
+    parser.add_option(
+        "", "--sample-rate", dest="sample_rate", type="eng_float", default=eng_notation.num_to_str(1e6),
+        help="Set Sample Rate [default=%default]")
     parser.add_option(
         "", "--sn-id", dest="sn_id", type="string", default='A',
         help="Set Sensor ID - A or B [default=%default]")
@@ -327,7 +387,7 @@ def main(top_block_cls=sn_multislot_dyn_ephyl, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls(T_p=options.T_p, ip_bs_addr=options.ip_bs_addr, ip_decision_layer_addr=options.ip_decision_layer_addr, sn_id=options.sn_id)
+    tb = top_block_cls(T_p=options.T_p, debug_log=options.debug_log, ip_bs_addr=options.ip_bs_addr, ip_decision_layer_addr=options.ip_decision_layer_addr, lora_bw=options.lora_bw, lora_cr=options.lora_cr, lora_crc=options.lora_crc, lora_sf=options.lora_sf, sample_rate=options.sample_rate, sn_id=options.sn_id)
     tb.start()
     try:
         raw_input('Press Enter to quit: ')
