@@ -20,6 +20,7 @@ from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from hier_sensor_lora import hier_sensor_lora  # grc-generated hier_block
 from optparse import OptionParser
+import threading
 import time
 
 
@@ -58,6 +59,8 @@ class sn_multislot_dyn_ephyl_lora(gr.top_block):
         self.port_sync = port_sync = 5556
         self.port_dlcch = port_dlcch = 5600
         self.bs_slots = bs_slots = range(S)
+        self.variable_function_probe_0 = variable_function_probe_0 = 0
+        self.tag_uhd = tag_uhd = "packet_len_id"
         self.samp_rate = samp_rate = int(sample_rate)
         self.gain = gain = 25
         self.freq = freq = 2450e6
@@ -72,26 +75,6 @@ class sn_multislot_dyn_ephyl_lora(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
-        self.zeromq_sub_msg_source_0_1 = zeromq.sub_msg_source(addr_dlcch, 100)
-        self.zeromq_sub_msg_source_0_0 = zeromq.sub_msg_source(addr_sync, 100)
-        self.zeromq_sub_msg_source_0 = zeromq.sub_msg_source(addr_sn_inst, 100)
-        self.zeromq_pub_msg_sink_0_0 = zeromq.pub_msg_sink(addr_ulcch, 100)
-        self.zeromq_pub_msg_sink_0 = zeromq.pub_msg_sink(addr_sn_feedback, 100)
-        self.uhd_usrp_sink_0_0 = uhd.usrp_sink(
-        	",".join(('', "")),
-        	uhd.stream_args(
-        		cpu_format="fc32",
-        		channels=range(1),
-        	),
-        )
-        self.uhd_usrp_sink_0_0.set_clock_source('external', 0)
-        self.uhd_usrp_sink_0_0.set_time_source('external', 0)
-        self.uhd_usrp_sink_0_0.set_samp_rate(samp_rate)
-        self.uhd_usrp_sink_0_0.set_time_unknown_pps(uhd.time_spec())
-        self.uhd_usrp_sink_0_0.set_center_freq(freq, 0)
-        self.uhd_usrp_sink_0_0.set_gain(gain, 0)
-        self.uhd_usrp_sink_0_0.set_antenna('TX/RX', 0)
-        self.uhd_usrp_sink_0_0.set_bandwidth(250e3, 0)
         self.hier_sensor_lora_0 = hier_sensor_lora(
             M=M,
             T_bch=T_bch,
@@ -106,7 +89,43 @@ class sn_multislot_dyn_ephyl_lora(gr.top_block):
             lora_sf=lora_sf,
             samp_rate=samp_rate,
             sn_id=sn_id,
+            tag_len_id=tag_uhd,
+            UHD=True,
         )
+        self.zeromq_sub_msg_source_0_1 = zeromq.sub_msg_source(addr_dlcch, 100)
+        self.zeromq_sub_msg_source_0_0 = zeromq.sub_msg_source(addr_sync, 100)
+        self.zeromq_sub_msg_source_0 = zeromq.sub_msg_source(addr_sn_inst, 100)
+        self.zeromq_pub_msg_sink_0_0 = zeromq.pub_msg_sink(addr_ulcch, 100)
+        self.zeromq_pub_msg_sink_0 = zeromq.pub_msg_sink(addr_sn_feedback, 100)
+
+        def _variable_function_probe_0_probe():
+            while True:
+                val = self.hier_sensor_lora_0.ephyl_sn_scheduler_0_0.set_top_block(self)
+                try:
+                    self.set_variable_function_probe_0(val)
+                except AttributeError:
+                    pass
+                time.sleep(1.0 / (10))
+        _variable_function_probe_0_thread = threading.Thread(target=_variable_function_probe_0_probe)
+        _variable_function_probe_0_thread.daemon = True
+        _variable_function_probe_0_thread.start()
+
+        self.uhd_usrp_sink_0_0 = uhd.usrp_sink(
+        	",".join(('', "")),
+        	uhd.stream_args(
+        		cpu_format="fc32",
+        		channels=range(1),
+        	),
+        	tag_uhd,
+        )
+        self.uhd_usrp_sink_0_0.set_clock_source('external', 0)
+        self.uhd_usrp_sink_0_0.set_time_source('external', 0)
+        self.uhd_usrp_sink_0_0.set_samp_rate(samp_rate)
+        self.uhd_usrp_sink_0_0.set_time_unknown_pps(uhd.time_spec())
+        self.uhd_usrp_sink_0_0.set_center_freq(freq, 0)
+        self.uhd_usrp_sink_0_0.set_gain(gain, 0)
+        self.uhd_usrp_sink_0_0.set_antenna('TX/RX', 0)
+        self.uhd_usrp_sink_0_0.set_bandwidth(250e3, 0)
         self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_float*1)
 
 
@@ -250,8 +269,8 @@ class sn_multislot_dyn_ephyl_lora(gr.top_block):
 
     def set_sn_id(self, sn_id):
         self.sn_id = sn_id
-        self.set_incr_port_sensor_ulcch(0 if self.sn_id == "A" else 1)
         self.hier_sensor_lora_0.set_sn_id(self.sn_id)
+        self.set_incr_port_sensor_ulcch(0 if self.sn_id == "A" else 1)
 
     def get_incr_port_sensor_ulcch(self):
         return self.incr_port_sensor_ulcch
@@ -289,13 +308,26 @@ class sn_multislot_dyn_ephyl_lora(gr.top_block):
         self.hier_sensor_lora_0.set_bs_slots(self.bs_slots)
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
+    def get_variable_function_probe_0(self):
+        return self.variable_function_probe_0
+
+    def set_variable_function_probe_0(self, variable_function_probe_0):
+        self.variable_function_probe_0 = variable_function_probe_0
+
+    def get_tag_uhd(self):
+        return self.tag_uhd
+
+    def set_tag_uhd(self, tag_uhd):
+        self.tag_uhd = tag_uhd
+        self.hier_sensor_lora_0.set_tag_len_id(self.tag_uhd)
+
     def get_samp_rate(self):
         return self.samp_rate
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.uhd_usrp_sink_0_0.set_samp_rate(self.samp_rate)
         self.hier_sensor_lora_0.set_samp_rate(self.samp_rate)
+        self.uhd_usrp_sink_0_0.set_samp_rate(self.samp_rate)
 
     def get_gain(self):
         return self.gain

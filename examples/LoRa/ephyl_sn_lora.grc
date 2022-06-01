@@ -495,6 +495,76 @@
     </param>
   </block>
   <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(872, 12)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>tag_uhd</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>"packet_len_id"</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_function_probe</key>
+    <param>
+      <key>block_id</key>
+      <value>hier_sensor_lora_0.ephyl_sn_scheduler_0_0</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>function_args</key>
+      <value>self</value>
+    </param>
+    <param>
+      <key>function_name</key>
+      <value>set_top_block</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1176, 324)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>variable_function_probe_0</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
+    </param>
+  </block>
+  <block>
     <key>parameter</key>
     <param>
       <key>alias</key>
@@ -1035,6 +1105,10 @@
       <value>0</value>
     </param>
     <param>
+      <key>UHD</key>
+      <value>True</value>
+    </param>
+    <param>
       <key>T_p</key>
       <value>T_p</value>
     </param>
@@ -1053,6 +1127,10 @@
     <param>
       <key>lora_sf</key>
       <value>lora_sf</value>
+    </param>
+    <param>
+      <key>tag_len_id</key>
+      <value>tag_uhd</value>
     </param>
   </block>
   <block>
@@ -2341,7 +2419,7 @@
     </param>
     <param>
       <key>len_tag_name</key>
-      <value></value>
+      <value>tag_uhd</value>
     </param>
     <param>
       <key>otw</key>
