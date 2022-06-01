@@ -153,7 +153,7 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
         self._qtgui_waterfall_sink_x_0_win = sip.wrapinstance(self.qtgui_waterfall_sink_x_0.pyqwidget(), Qt.QWidget)
         self.top_grid_layout.addWidget(self._qtgui_waterfall_sink_x_0_win)
         self.qtgui_time_sink_x_1 = qtgui.time_sink_c(
-        	int(200e3), #size
+        	int(samp_rate/1000 * (T_p + T_bch + (T_s + T_g) * len(bs_slots))), #size
         	samp_rate, #samp_rate
         	"frame_sink", #name
         	1 #number of inputs
@@ -257,6 +257,7 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
+            UHD=False,
             bs_slots=bs_slots,
             log=debug_log,
             lora_bw=lora_bw,
@@ -265,6 +266,7 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
             lora_sf=lora_sf,
             samp_rate=samp_rate,
             sn_id=list_sensor[1],
+            tag_len_id="packet_len_tx",
         )
         self.hier_sensor_lora_0 = hier_sensor_lora(
             M=M,
@@ -272,6 +274,7 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
+            UHD=False,
             bs_slots=bs_slots,
             log=debug_log,
             lora_bw=lora_bw,
@@ -280,6 +283,7 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
             lora_sf=lora_sf,
             samp_rate=samp_rate,
             sn_id=list_sensor[0],
+            tag_len_id="packet_len_tx",
         )
         self.hier_bs_lora_0 = hier_bs_lora(
             M=M,
@@ -310,7 +314,7 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.blocks_socket_pdu_0_0 = blocks.socket_pdu("UDP_CLIENT", '127.0.0.1', '52002', MTU, True)
         self.blocks_socket_pdu_0 = blocks.socket_pdu("UDP_SERVER", '', '52002', MTU, True)
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((1, ))
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0, ))
         self.blocks_message_strobe_0 = blocks.message_strobe(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1,[1])), .01)
         self.blocks_add_xx_0_0 = blocks.add_vcc(1)
 
