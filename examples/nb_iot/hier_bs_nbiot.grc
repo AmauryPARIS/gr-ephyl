@@ -2918,6 +2918,12 @@
   </connection>
   <connection>
     <source_block_id>pad_source_1_0</source_block_id>
+    <sink_block_id>ephyl_bs_scheduler_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>ULCCH</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>pad_source_1_0</source_block_id>
     <sink_block_id>ephyl_msg_mux_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>ULCCH</sink_key>

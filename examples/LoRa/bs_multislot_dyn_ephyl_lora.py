@@ -20,12 +20,13 @@ from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from hier_bs_lora import hier_bs_lora  # grc-generated hier_block
 from optparse import OptionParser
+import threading
 import time
 
 
 class bs_multislot_dyn_ephyl_lora(gr.top_block):
 
-    def __init__(self, M=32, S=1, T_bch=200, T_g=50, T_p=1000, T_s=150, cp_ratio=0.25, debug_log=False, ip_decision_layer_addr='localhost', list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_bs_feedback=5562, port_bs_inst=5561, power_tresh=-30, sample_rate=250e3, sn_1_ip_addr='mnode4', sn_2_ip_addr='mnode5'):
+    def __init__(self, M=32, S=4, T_bch=200, T_g=50, T_p=1000, T_s=150, cp_ratio=0.25, debug_log=False, ip_decision_layer_addr='localhost', list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_bs_feedback=5562, port_bs_inst=5561, power_tresh=-30, sample_rate=250e3, sn_1_ip_addr='mnode4', sn_2_ip_addr='mnode5'):
         gr.top_block.__init__(self, "BS flowgraph")
 
         ##################################################
@@ -55,12 +56,14 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
         ##################################################
         # Variables
         ##################################################
+        self.samp_rate = samp_rate = int(sample_rate)
         self.port_ulcch_2 = port_ulcch_2 = 5602
         self.port_ulcch_1 = port_ulcch_1 = 5601
         self.port_sync = port_sync = 5556
         self.port_dlcch = port_dlcch = 5600
         self.bs_slots = bs_slots = range(S)
-        self.samp_rate = samp_rate = int(sample_rate)
+        self.variable_function_probe_0 = variable_function_probe_0 = 0
+        self.variable_0 = variable_0 = int(samp_rate/1000 * (T_p + T_bch + (T_s + T_g) * len(bs_slots)))
         self.gain = gain = 25
         self.freq = freq = 2450e6
         self.frame_len = frame_len = (T_bch+len(bs_slots)*(T_s+T_g)+T_p)/float(1000)
@@ -75,12 +78,43 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
         ##################################################
         # Blocks
         ##################################################
+        self.hier_bs_lora_0 = hier_bs_lora(
+            M=M,
+            T_bch=T_bch,
+            T_g=T_g,
+            T_p=T_p,
+            T_s=T_s,
+            UHD=True,
+            bs_slots=bs_slots,
+            exit_frame=1000,
+            list_sensor=list_sensor,
+            log=debug_log,
+            lora_bw=lora_bw,
+            lora_cr=lora_cr,
+            lora_crc=lora_crc,
+            lora_sf=lora_sf,
+            power_tresh_detection=power_tresh,
+            samp_rate=samp_rate,
+        )
         self.zeromq_sub_msg_source_0_0_0_0 = zeromq.sub_msg_source(addr_2_ulcch, 100)
         self.zeromq_sub_msg_source_0_0_0 = zeromq.sub_msg_source(addr_1_ulcch, 100)
         self.zeromq_sub_msg_source_0_0 = zeromq.sub_msg_source(addr_bs_inst, 100)
         self.zeromq_pub_msg_sink_0_0_0 = zeromq.pub_msg_sink(addr_dlcch, 100)
         self.zeromq_pub_msg_sink_0_0 = zeromq.pub_msg_sink(addr_bs_feedback, 100)
         self.zeromq_pub_msg_sink_0 = zeromq.pub_msg_sink(addr_sync, 100)
+
+        def _variable_function_probe_0_probe():
+            while True:
+                val = self.hier_bs_lora_0.ephyl_bs_scheduler_0.set_top_block(self)
+                try:
+                    self.set_variable_function_probe_0(val)
+                except AttributeError:
+                    pass
+                time.sleep(1.0 / (10))
+        _variable_function_probe_0_thread = threading.Thread(target=_variable_function_probe_0_probe)
+        _variable_function_probe_0_thread.daemon = True
+        _variable_function_probe_0_thread.start()
+
         self.uhd_usrp_source_0_0 = uhd.usrp_source(
         	",".join(('', "")),
         	uhd.stream_args(
@@ -98,25 +132,11 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
         self.uhd_usrp_source_0_0.set_bandwidth(250e3, 0)
         self.uhd_usrp_source_0_0.set_auto_dc_offset(True, 0)
         self.uhd_usrp_source_0_0.set_auto_iq_balance(True, 0)
-        self.hier_bs_lora_0 = hier_bs_lora(
-            M=M,
-            T_bch=T_bch,
-            T_g=T_g,
-            T_p=T_p,
-            T_s=T_s,
-            UHD=False,
-            bs_slots=bs_slots,
-            exit_frame=1000,
-            list_sensor=list_sensor,
-            log=debug_log,
-            lora_bw=lora_bw,
-            lora_cr=lora_cr,
-            lora_crc=lora_crc,
-            lora_sf=lora_sf,
-            power_tresh_detection=power_tresh,
-            samp_rate=samp_rate,
-        )
         self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_gr_complex*1)
+        self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_gr_complex*1, 'raw', False)
+        self.blocks_file_sink_1.set_unbuffered(False)
+        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_gr_complex*1, 'slot', False)
+        self.blocks_file_sink_0.set_unbuffered(False)
 
 
 
@@ -130,7 +150,9 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
         self.msg_connect((self.zeromq_sub_msg_source_0_0, 'out'), (self.hier_bs_lora_0, 'inst'))
         self.msg_connect((self.zeromq_sub_msg_source_0_0_0, 'out'), (self.hier_bs_lora_0, 'ULCCH'))
         self.msg_connect((self.zeromq_sub_msg_source_0_0_0_0, 'out'), (self.hier_bs_lora_0, 'ULCCH'))
+        self.connect((self.hier_bs_lora_0, 0), (self.blocks_file_sink_0, 0))
         self.connect((self.hier_bs_lora_0, 0), (self.blocks_null_sink_0, 0))
+        self.connect((self.uhd_usrp_source_0_0, 0), (self.blocks_file_sink_1, 0))
         self.connect((self.uhd_usrp_source_0_0, 0), (self.hier_bs_lora_0, 0))
 
     def get_M(self):
@@ -153,6 +175,7 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_T_bch(self, T_bch):
         self.T_bch = T_bch
         self.hier_bs_lora_0.set_T_bch(self.T_bch)
+        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_T_g(self):
@@ -161,6 +184,7 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_T_g(self, T_g):
         self.T_g = T_g
         self.hier_bs_lora_0.set_T_g(self.T_g)
+        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_T_p(self):
@@ -169,6 +193,7 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_T_p(self, T_p):
         self.T_p = T_p
         self.hier_bs_lora_0.set_T_p(self.T_p)
+        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_T_s(self):
@@ -177,6 +202,7 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_T_s(self, T_s):
         self.T_s = T_s
         self.hier_bs_lora_0.set_T_s(self.T_s)
+        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_cp_ratio(self):
@@ -276,6 +302,15 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
         self.sn_2_ip_addr = sn_2_ip_addr
         self.set_addr_2_ulcch("tcp://" + str(self.sn_2_ip_addr) + ":" + str(self.port_ulcch_2))
 
+    def get_samp_rate(self):
+        return self.samp_rate
+
+    def set_samp_rate(self, samp_rate):
+        self.samp_rate = samp_rate
+        self.hier_bs_lora_0.set_samp_rate(self.samp_rate)
+        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
+        self.uhd_usrp_source_0_0.set_samp_rate(self.samp_rate)
+
     def get_port_ulcch_2(self):
         return self.port_ulcch_2
 
@@ -310,15 +345,20 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_bs_slots(self, bs_slots):
         self.bs_slots = bs_slots
         self.hier_bs_lora_0.set_bs_slots(self.bs_slots)
+        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
-    def get_samp_rate(self):
-        return self.samp_rate
+    def get_variable_function_probe_0(self):
+        return self.variable_function_probe_0
 
-    def set_samp_rate(self, samp_rate):
-        self.samp_rate = samp_rate
-        self.uhd_usrp_source_0_0.set_samp_rate(self.samp_rate)
-        self.hier_bs_lora_0.set_samp_rate(self.samp_rate)
+    def set_variable_function_probe_0(self, variable_function_probe_0):
+        self.variable_function_probe_0 = variable_function_probe_0
+
+    def get_variable_0(self):
+        return self.variable_0
+
+    def set_variable_0(self, variable_0):
+        self.variable_0 = variable_0
 
     def get_gain(self):
         return self.gain
@@ -388,7 +428,10 @@ def argument_parser():
     description = 'Base station flowgraph for the multislot dynamic version of the gr ephyl project'
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option, description=description)
     parser.add_option(
-        "", "--S", dest="S", type="intx", default=1,
+        "", "--M", dest="M", type="intx", default=32,
+        help="Set M [default=%default]")
+    parser.add_option(
+        "", "--S", dest="S", type="intx", default=4,
         help="Set Number of slot [default=%default]")
     parser.add_option(
         "", "--debug-log", dest="debug_log", type="intx", default=False,
@@ -427,7 +470,7 @@ def main(top_block_cls=bs_multislot_dyn_ephyl_lora, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls(S=options.S, debug_log=options.debug_log, ip_decision_layer_addr=options.ip_decision_layer_addr, lora_bw=options.lora_bw, lora_cr=options.lora_cr, lora_crc=options.lora_crc, lora_sf=options.lora_sf, power_tresh=options.power_tresh, sample_rate=options.sample_rate, sn_1_ip_addr=options.sn_1_ip_addr, sn_2_ip_addr=options.sn_2_ip_addr)
+    tb = top_block_cls(M=options.M, S=options.S, debug_log=options.debug_log, ip_decision_layer_addr=options.ip_decision_layer_addr, lora_bw=options.lora_bw, lora_cr=options.lora_cr, lora_crc=options.lora_crc, lora_sf=options.lora_sf, power_tresh=options.power_tresh, sample_rate=options.sample_rate, sn_1_ip_addr=options.sn_1_ip_addr, sn_2_ip_addr=options.sn_2_ip_addr)
     tb.start()
     try:
         raw_input('Press Enter to quit: ')

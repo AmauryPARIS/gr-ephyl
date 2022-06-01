@@ -132,8 +132,10 @@ class msg_mux(gr.sync_block):
                 log.append([detect_elem, detect[detect_elem]])
             else:
                 packets = None
+                found = False
                 for msg_elem in range(0,len(self.received_packet)):
                     if int(self.received_packet[msg_elem][1]) == int(detect_elem): # Check for matching slot number
+                        found = True
                         if self.received_packet[msg_elem][3] == "BUSY":
                             rx.append([detect_elem, detect[detect_elem]])
                             log.append([detect_elem, detect[detect_elem]])
@@ -142,7 +144,7 @@ class msg_mux(gr.sync_block):
                             packets = [self.received_packet[msg_elem][0], self.received_packet[msg_elem][2]] # [sn_id, sequence]
                             rx.append([detect_elem, detect[detect_elem], packets])
                             log.append([detect_elem, packets])
-                if len(self.received_packet) == 0:
+                if len(self.received_packet) == 0 or not found:
                     rx.append([detect_elem, detect[detect_elem]])
         
         # Frame number for the reception of dealt packets

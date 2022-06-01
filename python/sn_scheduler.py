@@ -24,10 +24,11 @@ import pmt
 import time
 import random
 import threading
-from gnuradio import gr, gr_unittest, blocks
+from gnuradio import gr, gr_unittest, blocks, uhd
 import string
 import re
 from datetime import datetime
+import json
 
 SLOT_READ=0
 IDLE=1
@@ -44,7 +45,7 @@ class sn_scheduler(gr.basic_block):
     """
     EPHYL Sensor Scheduler
     """
-    def __init__(self, phy_option=0,
+    def __init__(self, phy_option=0, uhd=True,
         num_slots=5, bch_time=20, guard_time=100, Slot_time=50, Proc_time = 50, 
         wanted_tag="corr_start",length_tag_key="packet_len2",samp_rate = 32000, ID = "Z", log=False, sf=7, cr=4, crc=True):
         gr.basic_block.__init__(self,
@@ -59,6 +60,7 @@ class sn_scheduler(gr.basic_block):
         self.length_tag_key = length_tag_key
         self.samp_rate = int(samp_rate/1000)
         self.logged = log
+        self.uhd = uhd
 
         self.lora_sf = sf
         self.lora_cr = cr
@@ -96,22 +98,20 @@ class sn_scheduler(gr.basic_block):
         
         self.ulcch = []
         self.dlcch = None
-        self.feedback_send = False
-        self.ulcch_send = False
-        self.send_inactive_fb_ul = False
 
         self.samp_cnt = 0
         self.delay = self.delay_t = 0
 
         self.pdu_cnt = 0
         self.slot_cnt = 0
+        self.time_tx_scd = 0
+        self.time_tx_frac = 0
         
-        self.test = 0
         self.msg_out = np.array([])
         self.msg_full = np.array([])
 
         self.state = SLOT_READ
-        self.state_dbg = self.state_tag = -1
+        self.state_tag = -1
         self.trig = ''
 
         self.active = -1
@@ -122,8 +122,7 @@ class sn_scheduler(gr.basic_block):
         self.slot_msg = np.array([])
 
         self.slots = []
-
-        self.i = 0
+        self.topblock = None
 
         self.inst_request_send = False
 
@@ -132,6 +131,8 @@ class sn_scheduler(gr.basic_block):
         self.frame_len = self.to_samples(self.STATES[2][BCH]+self.STATES[2][PROC]+self.num_slots*(self.STATES[2][EMIT]+self.STATES[2][GUARD]))
 
         self.filename_log = "LOG_SN_"+self.Id+"_sched_"+time.strftime("%d%m%Y-%H%M%S")+".txt"
+
+        
 
     def log(self, log):
         if self.logged:
@@ -148,11 +149,9 @@ class sn_scheduler(gr.basic_block):
         else :
             return int(duration*self.samp_rate)
 
-    def next_state(self) :
-        if self.state < len(self.STATES[0])-1 :
-            self.state += 1
-        else :
-            self.state = 0
+    def set_top_block(self, topblock):
+        if self.topblock == None:
+            self.topblock = topblock
 
     def handle_slot(self, slot_pmt):
         with self.lock : 
@@ -177,9 +176,9 @@ class sn_scheduler(gr.basic_block):
                             found = True
                     if not found:
                         self.active = False
-                        self.state = PROC
-                        self.send_inactive_fb_ul = True      
+                        self.state = PROC   
                         self.log("Inactive Frame")
+                        self.init_timer()
      
                 else :
                     new_array = pmt.to_python(slot_pmt)
@@ -248,32 +247,53 @@ class sn_scheduler(gr.basic_block):
             elif l[0] == "corr_est":
                 self.frame_cnt = int(l[1])
 
+                if self.uhd and self.frame_cnt == 0:
+                    self.topblock.uhd_usrp_sink_0_0.set_time_next_pps(uhd.time_spec(0, 0))
+
+                # transmit ULCCH
+                pop_instr = None
+                for elem in range(0,len(self.ulcch)): 
+                    if self.frame_cnt == self.ulcch[elem]["frame"] and self.ulcch[elem]["send"] == False:
+                        self.message_port_pub(pmt.to_pmt("ULCCH"), self.create_cch_msg(self.ulcch[elem]["content"]))
+                        self.ulcch[elem]["send"] = True
+                    elif self.ulcch[elem]["frame"] < self.frame_cnt:
+                        pop_instr = elem
+                if pop_instr is not None:
+                    self.ulcch.pop(pop_instr)
+
+                try:
+                    offset = json.loads(l[2])
+                    if self.uhd:
+                        self.time_tx_scd = offset[0]
+                        self.time_tx_frac = offset[1]
+                        offset = 0
+                    else:
+                        offset = int(offset)            
+                except:
+                    print "Offset non valid"
+                    if self.uhd: #TODO : add intern time + BCH time
+                        self.time_tx_scd = 0
+                        self.time_tx_frac = 0
+                        offset = 0
+                    else:
+                        offset = 0
+
             if self.state == LISTEN :
-                self.delay = 0
                 
                 try :
-
-                    self.frame_cnt = int(l[1])
                     self.log("Trig - Frame : %s" % (self.frame_cnt))
                     if l[0] == self.wanted_tag:
                         self.state = BCH
                         self.slot_cnt = 0
                         self.msg_out = self.msg_full[self.slot_cnt]     # Init first msg to be sent
 
-                        try:
-                            offset = int(l[2])
-                        except:
-                            print "Offset non valid"
-                            offset = 0
+                        self.delay = self.nitems_written(0)-offset 
 
-                        self.delay = self.nitems_written(0)-offset # Consider that sensors and 
-                        #self.delay = self.nitems_written(0)-0
-                        if self.delay>0:
+                        if self.delay>0: #
                             self.samp_cnt = self.delay
                         else:
-                            self.samp_cnt= 200000 
-                            
-                        self.log("Offset %s - self.delay %s - self.samp_cnt %s" % (offset, self.delay, self.samp_cnt))
+                            self.samp_cnt= 200000
+
                         return 0
                         
                 except:
@@ -324,43 +344,49 @@ class sn_scheduler(gr.basic_block):
                 self.log("SN %s : DLCCH received : SRC - %s | Frame - %s | CCH - %s" % (sn_id, bs_id, frame, self.dlcch))
                 print("SN %s : DLCCH received : SRC - %s | Frame - %s | CCH - %s" % (sn_id, bs_id, frame, self.dlcch))
 
+                if self.frame_cnt == 0 and not self.inst_request_send:
+                    self.log("Send START DLCCH to BS")
+                    self.message_port_pub(pmt.to_pmt("ULCCH"), self.create_cch_msg("START"))
+                    self.inst_request_send = True
+
+    def blank_transmission(self, len_output):
+        if self.uhd:
+            return []
+        else:
+            return [0]*len_output
+
+    def init_timer(self):
+        if self.uhd:
+            self.start_timer = datetime.now()
+
+    def next_state(self):
+        delta = datetime.now() - self.start_timer
+        time_limit_ms = (self.STATES[2][PROC] + self.STATES[2][BCH] if self.state == PROC and self.active == True else self.STATES[2][self.state])
+        if self.state == EMIT and self.slot_cnt in self.slots:
+            return False
+        elif (delta.total_seconds() * 1000 >= time_limit_ms) or self.state == BCH:
+            return True
+        else:
+            return False
 
     def run_state(self,output) :
-        self.log("State : %s" % (STATES[self.state]))
-        if self.frame_cnt == 0 and not self.inst_request_send:
-            self.log("Send START DLCCH to BS")
-            self.message_port_pub(pmt.to_pmt("ULCCH"), self.create_cch_msg("START"))
-            self.inst_request_send = True
-
-        pop_instr = None
-        for elem in range(0,len(self.ulcch)): 
-            if self.frame_cnt == self.ulcch[elem]["frame"] and self.ulcch[elem]["send"] == False:
-                self.message_port_pub(pmt.to_pmt("ULCCH"), self.create_cch_msg(self.ulcch[elem]["content"]))
-                self.ulcch[elem]["send"] = True
-            elif self.ulcch[elem]["frame"] < self.frame_cnt:
-                pop_instr = elem
-        if pop_instr is not None:
-            self.ulcch.pop(pop_instr)
-
+        self.log("State : %s - nitems written %s" % (STATES[self.state], self.nitems_written(0)))
+        
         self.samp_cnt += len(output)    # Sample count related to current state
-        state_samp = self.to_samples(self.STATES[2][self.state])      
-        diff = state_samp - self.samp_cnt       # Act as a timer
+        state_samp = self.to_samples(self.STATES[2][self.state])    
+        diff = state_samp - self.samp_cnt       # Act as a timer when in local 
         self.log("Sample count %s - state samp %s - diff %s - len(output) %s" % (self.samp_cnt, state_samp, diff, len(output)))
 
-        if self.state in (EMIT,GUARD,BCH,PROC):
-            self.i += len(output)
+        if self.uhd and self.state in (EMIT,GUARD,BCH,PROC) and self.next_state():
+            diff = -1
+            self.log("UHD - state time exceeded - going to next state")
+
         ###############################################################################    
         ## If the cuurent state cannot run completely, 
         ## i.e the sample count exceeds the number of samples required for the current state
         if diff < 0 :  
 
-            if self.state in (EMIT,GUARD,BCH,PROC):
-                self.i -= len(output)
-
             output = np.delete(output,slice(len(output)+diff,len(output)))    # Since diff is negative we use +diff
-            
-            if self.state in (EMIT,GUARD,BCH,PROC):
-                self.i += len(output)
 
             if self.state == EMIT : 
                 
@@ -371,11 +397,10 @@ class sn_scheduler(gr.basic_block):
                     else :
                         output[:] = self.msg_out[:len(output)]
                         
-                    
-
                 else :
-                    output[:] = [0]*len(output)
+                    output = self.blank_transmission(len(output))
                 self.state = GUARD
+                self.init_timer()
 
             else :    
                 if self.state == IDLE :
@@ -402,14 +427,12 @@ class sn_scheduler(gr.basic_block):
                         self.message_port_pub(pmt.to_pmt("busy"), pmt.to_pmt('RESET_FRAME'))
 
                 elif self.state == LISTEN :
-                    output[:] = [0]*len(output)
-
-                    
+                    output = self.blank_transmission(len(output))
 
                 elif self.state == BCH :
                     self.slot_cnt = 0
                     self.state = EMIT
-                    output[:] = [0]*len(output)
+                    output = self.blank_transmission(len(output))
                        
                 
                 elif self.state == GUARD :
@@ -424,6 +447,7 @@ class sn_scheduler(gr.basic_block):
                         self.slot_cnt = 0
                         self.message_port_pub(pmt.to_pmt("busy"), pmt.to_pmt('RESET_FRAME')) # Just before the start of PROC
                         self.state = PROC
+                        self.init_timer()
                         
 
 
@@ -434,17 +458,15 @@ class sn_scheduler(gr.basic_block):
                     self.msg_out = np.array([])
                     self.slot_msg = np.array([])
                     self.slot_cnt = 0
-                    self.slots = []   
-                    self.delay_t = 0
+                    self.slots = []
                     self.active = -1
-                    self.i=0
                     self.log("RESET proc -> slot_read")
 
                 elif self.state not in self.STATES[0] :
                     print("STATE ERROR")
                     exit(1)
                 
-                output[:] = [0]*len(output)
+                output = self.blank_transmission(len(output))
 
             self.samp_cnt = 0
 
@@ -465,21 +487,44 @@ class sn_scheduler(gr.basic_block):
                         
                         
                 else :
-                    output[:] = [0]*len(output)
+                    output = self.blank_transmission(len(output))
 
             else :
-                output[:] = [0]*len(output)
+                output = self.blank_transmission(len(output))
 
             self.samp_cnt += len(output)
         ###############################################################################
 
         # Add tags for each state
-        if self.state_tag != self.state :            
+        if self.state_tag != self.state :  
             self.state_tag = self.state
             offset = self.nitems_written(0)+len(output)
-            key = pmt.intern(self.STATES[1][self.state])
-            value = pmt.to_pmt(self.slot_cnt)
-            self.add_item_tag(0,offset, key, value)
+
+            if self.uhd and self.state == EMIT and self.slot_cnt in self.slots: 
+                # UHD length tag
+                key = pmt.intern(self.length_tag_key)
+                value = pmt.to_pmt(self.to_samples(self.STATES[2][EMIT])) 
+                self.add_item_tag(0,offset, key, value)
+
+                # UHD time tag (received by BS)
+                key = pmt.intern("tx_time")
+                slot_time_scd = self.slot_cnt * (float(self.STATES[2][EMIT] + self.STATES[2][GUARD]) / 1000 )
+                slot_time_frac_scd = float(slot_time_scd % 1)
+                slot_time_full_scd = int(round(slot_time_scd - slot_time_frac_scd))
+                value = pmt.to_pmt((self.time_tx_scd + slot_time_full_scd , self.time_tx_frac + slot_time_frac_scd)) 
+                self.add_item_tag(0,offset, key, value)
+
+                #LOG
+                time_now = self.topblock.uhd_usrp_sink_0_0.get_time_now()
+                self.log("Data send to UHD - Current UHD Time : %s - %s - Planned TX time : %s - %s" % (time_now.get_full_secs(), time_now.get_frac_secs(), self.time_tx_scd + slot_time_full_scd, self.time_tx_frac + slot_time_frac_scd))
+
+            elif self.uhd and self.state == EMIT and self.slot_cnt not in self.slots: 
+                self.init_timer()
+            
+            elif not self.uhd:
+                key = pmt.intern(self.STATES[1][self.state])
+                value = pmt.to_pmt(self.slot_cnt)
+                self.add_item_tag(0,offset, key, value)
 
         return len(output)
 
