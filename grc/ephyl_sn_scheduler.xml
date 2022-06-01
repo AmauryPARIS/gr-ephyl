@@ -4,7 +4,7 @@
   <key>ephyl_sn_scheduler</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.sn_scheduler($phy_option, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate, $ID, $log, $sf, $cr, $crc)</make>
+  <make>ephyl.sn_scheduler($phy_option, $uhd, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate, $ID, $log, $sf, $cr, $crc)</make>
  
   <param>
     <name>PHY Option</name>
@@ -26,12 +26,19 @@
   </param>
 
   <param>
+    <name>Over the air</name>
+    <key>uhd</key>
+    <value>False</value>
+    <type>bool</type>
+  </param>
+
+  <param>
     <name>Number of Slots</name>
     <key>num_slots</key>
     <value>5</value>
     <type>int</type>
   </param>
- 
+
   <param>
     <name>BCH duration</name>
     <key>bch_time</key>

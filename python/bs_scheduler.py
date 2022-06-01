@@ -20,12 +20,13 @@
 # 
 
 import numpy as np
-from gnuradio import gr
+from gnuradio import gr, uhd
 import time
 import datetime
 import threading
 import pmt
 from datetime import datetime
+import json
 
 IDLE = 0
 BCH = 1
@@ -47,7 +48,6 @@ class bs_scheduler(gr.sync_block):
             name="BS Scheduler",
             in_sig=[np.complex64],
             out_sig=[np.complex64])
-
 
         self.message_port_register_out(pmt.intern("bcn"))
         self.message_port_register_out(pmt.intern("DLCCH"))
@@ -84,10 +84,12 @@ class bs_scheduler(gr.sync_block):
         self.frame_cnt = 0
         self.bch_time = bch_time
         self.list_dlcch = []
+        self.topblock = None
 
         self.diff = self.left = 0
         self.inst_request_send = False
         self.dlcch_send = False
+         
 
         ## Here we set states data, 
         ## PS : SYNC has a constant offset of +guard_time to compensate the LISTEN state of the sensor nodes
@@ -123,6 +125,11 @@ class bs_scheduler(gr.sync_block):
         else :
             self.state = 0
 
+    def set_top_block(self, topblock):
+        if self.topblock == None:
+            self.topblock = topblock
+
+
     def handle_inst(self, msg_pmt):
         with self.lock :
             msg_pmt = pmt.deserialize_str(pmt.to_python(msg_pmt))
@@ -154,17 +161,16 @@ class bs_scheduler(gr.sync_block):
         self.log("Send end message beacon")
 
     def run_state(self,Input,output1) :
-        self.log("State %s" % (STATES[self.state]))
-        if self.frame_cnt == 0 and not self.inst_request_send:
-            for sensor in self.list_sensor:
-                self.log("Send START DLCCH to %s" % (sensor))
-                self.message_port_pub(pmt.to_pmt("DLCCH"), self.create_cch_msg(sensor, "START"))
-                self.inst_request_send = True
-
+        self.log("State %s - nread_items %s" % (STATES[self.state], self.nitems_read(0)))   
         
+        if self.frame_cnt == 0 and not self.inst_request_send:
+            for sn in self.list_sensor:
+                self.message_port_pub(pmt.to_pmt("DLCCH"), self.create_cch_msg(sn, "START"))
+            self.inst_request_send = True
 
         state_samp = self.to_samples(self.STATES[2][self.state])
         self.diff = state_samp-self.samp_cnt
+
 
         ###############################################################################
         ## If the cuurent state cannot run completely, 
@@ -209,6 +215,7 @@ class bs_scheduler(gr.sync_block):
 
             self.next_state()
             
+            
             # Add tags for each state
             offset = self.nitems_written(0)+len(output1)
             if self.state == PROC :
@@ -225,6 +232,8 @@ class bs_scheduler(gr.sync_block):
             if self.state == PROC :
                 print "[BS] ================= FRAME " + str(self.frame_cnt-1) + " PROCESSING ================="
                 self.end_frame_beacon()
+            elif self.state == BCH and self.UHD:
+                self.time_BCH = self.topblock.uhd_usrp_source_0_0.get_time_now()       
                 
 
         ###############################################################################
@@ -240,22 +249,22 @@ class bs_scheduler(gr.sync_block):
                         self.list_dlcch[elem]["send"] = True
 
             elif self.state == BCH :
-                if not(self.bcn_sent) :
+                if not(self.bcn_sent):
                     offset = 0
                     if self.UHD :
-                        # offset = self.nitems_read(0)
-                        # if self.num_slots < 4:
-                        offset = self.nitems_read(0)-60000*self.num_slots
-                    #     elif self.num_slots >= 4 and self.num_slots < 8:
-                    #         offset = self.nitems_read(0)-5000*self.num_slots
-                    #     elif self.num_slots >= 8 and self.num_slots < 16:
-                    #         offset = self.nitems_read(0)-2000*self.num_slots
-                    #     elif self.num_slots >= 16:
-                    #         offset = self.nitems_read(0)-500*self.num_slots                            
+                        # offset = self.nitems_read(0)-60000*self.num_slots # Legacy
+                        if self.frame_cnt == 0:
+                            self.time_BCH = self.topblock.uhd_usrp_source_0_0.get_time_now()
+
+                        length_bch_ms = self.STATES[2][BCH]
+                        time_tx = self.time_BCH + uhd.time_spec(0,float(length_bch_ms)/1000) # [full_scd, frac_scd]
+                        offset = [time_tx.get_full_secs(), time_tx.get_frac_secs()]
+                        self.log("ON AIR - offset : %s - now %s,%s" % (offset, self.time_BCH.get_full_secs(), self.time_BCH.get_frac_secs()))
+                                             
                     else:
                         offset = self.nitems_read(0)+1000
                         #offset = self.nitems_read(0)+20000
-                        
+
 
                     '''
                     We have to deconstruct the offset before appending it,
@@ -263,16 +272,21 @@ class bs_scheduler(gr.sync_block):
                     To recover the offset value in the sensor scheduler, 
                     we will simply convert what's after the 8 first elements
                     '''
-                    msg = 'corr_est' + '\t' + str(self.frame_cnt) + '\t' + str(offset)
+                    
+                    msg = 'corr_est' + '\t' + str(self.frame_cnt) + '\t' + json.dumps(offset) 
                     d = [ord(e) for e in msg]
 
                     trig_msg = pmt.cons(pmt.make_dict(), pmt.init_u8vector(len(d),d))
+
                     self.message_port_pub(pmt.to_pmt("bcn"), trig_msg)
-                    self.log("Send BCH beacon - offset : %s" % (str(offset)))
+                    self.log("Send BCH beacon - msg : %s" % (str(msg)))
                     self.bcn_sent = True
+
                     if self.frame_cnt != 0:
                         print("\n")
                         print "[BS] ================= FRAME " + str(self.frame_cnt) + " START ================="
+                    elif self.frame_cnt == 0 and self.UHD:
+                        self.topblock.uhd_usrp_source_0_0.set_time_next_pps(uhd.time_spec(0, 0))
 
                     output1[:] = [0.01]*len(output1)
                 else : 
@@ -305,4 +319,3 @@ class bs_scheduler(gr.sync_block):
             self.run_state(input_items[0],output_items[0])
 
             return self.to_return1
-
