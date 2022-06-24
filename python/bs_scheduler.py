@@ -177,6 +177,10 @@ class bs_scheduler(gr.sync_block):
         ## i.e the sample count exceeds the number of samples required for the current state      
         if self.diff < 0 :
             self.samp_cnt = 0
+            if self.state == PUSCH:
+                output1[:] = Input[:]
+            else:
+                output1[:] = [0.01]*len(output1)
             output1 = np.delete(output1,slice(len(output1)+self.diff,len(output1)))    # Since diff is negative
 
             if self.state == BCH :
