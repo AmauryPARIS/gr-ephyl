@@ -367,9 +367,7 @@ class sn_scheduler(gr.basic_block):
     def next_state(self):
         delta = datetime.now() - self.start_timer
         time_limit_ms = (self.STATES[2][PROC] + self.STATES[2][BCH] if self.state == PROC and self.active == True else self.STATES[2][self.state])
-        if self.state == EMIT and self.slot_cnt in self.slots:
-            return False
-        elif (delta.total_seconds() * 1000 >= time_limit_ms) or self.state == BCH:
+        if (delta.total_seconds() * 1000 >= time_limit_ms) or self.state == BCH:
             return True
         else:
             return False
@@ -383,7 +381,7 @@ class sn_scheduler(gr.basic_block):
         diff = state_samp - self.samp_cnt       # Act as a timer when in local 
         self.log("Sample count %s - state samp %s - diff %s - len(output) %s" % (self.samp_cnt, state_samp, diff, len(output)))
 
-        if self.uhd and self.state in (EMIT,GUARD,BCH,PROC) and self.next_state():
+        if self.uhd and self.state in (GUARD,BCH,PROC) and self.next_state():
             diff = -1
             self.log("UHD - state time exceeded - going to next state")
 
@@ -391,8 +389,9 @@ class sn_scheduler(gr.basic_block):
         ## If the cuurent state cannot run completely, 
         ## i.e the sample count exceeds the number of samples required for the current state
         if diff < 0 :  
-
-            output[:] = [0]*len(output) # Clear buffer
+            
+            if not self.uhd:
+                output[:] = [0]*len(output) # Clear buffer
             output = np.delete(output,slice(len(output)+diff,len(output)))    # Since diff is negative we use +diff
 
             if self.state == EMIT : 
@@ -438,15 +437,13 @@ class sn_scheduler(gr.basic_block):
                     elif self.active == False:
                         self.message_port_pub(pmt.to_pmt("busy"), pmt.to_pmt('RESET_FRAME'))
 
-                elif self.state == LISTEN :
-                    output[:] = [0]*len(output)
+                # elif self.state == LISTEN :
+                #     # If needed 
 
                 elif self.state == BCH :
                     self.slot_cnt = 0
                     self.state = EMIT
-                    output[:] = [0]*len(output)
                        
-                
                 elif self.state == GUARD :
                     self.slot_cnt += 1
                     if self.slot_cnt < self.num_slots :
@@ -476,7 +473,10 @@ class sn_scheduler(gr.basic_block):
                     print("STATE ERROR")
                     exit(1)
                 
-                output[:] = [0]*len(output)
+                if not self.uhd:
+                    output[:] = [0]*len(output)
+                else:
+                    output = []
 
             self.samp_cnt = 0
 
@@ -498,11 +498,14 @@ class sn_scheduler(gr.basic_block):
                         self.msg_out = self.msg_out[max_output:]
                         
                         
-                else :
+                else : # Empty EMIT slots
                     output[:] = [0]*len(output)
 
-            else :
-                output[:] = [0]*len(output)
+            else : 
+                if not self.uhd:
+                    output[:] = [0]*len(output)
+                else:
+                    output = []
 
             self.samp_cnt += len(output)
         ###############################################################################
@@ -512,7 +515,7 @@ class sn_scheduler(gr.basic_block):
             self.state_tag = self.state
             offset = self.nitems_written(0)+len(output)
 
-            if self.uhd and self.state == EMIT and self.slot_cnt in self.slots: 
+            if self.uhd and self.state == EMIT : 
                 # UHD length tag
                 key = pmt.intern(self.length_tag_key)
                 value = pmt.to_pmt(self.to_samples(self.STATES[2][EMIT])) 
@@ -529,9 +532,6 @@ class sn_scheduler(gr.basic_block):
                 #LOG
                 time_now = self.topblock.uhd_usrp_sink_0_0.get_time_now()
                 self.log("Data send to UHD - Current UHD Time : %s - %s - Planned TX time : %s - %s" % (time_now.get_full_secs(), time_now.get_frac_secs(), self.time_tx_scd + slot_time_full_scd, self.time_tx_frac + slot_time_frac_scd))
-
-            elif self.uhd and self.state == EMIT and self.slot_cnt not in self.slots: 
-                self.init_timer()
             
             elif not self.uhd:
                 if self.state == EMIT and self.slot_cnt in self.slots:
