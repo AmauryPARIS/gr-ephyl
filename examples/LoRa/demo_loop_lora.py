@@ -41,7 +41,7 @@ from gnuradio import qtgui
 
 class demo_loop_lora(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=100, bs_slots=range(4), cp_ratio=0.25, list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, power_tresh_detect=-8):
+    def __init__(self, M=32, N=1, T_bch=100, T_g=50, T_p=500, T_s=50, bs_slots=range(4), cp_ratio=0.25, list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, power_tresh_detect=-8):
         gr.top_block.__init__(self, "Demo Loop Lora")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop Lora")
@@ -314,7 +314,6 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.blocks_socket_pdu_0_0 = blocks.socket_pdu("UDP_CLIENT", '127.0.0.1', '52002', MTU, True)
         self.blocks_socket_pdu_0 = blocks.socket_pdu("UDP_SERVER", '', '52002', MTU, True)
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0, ))
         self.blocks_message_strobe_0 = blocks.message_strobe(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1,[1])), .01)
         self.blocks_add_xx_0_0 = blocks.add_vcc(1)
 
@@ -339,14 +338,13 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
         self.msg_connect((self.zeromq_sub_msg_source_0, 'out'), (self.hier_sensor_lora_0_0, 'Inst'))
         self.msg_connect((self.zeromq_sub_msg_source_0_0, 'out'), (self.hier_bs_lora_0, 'inst'))
         self.connect((self.blocks_add_xx_0_0, 0), (self.blocks_throttle_0, 0))
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_add_xx_0_0, 1))
         self.connect((self.blocks_throttle_0, 0), (self.channels_channel_model_0, 0))
         self.connect((self.channels_channel_model_0, 0), (self.hier_bs_lora_0, 0))
         self.connect((self.channels_channel_model_0, 0), (self.qtgui_waterfall_sink_x_0, 0))
         self.connect((self.hier_bs_lora_0, 0), (self.qtgui_time_sink_x_1, 0))
         self.connect((self.hier_sensor_lora_0, 1), (self.blocks_add_xx_0_0, 0))
         self.connect((self.hier_sensor_lora_0, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.hier_sensor_lora_0_0, 1), (self.blocks_multiply_const_vxx_0, 0))
+        self.connect((self.hier_sensor_lora_0_0, 1), (self.blocks_add_xx_0_0, 1))
         self.connect((self.hier_sensor_lora_0_0, 0), (self.qtgui_time_sink_x_0, 1))
 
     def closeEvent(self, event):

@@ -263,6 +263,33 @@
     </param>
     <param>
       <key>_coordinate</key>
+      <value>(16, 148)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>bs_slots</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>range(S)</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
       <value>(712, 12)</value>
     </param>
     <param>
@@ -468,6 +495,49 @@
     </param>
   </block>
   <block>
+    <key>variable_function_probe</key>
+    <param>
+      <key>block_id</key>
+      <value>hier_sensor_nbiot_0.ephyl_sn_scheduler_0_0</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>function_args</key>
+      <value>self</value>
+    </param>
+    <param>
+      <key>function_name</key>
+      <value>set_top_block</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1208, 364)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>variable_function_probe_0</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>poll_rate</key>
+      <value>10</value>
+    </param>
+  </block>
+  <block>
     <key>parameter</key>
     <param>
       <key>alias</key>
@@ -555,6 +625,53 @@
     <param>
       <key>type</key>
       <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>1</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(952, 12)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>S</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Number of slots</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>intx</value>
     </param>
     <param>
       <key>value</key>
@@ -859,53 +976,6 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(40, 132)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>bs_slots</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>BS Slots</value>
-    </param>
-    <param>
-      <key>short_id</key>
-      <value></value>
-    </param>
-    <param>
-      <key>hide</key>
-      <value>none</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>range(1)</value>
-    </param>
-  </block>
-  <block>
-    <key>parameter</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
       <value>(360, 12)</value>
     </param>
     <param>
@@ -991,6 +1061,10 @@
       <value>T_bch</value>
     </param>
     <param>
+      <key>T_bch_0</key>
+      <value>10</value>
+    </param>
+    <param>
       <key>bs_slots</key>
       <value>bs_slots</value>
     </param>
@@ -1051,6 +1125,10 @@
       <value>N</value>
     </param>
     <param>
+      <key>UHD</key>
+      <value>True</value>
+    </param>
+    <param>
       <key>T_p</key>
       <value>T_p</value>
     </param>
@@ -1065,6 +1143,10 @@
     <param>
       <key>T_s</key>
       <value>T_s</value>
+    </param>
+    <param>
+      <key>tag_len_id</key>
+      <value>"packet_len_tx"</value>
     </param>
   </block>
   <block>
@@ -2353,7 +2435,7 @@
     </param>
     <param>
       <key>len_tag_name</key>
-      <value></value>
+      <value>"packet_len_tx"</value>
     </param>
     <param>
       <key>otw</key>

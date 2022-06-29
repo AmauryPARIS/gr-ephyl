@@ -168,33 +168,6 @@
     </param>
   </block>
   <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(584, 4)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>cp_ratio</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>0.25</value>
-    </param>
-  </block>
-  <block>
     <key>variable_cc_decoder_def</key>
     <param>
       <key>padding</key>
@@ -498,7 +471,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>64</value>
+      <value>32</value>
     </param>
   </block>
   <block>
@@ -901,7 +874,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>file</key>
@@ -952,7 +925,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(648, 252)</value>
+      <value>(488, 276)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1305,7 +1278,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -1721,7 +1694,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1392, 492)</value>
+      <value>(1608, 516)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1745,53 +1718,6 @@
     </param>
     <param>
       <key>tresh</key>
-      <value>power_tresh_detection</value>
-    </param>
-  </block>
-  <block>
-    <key>ephyl_gate</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>2</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(432, 284)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>ephyl_gate_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>symb_len</key>
-      <value>int(M*(1+cp_ratio))</value>
-    </param>
-    <param>
-      <key>power_thresh</key>
       <value>power_tresh_detection</value>
     </param>
   </block>
@@ -1844,61 +1770,6 @@
     <param>
       <key>phy_option</key>
       <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>ephyl_select_m_in_n</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(816, 236)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>ephyl_select_m_in_n_0</value>
-    </param>
-    <param>
-      <key>m</key>
-      <value>M</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>n</key>
-      <value>int(M*(1+cp_ratio))</value>
-    </param>
-    <param>
-      <key>offset</key>
-      <value>16</value>
-    </param>
-    <param>
-      <key>choice</key>
-      <value>2</value>
     </param>
   </block>
   <block>
@@ -2422,7 +2293,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1752, 252)</value>
+      <value>(1608, 252)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2840,7 +2711,7 @@
   </connection>
   <connection>
     <source_block_id>ephyl_bs_scheduler_0</source_block_id>
-    <sink_block_id>ephyl_gate_0</sink_block_id>
+    <sink_block_id>blocks_keep_m_in_n_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -2849,18 +2720,6 @@
     <sink_block_id>ephyl_msg_mux_0</sink_block_id>
     <source_key>feedback</source_key>
     <sink_key>detect</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>ephyl_gate_0</source_block_id>
-    <sink_block_id>blocks_keep_m_in_n_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>ephyl_gate_0</source_block_id>
-    <sink_block_id>ephyl_select_m_in_n_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>ephyl_msg_mux_0</source_block_id>
@@ -2873,12 +2732,6 @@
     <sink_block_id>pad_sink_0_0</sink_block_id>
     <source_key>final_msg</source_key>
     <sink_key>in</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>ephyl_select_m_in_n_0</source_block_id>
-    <sink_block_id>digital_costas_loop_cc_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>ephyl_tag_2_msg_char_0</source_block_id>
@@ -2915,12 +2768,6 @@
     <sink_block_id>ephyl_bs_scheduler_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>inst</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>pad_source_1_0</source_block_id>
-    <sink_block_id>ephyl_bs_scheduler_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>ULCCH</sink_key>
   </connection>
   <connection>
     <source_block_id>pad_source_1_0</source_block_id>

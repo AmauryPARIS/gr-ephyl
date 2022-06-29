@@ -26,7 +26,7 @@ import time
 
 class sn_multislot_dyn_ephyl_lora(gr.top_block):
 
-    def __init__(self, M=32, S=1, T_bch=200, T_g=50, T_p=1000, T_s=150, cp_ratio=0.25, debug_log=False, ip_bs_addr='mnode3', ip_decision_layer_addr='localhost', lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_sn_feedback=5560, port_sn_inst=5559, sample_rate=250e3, sn_id='A'):
+    def __init__(self, M=32, S=1, T_bch=200, T_g=20, T_p=1000, T_s=70, cp_ratio=0.25, debug_log=False, ip_bs_addr='mnode3', ip_decision_layer_addr='localhost', lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_sn_feedback=5560, port_sn_inst=5559, sample_rate=250e3, sn_id='A'):
         gr.top_block.__init__(self, "Sensor flowgraph")
 
         ##################################################
@@ -62,7 +62,7 @@ class sn_multislot_dyn_ephyl_lora(gr.top_block):
         self.variable_function_probe_0 = variable_function_probe_0 = 0
         self.tag_uhd = tag_uhd = "packet_len_id"
         self.samp_rate = samp_rate = int(sample_rate)
-        self.gain = gain = 25
+        self.gain = gain = 17
         self.freq = freq = 2450e6
         self.frame_len = frame_len = (T_bch+len(bs_slots)*(T_s+T_g)+T_p)/float(1000)
         self.addr_ulcch = addr_ulcch = str("tcp://*:" + str(port_ulcch))
@@ -81,6 +81,7 @@ class sn_multislot_dyn_ephyl_lora(gr.top_block):
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
+            UHD=True,
             bs_slots=bs_slots,
             log=debug_log,
             lora_bw=lora_bw,
@@ -90,7 +91,6 @@ class sn_multislot_dyn_ephyl_lora(gr.top_block):
             samp_rate=samp_rate,
             sn_id=sn_id,
             tag_len_id=tag_uhd,
-            UHD=True,
         )
         self.zeromq_sub_msg_source_0_1 = zeromq.sub_msg_source(addr_dlcch, 100)
         self.zeromq_sub_msg_source_0_0 = zeromq.sub_msg_source(addr_sync, 100)
