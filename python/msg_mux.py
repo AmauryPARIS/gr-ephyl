@@ -125,6 +125,7 @@ class msg_mux(gr.sync_block):
         rx = []
         log = []
         # Match the detect [IDLE, RX] power status to any received and demodulated packet
+        self.log("MUX All received packets %s" % (self.received_packet))
         for detect_elem in range(0,len(detect)):
             self.log("MUX slot %s : %s" % (detect_elem, detect[detect_elem]))
             if detect[detect_elem] == "IDLE":
