@@ -26,7 +26,7 @@ import time
 
 class bs_multislot_dyn_ephyl_lora(gr.top_block):
 
-    def __init__(self, M=32, S=4, T_bch=200, T_g=50, T_p=1000, T_s=150, cp_ratio=0.25, debug_log=False, ip_decision_layer_addr='localhost', list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_bs_feedback=5562, port_bs_inst=5561, power_tresh=-30, sample_rate=250e3, sn_1_ip_addr='mnode4', sn_2_ip_addr='mnode5'):
+    def __init__(self, M=32, S=4, T_bch=200, T_g=20, T_p=1000, T_s=70, cp_ratio=0.25, debug_log=False, ip_decision_layer_addr='localhost', list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_bs_feedback=5562, port_bs_inst=5561, power_tresh=-30, sample_rate=250e3, sn_1_ip_addr='mnode4', sn_2_ip_addr='mnode5'):
         gr.top_block.__init__(self, "BS flowgraph")
 
         ##################################################
