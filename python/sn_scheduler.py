@@ -214,7 +214,7 @@ class sn_scheduler(gr.basic_block):
                 elif self.phy_option==2: # LoRa PHY Option
                     len_msg = len(self.slot_msg[0]) # data to be transmited [bytes]
                     len_crc = 4 if self.lora_crc else 0
-                    len_msg = (len_msg * 2) + 5 + 4 # whitening + header + crc [bytes]
+                    len_msg = (len_msg * 2) + 5 + len_crc # whitening + header + crc [bytes]
                     len_msg = 8 + (int((len_msg - (self.lora_sf-2))/self.lora_sf)+1) * (4+self.lora_cr) # Interleaver
                     len_msg = (len_msg + 12)*4 + 1  # modulate and preamble - each symbol worth 2**sf samples, except from one symbol in the preamble
                                                     # This symbol is worth 2**sf / 4 samples 
@@ -226,12 +226,17 @@ class sn_scheduler(gr.basic_block):
                 self.log("Store msg - size : %s - count : %s - slot msg : %s" % (self.signal_len, self.pdu_cnt, self.slot_msg))
 
                 if self.pdu_cnt == self.signal_len:   # Signal reconstructed 
-                    self.log("Store msg - signal reconstructed")
+
+                    self.log("Store msg - signal reconstructed len %s - theorical len %s - sample exemple %s" % (len(self.msg_out), (self.pdu_cnt * (2**self.lora_sf) / 4), self.msg_out[-10]))
+                    if len(self.msg_out) > self.to_samples(self.STATES[2][EMIT]):
+                        self.log("Store msg - ERROR : signal len is higher than slot len")
+                        print("ERROR : signal len is higher than slot len")
                     self.pdu_cnt=0
                     self.msg_full = np.array(self.msg_full.tolist() + [self.msg_out.tolist()])    # Store the N signals in N-dim array, analyze carefully before modifying
                     self.msg_out = np.array([])
                     self.state = IDLE    # Return to IDLE and check for remaining messages
                     self.slot_cnt +=1
+
 
     def handle_trig(self, trig_pmt):
         with self.lock : 
@@ -362,14 +367,13 @@ class sn_scheduler(gr.basic_block):
     def next_state(self):
         delta = datetime.now() - self.start_timer
         time_limit_ms = (self.STATES[2][PROC] + self.STATES[2][BCH] if self.state == PROC and self.active == True else self.STATES[2][self.state])
-        if self.state == EMIT and self.slot_cnt in self.slots:
-            return False
-        elif (delta.total_seconds() * 1000 >= time_limit_ms) or self.state == BCH:
+        if (delta.total_seconds() * 1000 >= time_limit_ms) or self.state == BCH:
             return True
         else:
             return False
 
     def run_state(self,output) :
+
         self.log("State : %s - nitems written %s" % (STATES[self.state], self.nitems_written(0)))
         
         self.samp_cnt += len(output)    # Sample count related to current state
@@ -377,7 +381,7 @@ class sn_scheduler(gr.basic_block):
         diff = state_samp - self.samp_cnt       # Act as a timer when in local 
         self.log("Sample count %s - state samp %s - diff %s - len(output) %s" % (self.samp_cnt, state_samp, diff, len(output)))
 
-        if self.uhd and self.state in (EMIT,GUARD,BCH,PROC) and self.next_state():
+        if self.uhd and self.state in (GUARD,BCH,PROC) and self.next_state():
             diff = -1
             self.log("UHD - state time exceeded - going to next state")
 
@@ -385,20 +389,27 @@ class sn_scheduler(gr.basic_block):
         ## If the cuurent state cannot run completely, 
         ## i.e the sample count exceeds the number of samples required for the current state
         if diff < 0 :  
-
+            
+            if not self.uhd:
+                output[:] = [0]*len(output) # Clear buffer
             output = np.delete(output,slice(len(output)+diff,len(output)))    # Since diff is negative we use +diff
 
             if self.state == EMIT : 
                 
                 if self.slot_cnt in self.slots :
                     
-                    if len(output) > len(self.msg_out) :    # In case output buffer is bigger than payload
+                    if len(self.msg_out) == 0:
+                        self.log("EMIT final - zeros - len %s" % (len(output)))
+                        output[:] = [0]*len(output)
+                    elif len(output) > len(self.msg_out) :    # In case output buffer is bigger than payload
+                        self.log("EMIT final - data leftover and zeros - len msg %s" % (len(self.msg_out[:len(output)])))
                         output[:] = np.append(self.msg_out[:len(output)] , [0]*(abs(len(output)-len(self.msg_out))))  # Fill what's left with Sensor Data (if left)
                     else :
+                        self.log("EMIT final - only data leftover")
                         output[:] = self.msg_out[:len(output)]
                         
                 else :
-                    output = self.blank_transmission(len(output))
+                    output[:] = [0]*len(output)
                 self.state = GUARD
                 self.init_timer()
 
@@ -426,15 +437,13 @@ class sn_scheduler(gr.basic_block):
                     elif self.active == False:
                         self.message_port_pub(pmt.to_pmt("busy"), pmt.to_pmt('RESET_FRAME'))
 
-                elif self.state == LISTEN :
-                    output = self.blank_transmission(len(output))
+                # elif self.state == LISTEN :
+                #     # If needed 
 
                 elif self.state == BCH :
                     self.slot_cnt = 0
                     self.state = EMIT
-                    output = self.blank_transmission(len(output))
                        
-                
                 elif self.state == GUARD :
                     self.slot_cnt += 1
                     if self.slot_cnt < self.num_slots :
@@ -449,8 +458,6 @@ class sn_scheduler(gr.basic_block):
                         self.state = PROC
                         self.init_timer()
                         
-
-
                 elif self.state == PROC :
                     # End of frame --> Reset some variables
                     self.state = SLOT_READ
@@ -466,7 +473,10 @@ class sn_scheduler(gr.basic_block):
                     print("STATE ERROR")
                     exit(1)
                 
-                output = self.blank_transmission(len(output))
+                if not self.uhd:
+                    output[:] = [0]*len(output)
+                else:
+                    output = []
 
             self.samp_cnt = 0
 
@@ -479,18 +489,23 @@ class sn_scheduler(gr.basic_block):
                 if self.slot_cnt in self.slots :
                     if len(self.msg_out) == 0 :
                         output[:] = [0]*len(output)
+                        self.log("EMIT ongoing : zeros")
                     else :    
                         max_output = min(len(output), len(self.msg_out))
                         output = output[:max_output]
                         output[:] = self.msg_out[:max_output]
+                        self.log("EMIT ongoing : signal")
                         self.msg_out = self.msg_out[max_output:]
                         
                         
-                else :
-                    output = self.blank_transmission(len(output))
+                else : # Empty EMIT slots
+                    output[:] = [0]*len(output)
 
-            else :
-                output = self.blank_transmission(len(output))
+            else : 
+                if not self.uhd:
+                    output[:] = [0]*len(output)
+                else:
+                    output = []
 
             self.samp_cnt += len(output)
         ###############################################################################
@@ -500,7 +515,7 @@ class sn_scheduler(gr.basic_block):
             self.state_tag = self.state
             offset = self.nitems_written(0)+len(output)
 
-            if self.uhd and self.state == EMIT and self.slot_cnt in self.slots: 
+            if self.uhd and self.state == EMIT : 
                 # UHD length tag
                 key = pmt.intern(self.length_tag_key)
                 value = pmt.to_pmt(self.to_samples(self.STATES[2][EMIT])) 
@@ -517,12 +532,12 @@ class sn_scheduler(gr.basic_block):
                 #LOG
                 time_now = self.topblock.uhd_usrp_sink_0_0.get_time_now()
                 self.log("Data send to UHD - Current UHD Time : %s - %s - Planned TX time : %s - %s" % (time_now.get_full_secs(), time_now.get_frac_secs(), self.time_tx_scd + slot_time_full_scd, self.time_tx_frac + slot_time_frac_scd))
-
-            elif self.uhd and self.state == EMIT and self.slot_cnt not in self.slots: 
-                self.init_timer()
             
             elif not self.uhd:
-                key = pmt.intern(self.STATES[1][self.state])
+                if self.state == EMIT and self.slot_cnt in self.slots:
+                    key = pmt.intern("ACTIF")
+                else:
+                    key = pmt.intern(self.STATES[1][self.state])
                 value = pmt.to_pmt(self.slot_cnt)
                 self.add_item_tag(0,offset, key, value)
 

@@ -41,7 +41,7 @@ from gnuradio import qtgui
 
 class demo_loop_nbiot(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=100, bs_slots=range(4), cp_ratio=0.25, list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, power_tresh_detect=3):
+    def __init__(self, M=32, N=1, T_bch=100, T_g=100, T_p=500, T_s=50, bs_slots=range(4), cp_ratio=0.25, list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, power_tresh_detect=3):
         gr.top_block.__init__(self, "Demo Loop Nbiot")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop Nbiot")
@@ -153,7 +153,7 @@ class demo_loop_nbiot(gr.top_block, Qt.QWidget):
         self._qtgui_waterfall_sink_x_0_win = sip.wrapinstance(self.qtgui_waterfall_sink_x_0.pyqwidget(), Qt.QWidget)
         self.top_grid_layout.addWidget(self._qtgui_waterfall_sink_x_0_win)
         self.qtgui_time_sink_x_1 = qtgui.time_sink_c(
-        	int(200e3), #size
+        	int(samp_rate/1000 * (T_p + T_bch + (T_s + T_g) * len(bs_slots)) / ((1+cp_ratio) * M*2)), #size
         	samp_rate, #samp_rate
         	"frame_sink", #name
         	1 #number of inputs
@@ -255,27 +255,33 @@ class demo_loop_nbiot(gr.top_block, Qt.QWidget):
             M=M,
             N=N,
             T_bch=T_bch,
+            T_bch_0=10,
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
+            UHD=True,
             bs_slots=bs_slots,
             debug_log=debug_log,
             id_0=list_sensor[1],
             log=debug_log,
             samp_rate=samp_rate,
+            tag_len_id="packet_len_tx",
         )
         self.hier_sensor_nbiot_0 = hier_sensor_nbiot(
             M=M,
             N=N,
             T_bch=T_bch,
+            T_bch_0=10,
             T_g=T_g,
             T_p=T_p,
             T_s=T_s,
+            UHD=True,
             bs_slots=bs_slots,
             debug_log=debug_log,
             id_0=list_sensor[0],
             log=debug_log,
             samp_rate=samp_rate,
+            tag_len_id="packet_len_tx",
         )
         self.hier_bs_nbiot_0 = hier_bs_nbiot(
             M=M,
@@ -286,6 +292,7 @@ class demo_loop_nbiot(gr.top_block, Qt.QWidget):
             T_s=T_s,
             UHD=False,
             bs_slots=bs_slots,
+            cp_ratio=cp_ratio,
             debug_log=debug_log,
             exit_frame=1000,
             list_sensor=list_sensor,
@@ -303,7 +310,6 @@ class demo_loop_nbiot(gr.top_block, Qt.QWidget):
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
         self.blocks_socket_pdu_0_0 = blocks.socket_pdu("UDP_CLIENT", '127.0.0.1', '52002', MTU, True)
         self.blocks_socket_pdu_0 = blocks.socket_pdu("UDP_SERVER", '', '52002', MTU, True)
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((1, ))
         self.blocks_message_strobe_0 = blocks.message_strobe(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1,[1])), .01)
         self.blocks_add_xx_0_0 = blocks.add_vcc(1)
 
@@ -328,14 +334,13 @@ class demo_loop_nbiot(gr.top_block, Qt.QWidget):
         self.msg_connect((self.zeromq_sub_msg_source_0, 'out'), (self.hier_sensor_nbiot_0_0, 'Inst'))
         self.msg_connect((self.zeromq_sub_msg_source_0_0, 'out'), (self.hier_bs_nbiot_0, 'inst'))
         self.connect((self.blocks_add_xx_0_0, 0), (self.blocks_throttle_0, 0))
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_add_xx_0_0, 1))
         self.connect((self.blocks_throttle_0, 0), (self.channels_channel_model_0, 0))
         self.connect((self.channels_channel_model_0, 0), (self.hier_bs_nbiot_0, 0))
         self.connect((self.channels_channel_model_0, 0), (self.qtgui_waterfall_sink_x_0, 0))
         self.connect((self.hier_bs_nbiot_0, 0), (self.qtgui_time_sink_x_1, 0))
         self.connect((self.hier_sensor_nbiot_0, 1), (self.blocks_add_xx_0_0, 0))
         self.connect((self.hier_sensor_nbiot_0, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.hier_sensor_nbiot_0_0, 1), (self.blocks_multiply_const_vxx_0, 0))
+        self.connect((self.hier_sensor_nbiot_0_0, 1), (self.blocks_add_xx_0_0, 1))
         self.connect((self.hier_sensor_nbiot_0_0, 0), (self.qtgui_time_sink_x_0, 1))
 
     def closeEvent(self, event):
@@ -416,6 +421,7 @@ class demo_loop_nbiot(gr.top_block, Qt.QWidget):
 
     def set_cp_ratio(self, cp_ratio):
         self.cp_ratio = cp_ratio
+        self.hier_bs_nbiot_0.set_cp_ratio(self.cp_ratio)
 
     def get_list_sensor(self):
         return self.list_sensor

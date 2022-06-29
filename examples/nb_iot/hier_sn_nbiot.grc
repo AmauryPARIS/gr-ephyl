@@ -576,6 +576,53 @@
     </param>
     <param>
       <key>_coordinate</key>
+      <value>(920, 172)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>T_bch_0</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>BCH duration (ms)</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>10</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
       <value>(896, 4)</value>
     </param>
     <param>
@@ -699,6 +746,53 @@
     <param>
       <key>value</key>
       <value>50</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(184, 108)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>UHD</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Over the air</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>True</value>
     </param>
   </block>
   <block>
@@ -1989,7 +2083,7 @@
     </param>
     <param>
       <key>length_tag_key</key>
-      <value>"packet_len2"</value>
+      <value>tag_len_id</value>
     </param>
     <param>
       <key>cr</key>
@@ -2014,6 +2108,10 @@
     <param>
       <key>num_slots</key>
       <value>len(bs_slots)</value>
+    </param>
+    <param>
+      <key>uhd</key>
+      <value>UHD</value>
     </param>
     <param>
       <key>phy_option</key>
@@ -2672,6 +2770,53 @@
     <param>
       <key>value</key>
       <value>1e6</value>
+    </param>
+  </block>
+  <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1184, 1196)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>tag_len_id</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>UHD Tag length ID</value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>"packet_len_tx"</value>
     </param>
   </block>
   <block>
