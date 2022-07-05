@@ -37,7 +37,7 @@ class msg_mux(gr.sync_block):
 
     Concatenates message data coming from inputs (payload, frame & slot number)
     """
-    def __init__(self, phy_option=0, list_sensor = ["a", "b"], log=False):  # only default arguments here
+    def __init__(self, phy_option=0, list_sensor = "AB", log=False):  # only default arguments here
         """arguments to this function show up as parameters in GRC"""
         gr.sync_block.__init__(
             self,

@@ -43,7 +43,7 @@ class bs_scheduler(gr.sync_block):
     """
     def __init__(self, num_slots=5,bch_time=20,
         guard_time=100, Slot_time=50, Proc_time = 50,
-        sample_rate=200000, UHD = True,exit_frame=0, list_sensor = ["a", "b"], log=False):
+        sample_rate=200000, UHD = True,exit_frame=0, list_sensor = "AB", log=False):
         gr.sync_block.__init__(self,
             name="BS Scheduler",
             in_sig=[np.complex64],
