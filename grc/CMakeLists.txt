@@ -19,9 +19,6 @@
 
 ########################################################################
 install(FILES
-    ephyl_turbofsk_tx.xml
-    ephyl_turbofsk_tx.xml
-    ephyl_turbofsk_rx.xml
     ephyl_sn_scheduler.xml
     ephyl_tag_2_msg.xml
     ephyl_bs_scheduler.xml

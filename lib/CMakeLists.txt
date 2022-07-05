@@ -24,11 +24,7 @@ include(GrPlatform) #define LIB_SUFFIX
 
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
-
 list(APPEND ephyl_sources
-    turbofsk_tx_impl.cc
-    turbofsk_rx_impl.cc
-    init_turbofsk.cc
     gate_impl.cc
     select_m_in_n_impl.cc
 )
@@ -41,7 +37,6 @@ endif(NOT ephyl_sources)
 
 add_library(gnuradio-ephyl SHARED ${ephyl_sources})
 target_link_libraries(gnuradio-ephyl ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
-target_link_libraries(gnuradio-ephyl TurboFSK_v4)
 set_target_properties(gnuradio-ephyl PROPERTIES DEFINE_SYMBOL "gnuradio_ephyl_EXPORTS")
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
