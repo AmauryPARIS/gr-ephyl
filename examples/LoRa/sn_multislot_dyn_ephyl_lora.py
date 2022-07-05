@@ -91,6 +91,7 @@ class sn_multislot_dyn_ephyl_lora(gr.top_block):
             samp_rate=samp_rate,
             sn_id=sn_id,
             tag_len_id=tag_uhd,
+            uhd_clock_master=True,
         )
         self.zeromq_sub_msg_source_0_1 = zeromq.sub_msg_source(addr_dlcch, 100)
         self.zeromq_sub_msg_source_0_0 = zeromq.sub_msg_source(addr_sync, 100)

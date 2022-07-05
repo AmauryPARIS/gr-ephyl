@@ -1129,6 +1129,10 @@
       <value>lora_sf</value>
     </param>
     <param>
+      <key>uhd_clock_master</key>
+      <value>True</value>
+    </param>
+    <param>
       <key>tag_len_id</key>
       <value>tag_uhd</value>
     </param>

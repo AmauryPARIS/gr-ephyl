@@ -1058,7 +1058,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>file</key>
@@ -1109,7 +1109,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>file</key>
@@ -1608,11 +1608,11 @@
     </param>
     <param>
       <key>type</key>
-      <value></value>
+      <value>string</value>
     </param>
     <param>
       <key>value</key>
-      <value>["A","B"]</value>
+      <value>AB</value>
     </param>
   </block>
   <block>

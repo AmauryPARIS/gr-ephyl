@@ -1193,11 +1193,11 @@
     </param>
     <param>
       <key>type</key>
-      <value></value>
+      <value>string</value>
     </param>
     <param>
       <key>value</key>
-      <value>["A","B"]</value>
+      <value>AB</value>
     </param>
   </block>
   <block>

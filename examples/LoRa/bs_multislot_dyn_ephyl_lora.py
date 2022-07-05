@@ -26,7 +26,7 @@ import time
 
 class bs_multislot_dyn_ephyl_lora(gr.top_block):
 
-    def __init__(self, M=32, S=4, T_bch=200, T_g=20, T_p=1000, T_s=70, cp_ratio=0.25, debug_log=False, ip_decision_layer_addr='localhost', list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_bs_feedback=5562, port_bs_inst=5561, power_tresh=-30, sample_rate=250e3, sn_1_ip_addr='mnode4', sn_2_ip_addr='mnode5'):
+    def __init__(self, M=32, S=4, T_bch=200, T_g=20, T_p=1000, T_s=70, cp_ratio=0.25, debug_log=False, ip_decision_layer_addr='localhost', list_sensor='AB', lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_bs_feedback=5562, port_bs_inst=5561, power_tresh=-30, sample_rate=250e3, sn_1_ip_addr='mnode4', sn_2_ip_addr='mnode5'):
         gr.top_block.__init__(self, "BS flowgraph")
 
         ##################################################
@@ -133,10 +133,6 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
         self.uhd_usrp_source_0_0.set_auto_dc_offset(True, 0)
         self.uhd_usrp_source_0_0.set_auto_iq_balance(True, 0)
         self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_gr_complex*1)
-        self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_gr_complex*1, 'raw', False)
-        self.blocks_file_sink_1.set_unbuffered(False)
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_gr_complex*1, 'slot', False)
-        self.blocks_file_sink_0.set_unbuffered(False)
 
 
 
@@ -150,9 +146,7 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
         self.msg_connect((self.zeromq_sub_msg_source_0_0, 'out'), (self.hier_bs_lora_0, 'inst'))
         self.msg_connect((self.zeromq_sub_msg_source_0_0_0, 'out'), (self.hier_bs_lora_0, 'ULCCH'))
         self.msg_connect((self.zeromq_sub_msg_source_0_0_0_0, 'out'), (self.hier_bs_lora_0, 'ULCCH'))
-        self.connect((self.hier_bs_lora_0, 0), (self.blocks_file_sink_0, 0))
         self.connect((self.hier_bs_lora_0, 0), (self.blocks_null_sink_0, 0))
-        self.connect((self.uhd_usrp_source_0_0, 0), (self.blocks_file_sink_1, 0))
         self.connect((self.uhd_usrp_source_0_0, 0), (self.hier_bs_lora_0, 0))
 
     def get_M(self):
@@ -440,6 +434,9 @@ def argument_parser():
         "", "--ip-decision-layer-addr", dest="ip_decision_layer_addr", type="string", default='localhost',
         help="Set IP/name of decision layer [default=%default]")
     parser.add_option(
+        "", "--list-sensor", dest="list_sensor", type="string", default='AB',
+        help="Set List of sensors [default=%default]")
+    parser.add_option(
         "", "--lora-bw", dest="lora_bw", type="eng_float", default=eng_notation.num_to_str(250e3),
         help="Set Bandwidth - LoRa [default=%default]")
     parser.add_option(
@@ -470,7 +467,7 @@ def main(top_block_cls=bs_multislot_dyn_ephyl_lora, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls(M=options.M, S=options.S, debug_log=options.debug_log, ip_decision_layer_addr=options.ip_decision_layer_addr, lora_bw=options.lora_bw, lora_cr=options.lora_cr, lora_crc=options.lora_crc, lora_sf=options.lora_sf, power_tresh=options.power_tresh, sample_rate=options.sample_rate, sn_1_ip_addr=options.sn_1_ip_addr, sn_2_ip_addr=options.sn_2_ip_addr)
+    tb = top_block_cls(M=options.M, S=options.S, debug_log=options.debug_log, ip_decision_layer_addr=options.ip_decision_layer_addr, list_sensor=options.list_sensor, lora_bw=options.lora_bw, lora_cr=options.lora_cr, lora_crc=options.lora_crc, lora_sf=options.lora_sf, power_tresh=options.power_tresh, sample_rate=options.sample_rate, sn_1_ip_addr=options.sn_1_ip_addr, sn_2_ip_addr=options.sn_2_ip_addr)
     tb.start()
     try:
         raw_input('Press Enter to quit: ')

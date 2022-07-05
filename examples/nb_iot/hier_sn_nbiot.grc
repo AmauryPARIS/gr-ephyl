@@ -2137,6 +2137,10 @@
       <key>wanted_tag</key>
       <value>'corr_est'</value>
     </param>
+    <param>
+      <key>clock_master</key>
+      <value>True</value>
+    </param>
   </block>
   <block>
     <key>fec_extended_tagged_encoder</key>

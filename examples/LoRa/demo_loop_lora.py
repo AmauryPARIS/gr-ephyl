@@ -41,7 +41,7 @@ from gnuradio import qtgui
 
 class demo_loop_lora(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=100, T_g=50, T_p=500, T_s=50, bs_slots=range(4), cp_ratio=0.25, list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, power_tresh_detect=-8):
+    def __init__(self, M=32, N=1, T_bch=100, T_g=50, T_p=500, T_s=50, bs_slots=range(4), cp_ratio=0.25, list_sensor='AB', lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, power_tresh_detect=-8):
         gr.top_block.__init__(self, "Demo Loop Lora")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop Lora")
@@ -267,6 +267,7 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
             samp_rate=samp_rate,
             sn_id=list_sensor[1],
             tag_len_id="packet_len_tx",
+            uhd_clock_master=False,
         )
         self.hier_sensor_lora_0 = hier_sensor_lora(
             M=M,
@@ -284,6 +285,7 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
             samp_rate=samp_rate,
             sn_id=list_sensor[0],
             tag_len_id="packet_len_tx",
+            uhd_clock_master=False,
         )
         self.hier_bs_lora_0 = hier_bs_lora(
             M=M,
@@ -547,6 +549,9 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
 def argument_parser():
     parser = OptionParser(usage="%prog: [options]", option_class=eng_option)
     parser.add_option(
+        "", "--list-sensor", dest="list_sensor", type="string", default='AB',
+        help="Set List of sensors [default=%default]")
+    parser.add_option(
         "", "--lora-bw", dest="lora_bw", type="eng_float", default=eng_notation.num_to_str(250e3),
         help="Set Bandwidth - LoRa [default=%default]")
     parser.add_option(
@@ -571,7 +576,7 @@ def main(top_block_cls=demo_loop_lora, options=None):
         Qt.QApplication.setGraphicsSystem(style)
     qapp = Qt.QApplication(sys.argv)
 
-    tb = top_block_cls(lora_bw=options.lora_bw, lora_cr=options.lora_cr, lora_crc=options.lora_crc, lora_sf=options.lora_sf)
+    tb = top_block_cls(list_sensor=options.list_sensor, lora_bw=options.lora_bw, lora_cr=options.lora_cr, lora_crc=options.lora_crc, lora_sf=options.lora_sf)
     tb.start()
     tb.show()
 
