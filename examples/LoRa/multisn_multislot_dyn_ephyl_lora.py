@@ -26,7 +26,7 @@ import time
 
 class multisn_multislot_dyn_ephyl_lora(gr.top_block):
 
-    def __init__(self, M=32, S=1, T_bch=200, T_g=20, T_p=1000, T_s=70, cp_ratio=0.25, debug_log=False, ip_bs_addr='mnode3', ip_decision_layer_addr='localhost', list_sensor=["A","B"], lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_sn_feedback=5560, port_sn_inst=5559, sample_rate=250e3):
+    def __init__(self, M=32, S=1, T_bch=200, T_g=20, T_p=1000, T_s=70, cp_ratio=0.25, debug_log=False, ip_bs_addr='mnode3', ip_decision_layer_addr='localhost', list_sensor='AB', lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, port_sn_feedback=5560, port_sn_inst=5559, sample_rate=250e3):
         gr.top_block.__init__(self, "Multi-Sensor flowgraph")
 
         ##################################################
@@ -59,6 +59,7 @@ class multisn_multislot_dyn_ephyl_lora(gr.top_block):
         self.port_sync = port_sync = 5556
         self.port_dlcch = port_dlcch = 5600
         self.bs_slots = bs_slots = range(S)
+        self.variable_function_probe_0_0 = variable_function_probe_0_0 = 0
         self.variable_function_probe_0 = variable_function_probe_0 = 0
         self.tag_uhd = tag_uhd = "packet_len_id"
         self.samp_rate = samp_rate = int(sample_rate)
@@ -91,12 +92,26 @@ class multisn_multislot_dyn_ephyl_lora(gr.top_block):
             samp_rate=samp_rate,
             sn_id=list_sensor[0],
             tag_len_id=tag_uhd,
+            uhd_clock_master=True,
         )
         self.zeromq_sub_msg_source_0_1 = zeromq.sub_msg_source(addr_dlcch, 100)
         self.zeromq_sub_msg_source_0_0 = zeromq.sub_msg_source(addr_sync, 100)
         self.zeromq_sub_msg_source_0 = zeromq.sub_msg_source(addr_sn_inst, 100)
         self.zeromq_pub_msg_sink_0_0 = zeromq.pub_msg_sink(addr_ulcch, 100)
         self.zeromq_pub_msg_sink_0 = zeromq.pub_msg_sink(addr_sn_feedback, 100)
+
+        def _variable_function_probe_0_0_probe():
+            while True:
+                val = self.hier_sensor_lora_0.ephyl_sn_scheduler_0_0.set_top_block(self)
+                try:
+                    self.set_variable_function_probe_0_0(val)
+                except AttributeError:
+                    pass
+                time.sleep(1.0 / (10))
+        _variable_function_probe_0_0_thread = threading.Thread(target=_variable_function_probe_0_0_probe)
+        _variable_function_probe_0_0_thread.daemon = True
+        _variable_function_probe_0_0_thread.start()
+
 
         def _variable_function_probe_0_probe():
             while True:
@@ -142,6 +157,7 @@ class multisn_multislot_dyn_ephyl_lora(gr.top_block):
             samp_rate=samp_rate,
             sn_id=list_sensor[1],
             tag_len_id=tag_uhd,
+            uhd_clock_master=False,
         )
         self.blocks_tag_gate_0 = blocks.tag_gate(gr.sizeof_gr_complex * 1, False)
         self.blocks_tag_gate_0.set_single_key("")
@@ -350,6 +366,12 @@ class multisn_multislot_dyn_ephyl_lora(gr.top_block):
         self.hier_sensor_lora_0_0.set_bs_slots(self.bs_slots)
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
+    def get_variable_function_probe_0_0(self):
+        return self.variable_function_probe_0_0
+
+    def set_variable_function_probe_0_0(self, variable_function_probe_0_0):
+        self.variable_function_probe_0_0 = variable_function_probe_0_0
+
     def get_variable_function_probe_0(self):
         return self.variable_function_probe_0
 
@@ -450,6 +472,9 @@ def argument_parser():
         "", "--ip-decision-layer-addr", dest="ip_decision_layer_addr", type="string", default='localhost',
         help="Set IP/name of decision layer [default=%default]")
     parser.add_option(
+        "", "--list-sensor", dest="list_sensor", type="string", default='AB',
+        help="Set List of sensors [default=%default]")
+    parser.add_option(
         "", "--lora-bw", dest="lora_bw", type="eng_float", default=eng_notation.num_to_str(250e3),
         help="Set Bandwidth - LoRa [default=%default]")
     parser.add_option(
@@ -471,7 +496,7 @@ def main(top_block_cls=multisn_multislot_dyn_ephyl_lora, options=None):
     if options is None:
         options, _ = argument_parser().parse_args()
 
-    tb = top_block_cls(S=options.S, T_p=options.T_p, debug_log=options.debug_log, ip_bs_addr=options.ip_bs_addr, ip_decision_layer_addr=options.ip_decision_layer_addr, lora_bw=options.lora_bw, lora_cr=options.lora_cr, lora_crc=options.lora_crc, lora_sf=options.lora_sf, sample_rate=options.sample_rate)
+    tb = top_block_cls(S=options.S, T_p=options.T_p, debug_log=options.debug_log, ip_bs_addr=options.ip_bs_addr, ip_decision_layer_addr=options.ip_decision_layer_addr, list_sensor=options.list_sensor, lora_bw=options.lora_bw, lora_cr=options.lora_cr, lora_crc=options.lora_crc, lora_sf=options.lora_sf, sample_rate=options.sample_rate)
     tb.start()
     try:
         raw_input('Press Enter to quit: ')
