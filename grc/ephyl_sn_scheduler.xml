@@ -4,7 +4,7 @@
   <key>ephyl_sn_scheduler</key>
   <category>[ephyl]</category>
   <import>import ephyl</import>
-  <make>ephyl.sn_scheduler($phy_option, $uhd, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate, $ID, $log, $sf, $cr, $crc)</make>
+  <make>ephyl.sn_scheduler($phy_option, $uhd, $clock_master, $num_slots, $bch_time, $guard_time, $Slot_time, $Proc_time, $wanted_tag,$length_tag_key, $samp_rate, $ID, $log, $sf, $cr, $crc)</make>
  
   <param>
     <name>PHY Option</name>
@@ -30,6 +30,14 @@
     <key>uhd</key>
     <value>False</value>
     <type>bool</type>
+  </param>
+
+  <param>
+    <name>UHD Clock Master</name>
+    <key>clock_master</key>
+    <value>True</value>
+    <type>bool</type>
+    <hide>#if str($uhd()) == 'True' then 'none' else 'all'#</hide>
   </param>
 
   <param>

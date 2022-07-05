@@ -45,7 +45,7 @@ class sn_scheduler(gr.basic_block):
     """
     EPHYL Sensor Scheduler
     """
-    def __init__(self, phy_option=0, uhd=True,
+    def __init__(self, phy_option=0, uhd=True, clock_master=True,
         num_slots=5, bch_time=20, guard_time=100, Slot_time=50, Proc_time = 50, 
         wanted_tag="corr_start",length_tag_key="packet_len2",samp_rate = 32000, ID = "Z", log=False, sf=7, cr=4, crc=True):
         gr.basic_block.__init__(self,
@@ -61,6 +61,7 @@ class sn_scheduler(gr.basic_block):
         self.samp_rate = int(samp_rate/1000)
         self.logged = log
         self.uhd = uhd
+        self.clock_master = clock_master
 
         self.lora_sf = sf
         self.lora_cr = cr
@@ -252,7 +253,7 @@ class sn_scheduler(gr.basic_block):
             elif l[0] == "corr_est":
                 self.frame_cnt = int(l[1])
 
-                if self.uhd and self.frame_cnt == 0:
+                if self.uhd and self.frame_cnt == 0 and self.clock_master:
                     self.topblock.uhd_usrp_sink_0_0.set_time_next_pps(uhd.time_spec(0, 0))
 
                 # transmit ULCCH
@@ -530,9 +531,12 @@ class sn_scheduler(gr.basic_block):
                 self.add_item_tag(0,offset, key, value)
 
                 #LOG
-                time_now = self.topblock.uhd_usrp_sink_0_0.get_time_now()
-                self.log("Data send to UHD - Current UHD Time : %s - %s - Planned TX time : %s - %s" % (time_now.get_full_secs(), time_now.get_frac_secs(), self.time_tx_scd + slot_time_full_scd, self.time_tx_frac + slot_time_frac_scd))
-            
+                if self.clock_master:
+                    time_now = self.topblock.uhd_usrp_sink_0_0.get_time_now()
+                    self.log("Data send to UHD - Current UHD Time : %s - %s - Planned TX time : %s - %s" % (time_now.get_full_secs(), time_now.get_frac_secs(), self.time_tx_scd + slot_time_full_scd, self.time_tx_frac + slot_time_frac_scd))
+                else:
+                    self.log("Data send to UHD - Planned TX time : %s - %s" % (self.time_tx_scd + slot_time_full_scd, self.time_tx_frac + slot_time_frac_scd))
+                    
             elif not self.uhd:
                 if self.state == EMIT and self.slot_cnt in self.slots:
                     key = pmt.intern("ACTIF")
