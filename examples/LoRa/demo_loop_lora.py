@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Demo Loop Lora
-# GNU Radio version: 3.7.13.5
+# GNU Radio version: 3.7.14.0
 ##################################################
 
 if __name__ == '__main__':
@@ -41,7 +41,7 @@ from gnuradio import qtgui
 
 class demo_loop_lora(gr.top_block, Qt.QWidget):
 
-    def __init__(self, M=32, N=1, T_bch=100, T_g=50, T_p=500, T_s=50, bs_slots=range(4), cp_ratio=0.25, list_sensor='AB', lora_bw=250e3, lora_cr=4, lora_crc=True, lora_sf=7, power_tresh_detect=-8):
+    def __init__(self, M=32, N=1, T_bch=100, T_g=50, T_p=500, T_s=50, bs_slots=range(4), cp_ratio=0.25, list_sensor='AB', lora_bw=250000, lora_cr=4, lora_crc=True, lora_sf=7, power_tresh_detect=-8):
         gr.top_block.__init__(self, "Demo Loop Lora")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Demo Loop Lora")
@@ -88,7 +88,7 @@ class demo_loop_lora(gr.top_block, Qt.QWidget):
         # Variables
         ##################################################
         self.time_offset = time_offset = 1
-        self.samp_rate = samp_rate = 250e3
+        self.samp_rate = samp_rate = int(250000)
         self.phase = phase = 0
         self.noise_voltage = noise_voltage = 0.1
         self.freq_offset = freq_offset = 0
@@ -552,7 +552,7 @@ def argument_parser():
         "", "--list-sensor", dest="list_sensor", type="string", default='AB',
         help="Set List of sensors [default=%default]")
     parser.add_option(
-        "", "--lora-bw", dest="lora_bw", type="eng_float", default=eng_notation.num_to_str(250e3),
+        "", "--lora-bw", dest="lora_bw", type="intx", default=250000,
         help="Set Bandwidth - LoRa [default=%default]")
     parser.add_option(
         "", "--lora-cr", dest="lora_cr", type="intx", default=4,
