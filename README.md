@@ -1,4 +1,4 @@
-# ge_ephyl v2 / S3CAP project
+# gr_ephyl v2 / S3CAP project
 This project is an adaptation of the [gr_ephyl](https://raweb.inria.fr/rapportsactivite/RA2019/maracas/uid47.html) project, creating a slotted and uplink framework to work on PHY or MAC layer.
 
 ![Flowgraph layout](png/ephyl_layout.png) 
