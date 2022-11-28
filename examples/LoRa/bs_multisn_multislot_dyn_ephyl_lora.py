@@ -89,7 +89,7 @@ class bs_multisn_multislot_dyn_ephyl_lora(gr.top_block):
             exit_frame=1000,
             list_sensor=list_sensor,
             log=debug_log,
-            lora_bw=lora_bw,
+            lora_bw=int(lora_bw),
             lora_cr=lora_cr,
             lora_crc=lora_crc,
             lora_sf=lora_sf,
@@ -231,7 +231,7 @@ class bs_multisn_multislot_dyn_ephyl_lora(gr.top_block):
 
     def set_lora_bw(self, lora_bw):
         self.lora_bw = lora_bw
-        self.hier_bs_lora_0.set_lora_bw(self.lora_bw)
+        self.hier_bs_lora_0.set_lora_bw(int(self.lora_bw))
 
     def get_lora_cr(self):
         return self.lora_cr

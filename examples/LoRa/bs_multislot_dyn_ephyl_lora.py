@@ -56,14 +56,13 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = int(sample_rate)
         self.port_ulcch_2 = port_ulcch_2 = 5602
         self.port_ulcch_1 = port_ulcch_1 = 5601
         self.port_sync = port_sync = 5556
         self.port_dlcch = port_dlcch = 5600
         self.bs_slots = bs_slots = range(S)
         self.variable_function_probe_0 = variable_function_probe_0 = 0
-        self.variable_0 = variable_0 = int(samp_rate/1000 * (T_p + T_bch + (T_s + T_g) * len(bs_slots)))
+        self.samp_rate = samp_rate = int(sample_rate)
         self.gain = gain = 25
         self.freq = freq = 2450e6
         self.frame_len = frame_len = (T_bch+len(bs_slots)*(T_s+T_g)+T_p)/float(1000)
@@ -169,7 +168,6 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_T_bch(self, T_bch):
         self.T_bch = T_bch
         self.hier_bs_lora_0.set_T_bch(self.T_bch)
-        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_T_g(self):
@@ -178,7 +176,6 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_T_g(self, T_g):
         self.T_g = T_g
         self.hier_bs_lora_0.set_T_g(self.T_g)
-        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_T_p(self):
@@ -187,7 +184,6 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_T_p(self, T_p):
         self.T_p = T_p
         self.hier_bs_lora_0.set_T_p(self.T_p)
-        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_T_s(self):
@@ -196,7 +192,6 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_T_s(self, T_s):
         self.T_s = T_s
         self.hier_bs_lora_0.set_T_s(self.T_s)
-        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_cp_ratio(self):
@@ -296,15 +291,6 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
         self.sn_2_ip_addr = sn_2_ip_addr
         self.set_addr_2_ulcch("tcp://" + str(self.sn_2_ip_addr) + ":" + str(self.port_ulcch_2))
 
-    def get_samp_rate(self):
-        return self.samp_rate
-
-    def set_samp_rate(self, samp_rate):
-        self.samp_rate = samp_rate
-        self.hier_bs_lora_0.set_samp_rate(self.samp_rate)
-        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
-        self.uhd_usrp_source_0_0.set_samp_rate(self.samp_rate)
-
     def get_port_ulcch_2(self):
         return self.port_ulcch_2
 
@@ -339,7 +325,6 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_bs_slots(self, bs_slots):
         self.bs_slots = bs_slots
         self.hier_bs_lora_0.set_bs_slots(self.bs_slots)
-        self.set_variable_0(int(self.samp_rate/1000 * (self.T_p + self.T_bch + (self.T_s + self.T_g) * len(self.bs_slots))))
         self.set_frame_len((self.T_bch+len(self.bs_slots)*(self.T_s+self.T_g)+self.T_p)/float(1000))
 
     def get_variable_function_probe_0(self):
@@ -348,11 +333,13 @@ class bs_multislot_dyn_ephyl_lora(gr.top_block):
     def set_variable_function_probe_0(self, variable_function_probe_0):
         self.variable_function_probe_0 = variable_function_probe_0
 
-    def get_variable_0(self):
-        return self.variable_0
+    def get_samp_rate(self):
+        return self.samp_rate
 
-    def set_variable_0(self, variable_0):
-        self.variable_0 = variable_0
+    def set_samp_rate(self, samp_rate):
+        self.samp_rate = samp_rate
+        self.hier_bs_lora_0.set_samp_rate(self.samp_rate)
+        self.uhd_usrp_source_0_0.set_samp_rate(self.samp_rate)
 
     def get_gain(self):
         return self.gain

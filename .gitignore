@@ -1,6 +1,5 @@
 
 /build/*
 *.so
-*.png
 *.pyc
 *.txt

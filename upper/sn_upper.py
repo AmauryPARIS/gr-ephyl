@@ -13,7 +13,7 @@ parser.add_argument('--rxPort', help="Port used by the upper layer to receive th
 parser.add_argument('--txPort', help="Port used by the upper layer to transmit instructions to the PHY layer", type= str, default="5559")
 parser.add_argument('--bs',     help="Upper layer for BS (True) or sensor (False)", type= bool, default=False)
 parser.add_argument('--list_sensors', help="List of used sensors ID", type= list, default=["A", "B"])
-parser.add_argument('--slot_count', help="Number of slot used in the PHY layer", type= int, default=5)
+parser.add_argument('--slot_count', help="Number of slot used in the PHY layer", type= int, default=4)
 parser.add_argument('--logged', help="Create log file", type= bool, default=False)
 args=parser.parse_args()
 

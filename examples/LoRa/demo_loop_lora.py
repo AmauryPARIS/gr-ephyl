@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Demo Loop Lora
-# GNU Radio version: 3.7.14.0
+# GNU Radio version: 3.7.13.5
 ##################################################
 
 if __name__ == '__main__':
