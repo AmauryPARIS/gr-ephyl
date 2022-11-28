@@ -1,5 +1,6 @@
 # ge_ephyl v2 / S3CAP project
 This project is an adaptation of the [gr_ephyl](https://raweb.inria.fr/rapportsactivite/RA2019/maracas/uid47.html) project, creating a slotted and uplink framework to work on PHY or MAC layer.
+
 ![Flowgraph layout](png/ephyl_layout.png) 
 
 ## Installation
@@ -26,6 +27,7 @@ Depending on the flowgraph you would like to use, generating the python executab
 
 ## Usage 
 This project offers a slotted and uplink transmission from multiple nodes to a base station. For each frame, the access policy of the MAC layer will set packets to be transmitted on chosen slots, and control messages. Then the PHY layer will generate and transmit all needed signals during the slotted time frame, to be finally received by the base station. Both nodes and the base station use the results of the previous frame to decide their next actions.   
+
 ![Flowgraph layout](png/ephyl_timetable.png) 
 
 ### MAC layer
