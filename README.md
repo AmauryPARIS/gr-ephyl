@@ -79,7 +79,7 @@ python2 /root/cxlb_toolchain_build/gr-ephyl/examples/LoRa/bs_multisn_multislot_d
 ```
 
 ## Documentation 
-Detailed documentation is available in the `documentation folder`
+Detailed documentation is available in the `documentation folder` and [here](https://hal.inria.fr/hal-03876369)
 
 ## Known error
 
