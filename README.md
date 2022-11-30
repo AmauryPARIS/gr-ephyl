@@ -20,7 +20,9 @@ docker pull m1mbert/cxlb-gnuradio-3.7
 docker run -dti --net=host --expose 2222 --privileged m1mbert/cxlb-gnuradio-3.7:1.0
 ```
 
-This will enable the usage of the main OOT blocks of the ephyl/s3cap project. If you want to use the available LoRa PHY layer (based on this [project](https://github.com/AmauryPARIS/LoRa_PHY_Cxlb)), you also need to install it. You can follow the installation step (don't forget to source `setpaths.sh`). 
+This will enable the usage of the main OOT blocks of the ephyl/s3cap project. If you want to use the available LoRa PHY layer (based on this [project](https://github.com/AmauryPARIS/LoRa_PHY_Cxlb)), you also need to install it. You can follow the installation step (don't forget to source `setpaths.sh`).
+
+For an easier "plug and play" solution, you can use this [docker image](https://hub.docker.com/repository/docker/amauryparis/s3cap) where both EPHYL/S3CAP and LoRa are installed.
 
 ### GNU Radio hier blocks
 Depending on the flowgraph you would like to use, generating the python executable of the needed hierarchical block will be required. 
@@ -80,6 +82,7 @@ python2 /root/cxlb_toolchain_build/gr-ephyl/examples/LoRa/bs_multisn_multislot_d
 
 ## Documentation 
 Detailed documentation is available in the `documentation folder` and [here](https://hal.inria.fr/hal-03876369)
+A tutorial is available on the FIT/CorteXlab wiki page, [here](https://wiki.cortexlab.fr/doku.php?id=ephyl_framework_v2).
 
 ## Known error
 
